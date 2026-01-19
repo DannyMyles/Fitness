@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/components/ui/Navigation";
 import Footer from "@/components/ui/Footer";
 import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
+import AuthProvider from "./providers/AuthProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -38,12 +39,14 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="min-h-screen bg-fitness-light font-sans">
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <WhatsAppWidget />
+        <AuthProvider>
+          <Navigation />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+          <WhatsAppWidget />
+        </AuthProvider>
       </body>
     </html>
   );
