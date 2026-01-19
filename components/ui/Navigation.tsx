@@ -4,68 +4,26 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Menu, X, Phone, ChevronDown, 
-  Search, Mail, Clock, ChevronRight, User,
-  Dumbbell, Heart, Zap, Users
+  Phone, Mail, Clock, Zap, User,
+  Dumbbell, Menu, X
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 type NavItem = {
   name: string;
   href: string;
-  submenu?: SubMenuItem[];
-};
-
-type SubMenuItem = {
-  name: string;
-  subitems?: NestedMenuItem[];
-  href?: string;
-};
-
-type NestedMenuItem = {
-  name: string;
-  href: string;
-};
-
-const hasSubitems = (item: SubMenuItem): item is SubMenuItem & { subitems: NestedMenuItem[] } => {
-  return 'subitems' in item && Array.isArray((item as any).subitems);
 };
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const navigation = {
     main: [
       { name: 'Home', href: '/' },
       { name: 'About', href: '/about' },
-      { 
-        name: 'Services', 
-        href: '/services',
-        submenu: [
-          { 
-            name: 'Training Programs', 
-            subitems: [
-              { name: 'Personal Training', href: '/services/personal-training' },
-              { name: 'Group Classes', href: '/services/group-classes' },
-              { name: 'Online Training', href: '/services/online-training' },
-              { name: 'Custom Programs', href: '/services/custom-programs' },
-            ]
-          },
-          { 
-            name: 'Nutrition', 
-            subitems: [
-              { name: 'Meal Planning', href: '/services/meal-planning' },
-              { name: 'Nutrition Coaching', href: '/services/nutrition-coaching' },
-              { name: 'Weight Management', href: '/services/weight-management' },
-            ]
-          },
-          { name: 'All Services', href: '/services' },
-        ]
-      },
+      { name: 'Services', href: '/services' },
       { name: 'Gallery', href: '/gallery' },
       { name: 'Events', href: '/events' },
       { name: 'Shop', href: '/shop' },
@@ -84,7 +42,6 @@ const Navigation = () => {
 
   useEffect(() => {
     setIsMenuOpen(false);
-    setMobileMenuOpen(false);
   }, [pathname]);
 
   const isActiveLink = (href: string) => {
@@ -92,14 +49,6 @@ const Navigation = () => {
       return pathname === href;
     }
     return pathname.startsWith(href);
-  };
-
-  const handleMouseEnter = (itemName: string) => {
-    setActiveDropdown(itemName);
-  };
-
-  const handleMouseLeave = () => {
-    setActiveDropdown(null);
   };
 
   return (
@@ -190,105 +139,22 @@ const Navigation = () => {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
               {navigation.main.map((item) => (
-                <div 
-                  key={item.name} 
-                  className="relative"
-                  onMouseEnter={() => item.submenu && handleMouseEnter(item.name)}
-                  onMouseLeave={handleMouseLeave}
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`px-4 py-3 font-medium transition-all duration-300 relative ${
+                    isActiveLink(item.href)
+                      ? 'text-fitness-primary'
+                      : 'text-gray-700 hover:text-fitness-primary'
+                  }`}
                 >
-                  {item.submenu ? (
-                    <div className="group">
-                      <button 
-                        className={`flex items-center gap-1.5 px-4 py-3 font-medium transition-all duration-300 relative ${
-                          isActiveLink(item.href)
-                            ? 'text-fitness-primary'
-                            : 'text-gray-700 hover:text-fitness-primary'
-                        }`}>
-                        <span className="relative">
-                          {item.name}
-                          <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-fitness-primary to-fitness-accent transition-all duration-300 ${
-                            isActiveLink(item.href) ? 'w-full' : 'w-0 group-hover:w-full'
-                          }`}></span>
-                        </span>
-                        <ChevronDown 
-                          size={16} 
-                          className={`transition-transform duration-300 ${
-                            activeDropdown === item.name ? 'rotate-180' : ''
-                          } ${isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-500'}`} 
-                        />
-                      </button>
-                      <div 
-                        className={`absolute left-0 top-full mt-2 w-72 bg-white rounded-2xl shadow-fitness-lg border border-gray-100 overflow-hidden transition-all duration-400 origin-top ${
-                          activeDropdown === item.name 
-                            ? 'opacity-100 visible translate-y-0' 
-                            : 'opacity-0 invisible -translate-y-4'
-                        }`}
-                      >
-                        <div className="p-3">
-                          {item.submenu.map((subItem) => (
-                            hasSubitems(subItem) ? (
-                              <div key={subItem.name} className="relative group/sub">
-                                <div className="flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-gradient-to-r hover:from-fitness-primary/5 hover:to-fitness-accent/5 hover:text-fitness-primary rounded-xl transition-all duration-300 cursor-pointer">
-                                  <span className="font-medium">{subItem.name}</span>
-                                  <ChevronRight size={16} className="text-fitness-primary transition-transform duration-300 group-hover/sub:translate-x-1" />
-                                </div>
-                                <div 
-                                  className={`absolute left-full top-0 ml-2 w-64 bg-white rounded-2xl shadow-fitness-lg border border-gray-100 overflow-hidden transition-all duration-400 origin-left ${
-                                    activeDropdown === subItem.name ? 'opacity-100 visible' : 'opacity-0 invisible'
-                                  }`}
-                                >
-                                  <div className="p-3">
-                                    {subItem.subitems?.map((nestedItem) => (
-                                      <Link
-                                        key={nestedItem.name}
-                                        href={nestedItem.href}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                                          isActiveLink(nestedItem.href)
-                                            ? 'bg-gradient-to-r from-fitness-primary/10 to-fitness-accent/10 text-fitness-primary'
-                                            : 'text-gray-700 hover:bg-gradient-to-r hover:from-fitness-primary/5 hover:to-fitness-accent/5 hover:text-fitness-primary'
-                                        }`}
-                                      >
-                                        <span className="font-medium">{nestedItem.name}</span>
-                                      </Link>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <Link
-                                key={subItem.name}
-                                href={subItem.href!}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                                  isActiveLink(subItem.href!)
-                                    ? 'bg-gradient-to-r from-fitness-primary/10 to-fitness-accent/10 text-fitness-primary'
-                                    : 'text-gray-700 hover:bg-gradient-to-r hover:from-fitness-primary/5 hover:to-fitness-accent/5 hover:text-fitness-primary'
-                                }`}
-                              >
-                                <span className="font-medium">{subItem.name}</span>
-                              </Link>
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={`px-4 py-3 font-medium transition-all duration-300 relative ${
-                        isActiveLink(item.href)
-                          ? 'text-fitness-primary'
-                          : 'text-gray-700 hover:text-fitness-primary'
-                      }`}
-                    >
-                      <span className="relative">
-                        {item.name}
-                        <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-fitness-primary to-fitness-accent transition-all duration-300 ${
-                          isActiveLink(item.href) ? 'w-full' : 'w-0 hover:w-full'
-                        }`}></span>
-                      </span>
-                    </Link>
-                  )}
-                </div>
+                  <span className="relative">
+                    {item.name}
+                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-fitness-primary to-fitness-accent transition-all duration-300 ${
+                      isActiveLink(item.href) ? 'w-full' : 'w-0 hover:w-full'
+                    }`}></span>
+                  </span>
+                </Link>
               ))}
             </nav>
 
@@ -336,63 +202,15 @@ const Navigation = () => {
               <div className="space-y-1">
                 {navigation.main.map((item) => (
                   <div key={item.name} className="border-b border-gray-100 last:border-0">
-                    {item.submenu ? (
-                      <details className="group">
-                        <summary className={`flex items-center justify-between py-4 font-semibold cursor-pointer list-none transition-colors duration-300 ${
-                          isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-700'
-                        }`}>
-                          {item.name}
-                          <ChevronDown size={20} className="transition-transform duration-300 group-open:rotate-180" />
-                        </summary>
-                        <div className="pb-4 pl-4">
-                          {item.submenu.map((subItem) => (
-                            hasSubitems(subItem) ? (
-                              <details key={subItem.name} className="group/sub">
-                                <summary className="flex items-center justify-between py-3 px-4 cursor-pointer list-none text-gray-600 hover:text-fitness-primary transition-colors duration-300">
-                                  {subItem.name}
-                                  <ChevronRight size={16} className="transition-transform duration-300 group-open/sub:rotate-90" />
-                                </summary>
-                                <div className="ml-4">
-                                  {subItem.subitems?.map((nestedItem) => (
-                                    <Link
-                                      key={nestedItem.name}
-                                      href={nestedItem.href}
-                                      onClick={() => setIsMenuOpen(false)}
-                                      className="flex items-center gap-3 py-3 px-4 rounded-lg text-gray-600 hover:bg-gradient-to-r hover:from-fitness-primary/5 hover:to-fitness-accent/5 hover:text-fitness-primary transition-all duration-300"
-                                    >
-                                      {nestedItem.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </details>
-                            ) : (
-                              <Link
-                                key={subItem.name}
-                                href={subItem.href!}
-                                onClick={() => setIsMenuOpen(false)}
-                                className={`flex items-center gap-3 py-3 px-4 rounded-lg transition-all duration-300 ${
-                                  isActiveLink(subItem.href!) 
-                                    ? 'bg-gradient-to-r from-fitness-primary/5 to-fitness-accent/5 text-fitness-primary' 
-                                    : 'text-gray-600 hover:bg-gradient-to-r hover:from-fitness-primary/5 hover:to-fitness-accent/5 hover:text-fitness-primary'
-                                }`}
-                              >
-                                {subItem.name}
-                              </Link>
-                            )
-                          ))}
-                        </div>
-                      </details>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`flex items-center justify-between py-4 font-semibold transition-all duration-300 ${
-                          isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-700 hover:text-fitness-primary'
-                        }`}
-                      >
-                        {item.name}
-                      </Link>
-                    )}
+                    <Link
+                      href={item.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center justify-between py-4 font-semibold transition-all duration-300 ${
+                        isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-700 hover:text-fitness-primary'
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
                   </div>
                 ))}
               </div>
