@@ -272,7 +272,7 @@ export default function BlogManagementPage() {
           </button>
           <Link
             href="/admin/blog/create"
-            className="btn-adventure flex items-center gap-2 w-fit"
+            className="btn-primary flex items-center gap-2 w-fit"
           >
             <Plus className="h-5 w-5" />
             New Blog Post
@@ -282,28 +282,28 @@ export default function BlogManagementPage() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="adventure-card">
+        <div className="admin-card">
           <p className="text-sm text-gray-600">Total Posts</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">{stats.totalBlogs}</p>
         </div>
-        <div className="adventure-card">
+        <div className="admin-card">
           <p className="text-sm text-gray-600">With Images</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">{stats.blogsWithImages}</p>
           <p className="text-xs text-gray-500 mt-1">
             {stats.blogsWithImages > 0 ? Math.round((stats.blogsWithImages / stats.totalBlogs) * 100) : 0}% coverage
           </p>
         </div>
-        <div className="adventure-card">
+        <div className="admin-card">
           <p className="text-sm text-gray-600">Total Images</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">{formatFileSize(stats.totalImageSize)}</p>
         </div>
-        <div className="adventure-card">
+        <div className="admin-card">
           <p className="text-sm text-gray-600">Avg. Image Size</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">
             {stats.avgImageSize > 0 ? formatFileSize(stats.avgImageSize) : '0 Bytes'}
           </p>
         </div>
-        <div className="adventure-card">
+        <div className="admin-card">
           <p className="text-sm text-gray-600">Max Image Size</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">
             {stats.maxImageSize > 0 ? formatFileSize(stats.maxImageSize) : '0 Bytes'}
@@ -431,10 +431,10 @@ export default function BlogManagementPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
+                      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                         blog.published !== false
-                          ? 'bg-green-50 text-green-700'
-                          : 'bg-gray-100 text-gray-700'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}>
                         {blog.published !== false ? 'Published' : 'Draft'}
                       </span>

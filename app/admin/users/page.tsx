@@ -191,7 +191,7 @@ export default function UsersManagementPage() {
   }
 
   const getStatusColor = (isActive: boolean) => {
-    return isActive ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-700'
+    return isActive ? 'status-badge status-badge-active' : 'status-badge status-badge-inactive'
   }
 
   const getStatusIcon = (isActive: boolean) => {
@@ -204,10 +204,10 @@ export default function UsersManagementPage() {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-purple-50 text-purple-700'
-      case 'editor': return 'bg-blue-50 text-blue-700'
-      case 'viewer': return 'bg-gray-50 text-gray-700'
-      default: return 'bg-accent-50 text-accent-700'
+      case 'admin': return 'bg-purple-100 text-purple-800'
+      case 'editor': return 'bg-blue-100 text-blue-800'
+      case 'viewer': return 'bg-gray-100 text-gray-800'
+      default: return 'bg-green-100 text-green-800'
     }
   }
 
@@ -283,7 +283,7 @@ export default function UsersManagementPage() {
           </button>
           <Link
             href="/admin/users/create"
-            className="btn-adventure flex items-center gap-2"
+            className="btn-primary flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             Add User
@@ -311,62 +311,62 @@ export default function UsersManagementPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="adventure-card">
+        <div className="admin-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Total Users</p>
               <p className="text-2xl font-bold text-gray-900 mt-2">{stats.total}</p>
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg">
+            <div className="p-3 bg-blue-100 rounded-lg">
               <UserIcon className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
         
-        <div className="adventure-card">
+        <div className="admin-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Active</p>
               <p className="text-2xl font-bold text-gray-900 mt-2">{stats.active}</p>
             </div>
-            <div className="p-3 bg-green-50 rounded-lg">
+            <div className="p-3 bg-green-100 rounded-lg">
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
         
-        <div className="adventure-card">
+        <div className="admin-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Inactive</p>
               <p className="text-2xl font-bold text-gray-900 mt-2">{stats.inactive}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div className="p-3 bg-gray-200 rounded-lg">
               <XCircle className="h-6 w-6 text-gray-600" />
             </div>
           </div>
         </div>
         
-        <div className="adventure-card">
+        <div className="admin-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Admins</p>
               <p className="text-2xl font-bold text-gray-900 mt-2">{stats.admins}</p>
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg">
+            <div className="p-3 bg-purple-100 rounded-lg">
               <Shield className="h-6 w-6 text-purple-600" />
             </div>
           </div>
         </div>
         
-        <div className="adventure-card">
+        <div className="admin-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Regular Users</p>
               <p className="text-2xl font-bold text-gray-900 mt-2">{stats.regularUsers}</p>
             </div>
-            <div className="p-3 bg-accent-50 rounded-lg">
-              <UserIcon className="h-6 w-6 text-accent-600" />
+            <div className="p-3 bg-green-100 rounded-lg">
+              <UserIcon className="h-6 w-6 text-green-600" />
             </div>
           </div>
         </div>
@@ -472,29 +472,27 @@ export default function UsersManagementPage() {
 
       {/* Users Table */}
       {!loading && (
-        <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-card border border-gray-200 overflow-hidden">
           {filteredUsers.length > 0 ? (
             <>
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="admin-table">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-6 py-4">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                            onChange={(e) => handleSelectAll(e.target.checked)}
-                            className="h-4 w-4 text-accent-500 focus:ring-accent-500"
-                          />
-                        </div>
+                      <th className="px-6 py-4 w-12">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] rounded"
+                        />
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">User</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Joined</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 w-32">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -505,7 +503,7 @@ export default function UsersManagementPage() {
                             type="checkbox"
                             checked={selectedUsers.includes(user._id)}
                             onChange={(e) => handleSelectUser(user._id, e.target.checked)}
-                            className="h-4 w-4 text-accent-500 focus:ring-accent-500"
+                            className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] rounded"
                           />
                         </td>
                         <td className="px-6 py-4">
@@ -513,13 +511,13 @@ export default function UsersManagementPage() {
                             <img
                               src={userService.getAvatarUrl(user)}
                               alt={user.name}
-                              className="h-10 w-10 rounded-full"
+                              className="h-10 w-10 rounded-full bg-gray-200"
                             />
                             <div>
                               <p className="font-medium text-gray-900">
                                 {user.name}
                                 {user.isActive && (
-                                  <span className="ml-2 inline-flex items-center text-xs text-green-600">
+                                  <span className="ml-2 inline-flex items-center text-xs text-green-600 font-medium">
                                     <CheckCircle className="h-3 w-3 mr-1" />
                                     Verified
                                   </span>
@@ -530,54 +528,45 @@ export default function UsersManagementPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-4 w-4 text-gray-400" />
-                              <a 
-                                href={`mailto:${user.email}`}
-                                className="text-sm text-gray-600 hover:text-accent-600 transition-colors"
-                              >
-                                {user.email}
-                              </a>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-gray-400" />
+                            <a 
+                              href={`mailto:${user.email}`}
+                              className="text-sm text-gray-700 hover:text-[#FF6B35] transition-colors"
+                            >
+                              {user.email}
+                            </a>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
+                          <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${getRoleColor(user.role)}`}>
                             {userService.getRoleDisplayName(user.role)}
                           </span>
-                          {user.roleId && typeof user.roleId === 'object' && (
-                            <p className="text-xs text-gray-500 mt-1">
-                              Role ID: {user.roleId.name}
-                            </p>
-                          )}
                         </td>
                         <td className="px-6 py-4">
                           <button
                             onClick={() => handleToggleStatus(user._id)}
-                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${getStatusColor(user.isActive)}`}
+                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold cursor-pointer hover:opacity-80 transition-opacity ${getStatusColor(user.isActive)}`}
                           >
                             {getStatusIcon(user.isActive)}
                             {userService.getStatusDisplayName(user.isActive)}
                           </button>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="space-y-1">
-                            <div className="text-sm text-gray-900">
-                              {userService.formatDate(user.createdAt)}
-                            </div>
-                            {user.lastLogin && (
-                              <div className="text-xs text-gray-500">
-                                Last: {userService.formatLastLogin(user.lastLogin)}
-                              </div>
-                            )}
+                          <div className="text-sm text-gray-900">
+                            {userService.formatDate(user.createdAt)}
                           </div>
+                          {user.lastLogin && (
+                            <div className="text-xs text-gray-500">
+                              Last: {userService.formatLastLogin(user.lastLogin)}
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1">
                             <Link
                               href={`/admin/users/${user._id}`}
-                              className="p-2 hover:bg-blue-50 rounded-lg transition-colors text-blue-600"
+                              className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
                               title="View Profile"
                             >
                               <Eye className="h-4 w-4" />
@@ -585,7 +574,7 @@ export default function UsersManagementPage() {
                             
                             <Link
                               href={`/admin/users/edit/${user._id}`}
-                              className="p-2 hover:bg-accent-50 rounded-lg transition-colors text-accent-600"
+                              className="p-2 hover:bg-orange-100 rounded-lg transition-colors text-[#FF6B35]"
                               title="Edit"
                             >
                               <Edit className="h-4 w-4" />
@@ -593,14 +582,10 @@ export default function UsersManagementPage() {
                             
                             <button
                               onClick={() => handleDeleteUser(user._id)}
-                              className="p-2 hover:bg-red-50 rounded-lg transition-colors text-red-600"
+                              className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
                               title="Delete"
                             >
                               <Trash2 className="h-4 w-4" />
-                            </button>
-                            
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                              <MoreVertical className="h-4 w-4" />
                             </button>
                           </div>
                         </td>

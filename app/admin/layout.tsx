@@ -18,26 +18,6 @@ const sidebarLinks = [
   { icon: Settings, label: 'Settings', href: '/admin/settings' },
 ];
 
-const stats = [
-  { label: 'Total Users', value: '1,234', change: '+12%', icon: Users, color: 'from-blue-500 to-blue-600' },
-  { label: 'Total Orders', value: '456', change: '+8%', icon: ShoppingCart, color: 'from-green-500 to-green-600' },
-  { label: 'Revenue', value: 'KES 125K', change: '+15%', icon: DollarSign, color: 'from-purple-500 to-purple-600' },
-  { label: 'Page Views', value: '5.2K', change: '+23%', icon: Eye, color: 'from-orange-500 to-orange-600' },
-];
-
-const recentOrders = [
-  { id: 'MK001', customer: 'John Doe', product: 'Protein Powder', amount: 3500, status: 'completed' },
-  { id: 'MK002', customer: 'Jane Smith', product: 'Training Guide', amount: 2000, status: 'pending' },
-  { id: 'MK003', customer: 'Mike Johnson', product: 'Resistance Bands', amount: 1200, status: 'completed' },
-  { id: 'MK004', customer: 'Sarah Williams', product: 'Yoga Mat', amount: 2500, status: 'processing' },
-];
-
-const upcomingEvents = [
-  { id: 1, title: 'Morning HIIT Bootcamp', date: '2024-03-15', spots: 15 },
-  { id: 2, title: 'Strength Workshop', date: '2024-03-16', spots: 8 },
-  { id: 3, title: 'Weight Loss Challenge', date: '2024-03-20', spots: 25 },
-];
-
 export default function AdminLayout({
   children,
 }: {
@@ -47,7 +27,7 @@ export default function AdminLayout({
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -57,15 +37,15 @@ export default function AdminLayout({
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-fitness-dark text-white z-50 transform transition-transform duration-300 lg:translate-x-0 ${
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-gradient-to-br from-[#1A1A2E] to-[#2D3142] text-white z-50 transform transition-transform duration-300 lg:translate-x-0 ${
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="p-6">
+        <div className="p-6 border-b border-white/10">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-fitness-primary to-fitness-primaryDark rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-lg flex items-center justify-center">
               <Dumbbell size={20} className="text-white" />
             </div>
-            <span className="text-xl font-bold">Marksila<span className="text-fitness-primary">Admin</span></span>
+            <span className="text-xl font-bold">Marksila<span className="text-[#FF6B35]">Admin</span></span>
           </Link>
         </div>
 
@@ -76,9 +56,9 @@ export default function AdminLayout({
               <Link
                 key={link.label}
                 href={link.href}
-                className={`flex items-center gap-3 px-6 py-3 transition-colors ${
+                className={`flex items-center gap-3 px-6 py-3 transition-all duration-200 ${
                   isActive 
-                    ? 'bg-fitness-primary text-white border-l-4 border-fitness-accent' 
+                    ? 'bg-[#FF6B35]/20 text-white border-l-4 border-[#FF6B35]' 
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -100,17 +80,17 @@ export default function AdminLayout({
       {/* Main Content */}
       <div className="lg:ml-64">
         {/* Top Header */}
-        <header className="bg-white shadow-sm sticky top-0 z-30">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center justify-between px-6 py-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <Menu size={24} />
+              <Menu size={24} className="text-gray-700" />
             </button>
             
             <div className="flex items-center gap-4 ml-auto">
-              <div className="w-10 h-10 bg-fitness-primary rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
                 A
               </div>
             </div>

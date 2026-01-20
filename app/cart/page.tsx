@@ -122,7 +122,7 @@ export default function CartPage() {
                           <div className="flex justify-between">
                             <div>
                               <h3 className="font-semibold text-fitness-dark">{item.name}</h3>
-                              <p className="text-sm text-gray-500">{item.variant}</p>
+                            <p className="text-sm text-gray-600">{item.variant}</p>
                             </div>
                             <button
                               onClick={() => removeItem(item.id)}
@@ -257,8 +257,8 @@ export default function CartPage() {
                       <div className="flex items-center gap-3">
                         <CreditCard size={24} className="text-fitness-primary" />
                         <div>
-                          <p className="font-semibold">M-Pesa</p>
-                          <p className="text-sm text-gray-500">Pay via M-Pesa mobile money</p>
+                          <p className="font-semibold text-gray-900">M-Pesa</p>
+                          <p className="text-sm text-gray-600">Pay via M-Pesa mobile money</p>
                         </div>
                       </div>
                     </div>
@@ -267,8 +267,8 @@ export default function CartPage() {
                       <div className="flex items-center gap-3">
                         <CreditCard size={24} className="text-gray-600" />
                         <div>
-                          <p className="font-semibold">Credit/Debit Card</p>
-                          <p className="text-sm text-gray-500">Visa, Mastercard</p>
+                          <p className="font-semibold text-gray-900">Credit/Debit Card</p>
+                          <p className="text-sm text-gray-600">Visa, Mastercard</p>
                         </div>
                       </div>
                     </div>

@@ -189,8 +189,8 @@ export default function ShopPage() {
                 <Truck size={24} className="text-fitness-primary" />
               </div>
               <div>
-                <p className="font-semibold text-fitness-dark">Free Delivery</p>
-                <p className="text-sm text-gray-500">Orders over KES 5,000</p>
+                <p className="font-semibold text-gray-800">Free Delivery</p>
+                <p className="text-sm text-gray-600">Orders over KES 5,000</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -198,8 +198,8 @@ export default function ShopPage() {
                 <Shield size={24} className="text-fitness-accent" />
               </div>
               <div>
-                <p className="font-semibold text-fitness-dark">Quality Guaranteed</p>
-                <p className="text-sm text-gray-500">Premium products</p>
+                <p className="font-semibold text-gray-800">Quality Guaranteed</p>
+                <p className="text-sm text-gray-600">Premium products</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -207,8 +207,8 @@ export default function ShopPage() {
                 <RefreshCw size={24} className="text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-fitness-dark">Easy Returns</p>
-                <p className="text-sm text-gray-500">30-day policy</p>
+                <p className="font-semibold text-gray-800">Easy Returns</p>
+                <p className="text-sm text-gray-600">30-day policy</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -216,8 +216,8 @@ export default function ShopPage() {
                 <Dumbbell size={24} className="text-purple-600" />
               </div>
               <div>
-                <p className="font-semibold text-fitness-dark">Expert Curated</p>
-                <p className="text-sm text-gray-500">Trainer approved</p>
+                <p className="font-semibold text-gray-800">Expert Curated</p>
+                <p className="text-sm text-gray-600">Trainer approved</p>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function ShopPage() {
 
                 {/* Categories */}
                 <div>
-                  <h3 className="font-semibold text-fitness-dark mb-4">Categories</h3>
+                  <h3 className="font-semibold text-gray-800 mb-4">Categories</h3>
                   <div className="space-y-2">
                     {categories.map((category) => (
                       <button
@@ -267,7 +267,7 @@ export default function ShopPage() {
             {/* Products Grid */}
             <div className="lg:w-3/4">
               <div className="flex items-center justify-between mb-6">
-                <p className="text-gray-600">
+                <p className="text-gray-700">
                   Showing {filteredProducts.length} products
                 </p>
                 <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary">
@@ -299,13 +299,13 @@ export default function ShopPage() {
                     
                     <div className="p-5">
                       <p className="text-sm text-fitness-primary mb-1">{product.category}</p>
-                      <h3 className="font-bold text-fitness-dark mb-2">{product.name}</h3>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
+                      <h3 className="font-bold text-gray-900 mb-2">{product.name}</h3>
+                      <p className="text-sm text-gray-800 mb-3 line-clamp-2">{product.description}</p>
                       
                       <div className="flex items-center gap-1 mb-3">
                         <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{product.rating}</span>
-                        <span className="text-sm text-gray-500">({product.reviews})</span>
+                        <span className="text-sm font-medium text-gray-800">{product.rating}</span>
+                        <span className="text-sm text-gray-600">({product.reviews})</span>
                       </div>
                       
                       <div className="flex items-center justify-between">
@@ -370,7 +370,7 @@ export default function ShopPage() {
           
           <div className="flex-1 overflow-y-auto p-6">
             {Object.entries(cart).length === 0 ? (
-              <p className="text-gray-500 text-center">Your cart is empty</p>
+              <p className="text-gray-600 text-center">Your cart is empty</p>
             ) : (
               <div className="space-y-4">
                 {Object.entries(cart).map(([id, qty]) => {
@@ -384,8 +384,8 @@ export default function ShopPage() {
                         className="w-20 h-20 object-cover rounded-lg"
                       />
                       <div className="flex-1">
-                        <h4 className="font-medium text-fitness-dark">{product.name}</h4>
-                        <p className="text-fitness-primary font-semibold">KES {product.price}</p>
+                        <h4 className="font-medium text-gray-900">{product.name}</h4>
+                        <p className="text-gray-700 font-semibold">KES {product.price}</p>
                         <div className="flex items-center gap-2 mt-2">
                           <button 
                             onClick={() => removeFromCart(product.id)}

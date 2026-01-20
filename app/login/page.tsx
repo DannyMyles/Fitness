@@ -116,7 +116,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full btn-fitness py-4 flex items-center justify-center gap-2"
+              className="w-full btn-primary py-4 flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
