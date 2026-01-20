@@ -37,11 +37,11 @@ const topProducts = [
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'completed': return 'bg-green-100 text-green-700';
-    case 'pending': return 'bg-yellow-100 text-yellow-700';
-    case 'processing': return 'bg-blue-100 text-blue-700';
-    case 'cancelled': return 'bg-red-100 text-red-700';
-    default: return 'bg-gray-100 text-gray-700';
+    case 'completed': return 'status-badge status-badge-completed';
+    case 'pending': return 'status-badge status-badge-pending';
+    case 'processing': return 'status-badge status-badge-processing';
+    case 'cancelled': return 'status-badge status-badge-cancelled';
+    default: return 'status-badge status-badge-inactive';
   }
 };
 
@@ -51,10 +51,10 @@ export default function AdminDashboard() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-fitness-dark">Dashboard</h1>
-          <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
         </div>
-        <button className="btn-fitness flex items-center gap-2">
+        <button className="btn-primary flex items-center gap-2">
           <Plus size={20} />
           Add New
         </button>
@@ -63,20 +63,18 @@ export default function AdminDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl p-6 shadow-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center`}>
-                <stat.icon size={24} className="text-white" />
-              </div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${
-                stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {stat.change.startsWith('+') ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
+          <div key={index} className="admin-stats-card">
+            <div className={`stat-icon bg-gradient-to-br ${stat.color}`}>
+              <stat.icon size={24} />
+            </div>
+            <div>
+              <div className="stat-value">{stat.value}</div>
+              <div className="stat-label">{stat.label}</div>
+              <div className={`stat-change ${stat.change.startsWith('+') ? 'stat-change-positive' : 'stat-change-negative'}`}>
+                {stat.change.startsWith('+') ? <ArrowUp size={12} /> : <ArrowDown size={12} />}
                 {stat.change}
               </div>
             </div>
-            <div className="text-2xl font-bold text-fitness-dark">{stat.value}</div>
-            <div className="text-gray-500">{stat.label}</div>
           </div>
         ))}
       </div>
@@ -86,41 +84,41 @@ export default function AdminDashboard() {
         {/* Recent Orders - 2 columns */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-card overflow-hidden">
           <div className="p-6 border-b flex items-center justify-between">
-            <h2 className="text-lg font-bold text-fitness-dark">Recent Orders</h2>
-            <a href="/admin/orders" className="text-fitness-primary text-sm font-medium hover:underline">
+            <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
+            <a href="/admin/orders" className="text-[#FF6B35] text-sm font-medium hover:underline">
               View All
             </a>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-medium text-fitness-dark">{order.id}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.customer}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{order.product}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-fitness-primary">KES {order.amount.toLocaleString()}</td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                  <tr key={order.id}>
+                    <td className="font-medium text-gray-900">{order.id}</td>
+                    <td className="text-gray-700">{order.customer}</td>
+                    <td className="text-gray-700">{order.product}</td>
+                    <td className="font-semibold text-[#FF6B35]">KES {order.amount.toLocaleString()}</td>
+                    <td>
+                      <span className={getStatusColor(order.status)}>
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td>
                       <div className="flex items-center gap-2">
-                        <button className="p-1 hover:text-fitness-primary transition-colors">
+                        <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 hover:text-[#FF6B35] transition-colors">
                           <EyeIcon size={16} />
                         </button>
-                        <button className="p-1 hover:text-fitness-primary transition-colors">
+                        <button className="p-1.5 hover:bg-gray-100 rounded text-gray-600 hover:text-[#FF6B35] transition-colors">
                           <Edit size={16} />
                         </button>
                       </div>
@@ -135,26 +133,26 @@ export default function AdminDashboard() {
         {/* Upcoming Events */}
         <div className="bg-white rounded-xl shadow-card overflow-hidden">
           <div className="p-6 border-b flex items-center justify-between">
-            <h2 className="text-lg font-bold text-fitness-dark">Upcoming Events</h2>
-            <a href="/admin/events" className="text-fitness-primary text-sm font-medium hover:underline">
+            <h2 className="text-lg font-bold text-gray-900">Upcoming Events</h2>
+            <a href="/admin/events" className="text-[#FF6B35] text-sm font-medium hover:underline">
               View All
             </a>
           </div>
-          <div className="divide-y">
+          <div className="divide-y divide-gray-100">
             {upcomingEvents.map((event) => (
-              <div key={event.id} className="p-4 hover:bg-gray-50">
+              <div key={event.id} className="p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-medium text-fitness-dark">{event.title}</h3>
-                    <p className="text-sm text-gray-500">{event.date}</p>
+                    <h3 className="font-medium text-gray-900">{event.title}</h3>
+                    <p className="text-sm text-gray-600">{event.date}</p>
                   </div>
-                  <span className="text-xs bg-fitness-primary/10 text-fitness-primary px-2 py-1 rounded-full">
+                  <span className="text-xs bg-[#FF6B35]/10 text-[#FF6B35] px-2 py-1 rounded-full font-medium">
                     {event.registered}/{event.spots} spots
                   </span>
                 </div>
-                <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-fitness-primary rounded-full"
+                    className="h-full bg-[#FF6B35] rounded-full transition-all duration-300"
                     style={{ width: `${(event.registered / event.spots) * 100}%` }}
                   ></div>
                 </div>
@@ -167,31 +165,31 @@ export default function AdminDashboard() {
       {/* Top Products */}
       <div className="bg-white rounded-xl shadow-card overflow-hidden">
         <div className="p-6 border-b flex items-center justify-between">
-          <h2 className="text-lg font-bold text-fitness-dark">Top Selling Products</h2>
-          <a href="/admin/products" className="text-fitness-primary text-sm font-medium hover:underline">
+          <h2 className="text-lg font-bold text-gray-900">Top Selling Products</h2>
+          <a href="/admin/products" className="text-[#FF6B35] text-sm font-medium hover:underline">
             View All
           </a>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
+          <table className="admin-table">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sales</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Revenue</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Performance</th>
+                <th>Product</th>
+                <th>Sales</th>
+                <th>Revenue</th>
+                <th>Performance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody>
               {topProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-fitness-dark">{product.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{product.sales}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-fitness-primary">KES {product.revenue.toLocaleString()}</td>
-                  <td className="px-6 py-4 w-32">
+                <tr key={product.id}>
+                  <td className="font-medium text-gray-900">{product.name}</td>
+                  <td className="text-gray-700">{product.sales}</td>
+                  <td className="font-semibold text-[#FF6B35]">KES {product.revenue.toLocaleString()}</td>
+                  <td className="w-32">
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-fitness-primary rounded-full"
+                        className="h-full bg-[#FF6B35] rounded-full transition-all duration-300"
                         style={{ width: `${(product.sales / topProducts[0].sales) * 100}%` }}
                       ></div>
                     </div>

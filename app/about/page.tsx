@@ -195,7 +195,7 @@ export default function AboutPage() {
                 Transforming Lives Through <span className="text-gradient-mixed">Fitness</span>
               </h2>
               
-              <div className="space-y-4 text-gray-600 leading-relaxed">
+              <div className="space-y-4 text-gray-800 leading-relaxed">
                 <p>
                   I started my fitness journey over a decade ago, driven by a personal transformation 
                   that changed my life. What began as a personal quest for better health quickly 
@@ -224,7 +224,7 @@ export default function AboutPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">{value.title}</h4>
-                      <p className="text-sm text-gray-600">{value.description}</p>
+                      <p className="text-sm text-gray-800">{value.description}</p>
                     </div>
                   </div>
                 ))}
@@ -266,7 +266,7 @@ export default function AboutPage() {
                   <value.icon size={28} className="text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{value.title}</h3>
-                <p className="text-gray-600">{value.description}</p>
+                <p className="text-gray-800">{value.description}</p>
               </div>
             ))}
           </div>

@@ -54,7 +54,7 @@ const Navigation = () => {
   return (
     <>
       {/* Top Contact Bar */}
-      <div className="bg-gradient-to-r from-fitness-dark via-fitness-secondary to-fitness-dark text-gray-500 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-fitness-dark via-fitness-secondary to-fitness-dark text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-fitness-primary/20 to-fitness-accent/20 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center py-2 text-sm">
@@ -145,7 +145,7 @@ const Navigation = () => {
                   className={`px-4 py-3 font-medium transition-all duration-300 relative ${
                     isActiveLink(item.href)
                       ? 'text-fitness-primary'
-                      : 'text-gray-700 hover:text-fitness-primary'
+                      : 'text-gray-800 hover:text-fitness-primary'
                   }`}
                 >
                   <span className="relative">
@@ -206,7 +206,7 @@ const Navigation = () => {
                       href={item.href}
                       onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center justify-between py-4 font-semibold transition-all duration-300 ${
-                        isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-700 hover:text-fitness-primary'
+                        isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-800 hover:text-fitness-primary'
                       }`}
                     >
                       {item.name}

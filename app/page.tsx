@@ -124,7 +124,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Transform With <span className="text-gradient-mixed">Expert Guidance</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               Professional fitness training with personalized attention to help you achieve your health and wellness goals.
             </p>
           </div>
@@ -140,7 +140,7 @@ export default function Home() {
                   <feature.icon size={28} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-gray-700">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -193,11 +193,11 @@ export default function Home() {
                 About <span className="text-gradient-primary">Marksila254</span>
               </h2>
               
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-lg text-gray-700 leading-relaxed">
                 Passionate about helping people transform their lives through fitness, proper nutrition, and sustainable lifestyle changes. With over 10 years of experience, I've helped hundreds of clients achieve their health and wellness goals.
               </p>
               
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-700 leading-relaxed">
                 My approach combines scientific training principles with practical nutrition guidance to create sustainable lifestyle changes that last a lifetime.
               </p>
 
@@ -242,7 +242,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Training <span className="text-gradient-accent">Services</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               Professional fitness services tailored to help you achieve your health and wellness goals.
             </p>
           </div>
@@ -292,7 +292,7 @@ export default function Home() {
                 
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-gray-600 mb-4">{service.description}</p>
+                  <p className="text-gray-700 mb-4">{service.description}</p>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <span className="text-gradient-primary font-bold">{service.price}</span>
@@ -332,7 +332,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Start Your <span className="text-gradient-mixed">Journey</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               Simple steps to begin your fitness transformation.
             </p>
           </div>
@@ -350,7 +350,7 @@ export default function Home() {
                   </div>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <p className="text-gray-700">{item.description}</p>
                 
                 {/* Arrow connector for desktop */}
                 {index < processSteps.length - 1 && (
@@ -377,7 +377,7 @@ export default function Home() {
               <Star size={16} className="text-yellow-400" />
               <span>Client Testimonials</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[] mb-4">
               What <span className="text-gradient-primary">Clients Say</span>
             </h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
@@ -468,7 +468,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Training <span className="text-gradient-primary">Moments</span>
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               Glimpses of fitness sessions and client transformations.
             </p>
           </div>

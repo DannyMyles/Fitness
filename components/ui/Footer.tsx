@@ -77,7 +77,7 @@ const Footer = () => {
                   />
               </div>
             </div>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-gray-200 leading-relaxed">
               Transforming lives through expert fitness training, nutrition guidance, and personalized workout programs tailored to your goals.
             </p>
             
@@ -107,7 +107,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     href={link.href} 
-                    className="text-gray-300 hover:text-fitness-primary transition-all duration-300 flex items-center gap-2 group"
+                    className="text-gray-200 hover:text-fitness-primary transition-all duration-300 flex items-center gap-2 group"
                   >
                     <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-fitness-primary" />
                     <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
@@ -128,7 +128,7 @@ const Footer = () => {
                 <li key={index}>
                   <Link 
                     href={service.href} 
-                    className="text-gray-300 hover:text-fitness-accent transition-all duration-300 flex items-center gap-2 group"
+                    className="text-gray-200 hover:text-fitness-accent transition-all duration-300 flex items-center gap-2 group"
                   >
                     <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-fitness-accent" />
                     <span className="group-hover:translate-x-1 transition-transform duration-300">{service.name}</span>
@@ -199,7 +199,7 @@ const Footer = () => {
                 <span>Stay Fit & Updated</span>
               </div>
               <h4 className="text-2xl font-bold mb-2">Join Our Fitness Community</h4>
-              <p className="text-gray-300">Subscribe for fitness tips, nutrition guides, and exclusive offers.</p>
+              <p className="text-gray-200">Subscribe for fitness tips, nutrition guides, and exclusive offers.</p>
             </div>
             <form onSubmit={handleSubscribe} className="flex gap-2 w-full md:w-auto">
               <div className="relative flex-1 md:w-64">

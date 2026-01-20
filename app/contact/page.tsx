@@ -152,7 +152,7 @@ export default function ContactPage() {
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                   Let's Start Your <span className="text-gradient-primary">Journey</span>
                 </h2>
-                <p className="text-gray-600 mt-2">Fill out the form below and I'll get back to you within 24 hours.</p>
+                <p className="text-gray-700 mt-2">Fill out the form below and I'll get back to you within 24 hours.</p>
               </div>
               
               {submitted ? (

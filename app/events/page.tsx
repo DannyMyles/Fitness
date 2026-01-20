@@ -147,7 +147,7 @@ export default function EventsPage() {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-fitness-dark mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Upcoming Events
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -173,8 +173,8 @@ export default function EventsPage() {
                   <div className="md:col-span-2 p-6">
                     <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
                       <div>
-                        <h3 className="text-xl font-bold text-fitness-dark mb-2">{event.title}</h3>
-                        <p className="text-gray-600">{event.description}</p>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                        <p className="text-gray-800">{event.description}</p>
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-fitness-primary">KES {event.price}</div>
@@ -182,7 +182,7 @@ export default function EventsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
+                    <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-800">
                       <div className="flex items-center gap-2">
                         <Calendar size={16} className="text-fitness-primary" />
                         {formatDate(event.date)}
@@ -230,10 +230,10 @@ export default function EventsPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-fitness-dark mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
               Host Your Own Event
             </h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <p className="text-lg text-gray-700 mb-8">
               Looking to organize a corporate fitness event, private training session, or special workshop? 
               I can customize an experience for your group.
             </p>

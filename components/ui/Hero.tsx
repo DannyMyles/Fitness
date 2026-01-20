@@ -120,7 +120,7 @@ const Hero = () => {
             </h1>
 
             {/* Description */}
-            <p className="text-lg md:text-xl text-gray-600 max-w-xl leading-relaxed animate-on-scroll opacity-100 translate-y-0" style={{ animationDelay: '0.4s' }}>
+            <p className="text-lg md:text-xl text-gray-700 max-w-xl leading-relaxed animate-on-scroll opacity-100 translate-y-0" style={{ animationDelay: '0.4s' }}>
               Personalized training programs, nutrition planning, and motivation to help you achieve your health and fitness goals. Start your transformation today!
             </p>
 
@@ -160,7 +160,7 @@ const Hero = () => {
                   <div className="text-2xl md:text-3xl font-bold text-gray-900">
                     {stat.value}{stat.suffix || '+'}
                   </div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+                  <div className="text-sm text-gray-700">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -189,8 +189,8 @@ const Hero = () => {
                       <Users size={20} className="text-white" />
                     </div>
                     <div>
-                      <div className="font-bold text-gray-900">Group Classes</div>
-                      <div className="text-sm text-gray-600">Daily Sessions</div>
+                      <div className="font-bold text-white">Group Classes</div>
+                      <div className="text-sm text-gray-200">Daily Sessions</div>
                     </div>
                   </div>
                 </div>
@@ -201,8 +201,8 @@ const Hero = () => {
                       <Clock size={20} className="text-white" />
                     </div>
                     <div>
-                      <div className="font-bold text-gray-900">Flexible Hours</div>
-                      <div className="text-sm text-gray-600">6AM - 9PM</div>
+                      <div className="font-bold text-white">Flexible Hours</div>
+                      <div className="text-sm text-gray-200">6AM - 9PM</div>
                     </div>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ const Hero = () => {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-slow">
         <div className="flex flex-col items-center gap-2">
-          <span className="text-sm text-gray-500">Scroll to explore</span>
+          <span className="text-sm text-white">Scroll to explore</span>
           <div className="w-6 h-10 border-2 border-fitness-primary/30 rounded-full flex items-start justify-center p-1">
             <div className="w-1.5 h-3 bg-gradient-to-b from-fitness-primary to-fitness-accent rounded-full animate-scroll-indicator"></div>
           </div>

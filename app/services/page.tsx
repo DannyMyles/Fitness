@@ -187,16 +187,16 @@ export default function ServicesPage() {
                 
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{service.title}</h3>
-                  <p className="text-gray-600 mb-4">{service.description}</p>
+                  <p className="text-gray-700 mb-4">{service.description}</p>
                   
                   <div className="space-y-2 mb-6">
                     {service.features.map((feature, i) => (
                       <div 
                         key={i} 
-                        className="flex items-center gap-2 text-sm text-gray-600 transition-all duration-300"
+                        className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300"
                         style={{ 
                           transform: hoveredCard === index ? 'translateX(5px)' : 'translateX(0)',
-                          opacity: hoveredCard === index ? 1 : 0.7
+                          opacity: hoveredCard === index ? 1 : 0.8
                         }}
                       >
                         <div className="w-5 h-5 bg-gradient-to-br from-fitness-primary/20 to-fitness-accent/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -264,7 +264,7 @@ export default function ServicesPage() {
                 Achieve More With <span className="text-gradient-mixed">Expert Guidance</span>
               </h2>
               
-              <p className="text-gray-600 mb-8 leading-relaxed">
+              <p className="text-gray-700 mb-8 leading-relaxed">
                 With over 10 years of experience and hundreds of satisfied clients, I bring 
                 expertise, passion, and personalized attention to every training session.
               </p>
@@ -329,7 +329,7 @@ export default function ServicesPage() {
                 </div>
                 
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
+                <p className="text-gray-700">{item.description}</p>
                 
                 {/* Arrow connector for desktop */}
                 {index < processSteps.length - 1 && (
