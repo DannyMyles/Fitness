@@ -5,8 +5,36 @@ import Link from 'next/link';
 import { 
   Dumbbell, Heart, Zap, Clock, Users, Award, 
   ChevronRight, CheckCircle, Star, ArrowRight,
-  ArrowLeft
+  ArrowLeft, Quote
 } from 'lucide-react';
+
+// Testimonials Data
+const testimonials = [
+  {
+    text: "Training with Mark transformed my life. I lost 30kg in 6 months and gained confidence I never knew I had. His personalized approach and constant motivation made all the difference.",
+    name: "Sarah Wanjiku",
+    role: "Software Engineer",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+    achievement: "-30kg Lost"
+  },
+  {
+    text: "The best investment I made in my health. Mark's nutrition guidance complemented his training perfectly. I've never felt stronger or more energetic.",
+    name: "James Muthomi",
+    role: "Business Owner",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    achievement: "+15kg Muscle"
+  },
+  {
+    text: "Group classes are incredibly motivating! The energy in every session is infectious. I've made great friends while getting fit together.",
+    name: "Emily Njeri",
+    role: "Marketing Manager",
+    rating: 5,
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+    achievement: "6 Months Strong"
+  }
+];
 
 const services = [
   {
@@ -90,10 +118,19 @@ const processSteps = [
 export default function ServicesPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
 
   return (
     <div className="pt-8">
@@ -316,25 +353,89 @@ export default function ServicesPage() {
                 key={index}
                 className="relative text-center group"
               >
-                <div className="relative inline-flex items-center justify-center w-24 h-24 mb-6">
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
+                {/* Step Card Container */}
+                <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-fitness-lg hover:border-fitness-primary/30 transition-all duration-500">
+                  {/* Gradient Glow Background */}
+                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${
+                    index === 0 ? 'from-fitness-primary/10 to-fitness-accent/10' : 
+                    index === 1 ? 'from-fitness-accent/10 to-teal-500/10' : 
+                    index === 2 ? 'from-teal-500/10 to-cyan-500/10' : 
+                    'from-cyan-500/10 to-fitness-primary/10'
+                  } opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+                  
+                  {/* Pulsing Glow Effect */}
+                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${
                     index === 0 ? 'from-fitness-primary to-fitness-accent' : 
                     index === 1 ? 'from-fitness-accent to-teal-500' : 
                     index === 2 ? 'from-teal-500 to-cyan-500' : 
                     'from-cyan-500 to-fitness-primary'
-                  } opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-500`}></div>
-                  <div className="relative w-20 h-20 bg-gradient-to-br from-fitness-primary to-fitness-accent text-white text-2xl font-bold rounded-full flex items-center justify-center shadow-fitness transform transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
-                    {item.step}
+                  } opacity-5 blur-xl animate-pulse-glow`}></div>
+                  
+                  {/* Step Circle */}
+                  <div className="relative inline-flex items-center justify-center w-28 h-28 mb-6">
+                    {/* Outer Ring - Animated */}
+                    <div className={`absolute inset-0 rounded-full border-2 border-dashed ${
+                      index === 0 ? 'border-fitness-primary' : 
+                      index === 1 ? 'border-fitness-accent' : 
+                      index === 2 ? 'border-teal-500' : 
+                      'border-cyan-500'
+                    } opacity-40 animate-rotate`} style={{ animationDirection: 'reverse' }}></div>
+                    
+                    {/* Middle Glow Ring */}
+                    <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
+                      index === 0 ? 'from-fitness-primary to-fitness-accent' : 
+                      index === 1 ? 'from-fitness-accent to-teal-500' : 
+                      index === 2 ? 'from-teal-500 to-cyan-500' : 
+                      'from-cyan-500 to-fitness-primary'
+                    } opacity-20 blur-2xl group-hover:opacity-40 transition-all duration-500`}></div>
+                    
+                    {/* Inner Circle with Number */}
+                    <div className="relative w-24 h-24 bg-gradient-to-br from-white to-gray-50 text-white text-2xl font-bold rounded-full flex items-center justify-center shadow-fitness border-4 border-transparent bg-clip-border overflow-hidden">
+                      {/* Gradient Background for Number */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${
+                        index === 0 ? 'from-fitness-primary to-fitness-accent' : 
+                        index === 1 ? 'from-fitness-accent to-teal-500' : 
+                        index === 2 ? 'from-teal-500 to-cyan-500' : 
+                        'from-cyan-500 to-fitness-primary'
+                      }`}></div>
+                      <span className="relative z-10 drop-shadow-md">{item.step}</span>
+                    </div>
+                    
+                    {/* Sparkle Effect on Hover */}
+                    <div className="absolute top-0 right-2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300 shadow-lg"></div>
+                    <div className="absolute bottom-2 left-0 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300 delay-100 shadow-lg"></div>
                   </div>
+                  
+                  {/* Title with Gradient */}
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gradient-mixed transition-all duration-300">{item.title}</h3>
+                  
+                  {/* Description */}
+                  <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">{item.description}</p>
                 </div>
                 
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-700">{item.description}</p>
-                
-                {/* Arrow connector for desktop */}
+                {/* Arrow Connector for desktop - Enhanced visibility */}
                 {index < processSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-[60%] w-[80%]">
-                    <ArrowRight size={24} className="text-fitness-primary/30" />
+                  <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 left-[105%] w-[calc(100%-2rem)]">
+                    <div className="flex items-center">
+                      <div className={`h-0.5 flex-1 bg-gradient-to-r ${
+                        index === 0 ? 'from-fitness-primary to-fitness-accent' : 
+                        index === 1 ? 'from-fitness-accent to-teal-500' : 
+                        index === 2 ? 'from-teal-500 to-cyan-500' : 
+                        'from-cyan-500 to-fitness-primary'
+                      }`}></div>
+                      <ArrowRight size={20} className={`${
+                        index === 0 ? 'text-fitness-primary' : 
+                        index === 1 ? 'text-fitness-accent' : 
+                        index === 2 ? 'text-teal-500' : 
+                        'text-cyan-500'
+                      } flex-shrink-0 mx-2`} />
+                      <div className={`h-0.5 flex-1 bg-gradient-to-r ${
+                        index === 0 ? 'from-fitness-accent to-fitness-primary' : 
+                        index === 1 ? 'from-teal-500 to-fitness-accent' : 
+                        index === 2 ? 'from-cyan-500 to-teal-500' : 
+                        'from-fitness-primary to-cyan-500'
+                      }`}></div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -364,6 +465,148 @@ export default function ServicesPage() {
               Get Started
               <ChevronRight size={20} />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-24 relative overflow-hidden">
+        {/* Background with Gradient */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920')"
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-fitness-dark/95 via-fitness-dark/90 to-fitness-primaryDark/80"></div>
+        </div>
+
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-40 left-20 w-72 h-72 bg-fitness-primary/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-40 right-20 w-96 h-96 bg-fitness-accent/15 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-fitness-primary/10 to-fitness-accent/10 rounded-full blur-3xl animate-pulse-glow"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-white/10 text-white px-5 py-2.5 rounded-full text-sm font-semibold backdrop-blur-sm mb-6 border border-white/20">
+              <Star size={18} className="text-yellow-400 fill-yellow-400" />
+              <span>Client Testimonials</span>
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold  text-gray-700 mb-4">
+              What <span className="text-gradient-primary">Clients Say</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Real stories from real people who transformed their lives.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            {/* Testimonial Card */}
+            <div className="relative group">
+              {/* Outer Glow Ring */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-fitness-primary via-fitness-accent to-fitness-primary rounded-3xl opacity-30 blur-xl animate-pulse-glow"></div>
+              
+              {/* Main Card */}
+              <div className="relative bg-white/10 backdrop-blur-2xl rounded-3xl p-8 md:p-12 border border-white/20 shadow-fitness-lg">
+                {/* Decorative Corners */}
+                <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2 border-fitness-primary/50 rounded-tl-lg"></div>
+                <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2 border-fitness-accent/50 rounded-tr-lg"></div>
+                <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2 border-fitness-accent/50 rounded-bl-lg"></div>
+                <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2 border-fitness-primary/50 rounded-br-lg"></div>
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-fitness-primary/5 to-fitness-accent/5 rounded-3xl pointer-events-none"></div>
+
+                {/* Navigation Buttons */}
+                <button
+                  onClick={prevTestimonial}
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-gradient-to-br hover:from-fitness-primary hover:to-fitness-accent hover:scale-110 transition-all duration-300 backdrop-blur-sm border border-white/20 group-hover:shadow-fitness"
+                  aria-label="Previous testimonial"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <button
+                  onClick={nextTestimonial}
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-gradient-to-br hover:from-fitness-primary hover:to-fitness-accent hover:scale-110 transition-all duration-300 backdrop-blur-sm border border-white/20 group-hover:shadow-fitness"
+                  aria-label="Next testimonial"
+                >
+                  <ArrowRight size={20} />
+                </button>
+
+                {/* Testimonial Content */}
+                <div className="text-center">
+                  {/* Quote Icon with Glow */}
+                  <div className="relative inline-flex items-center justify-center mb-6">
+                    <div className="absolute inset-0 bg-fitness-primary/30 rounded-full blur-xl"></div>
+                    <div className="relative p-4 bg-white/10 rounded-full backdrop-blur-sm border border-white/20">
+                      <Quote size={40} className="text-fitness-primary relative z-10" />
+                    </div>
+                  </div>
+                  
+                  {/* Testimonial Text */}
+                  <p className="text-xl md:text-2xl text-white leading-relaxed mb-8 font-medium">
+                    "{testimonials[currentTestimonial].text}"
+                  </p>
+                  
+                  {/* Client Info */}
+                  <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                    {/* Avatar with Ring */}
+                    <div className="relative">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-fitness-primary to-fitness-accent rounded-full blur-md opacity-70"></div>
+                      <img
+                        src={testimonials[currentTestimonial].image}
+                        alt={testimonials[currentTestimonial].name}
+                        className="relative w-20 h-20 rounded-full object-cover border-2 border-white shadow-lg"
+                      />
+                    </div>
+                    
+                    {/* Name and Role */}
+                    <div className="text-center md:text-left">
+                      <div className="flex items-center gap-2 mb-1 justify-center md:justify-start">
+                        {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                          <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
+                        ))}
+                      </div>
+                      <div className="font-bold text-white text-xl">{testimonials[currentTestimonial].name}</div>
+                      <div className="text-gray-400 text-sm">{testimonials[currentTestimonial].role}</div>
+                    </div>
+                    
+                    {/* Achievement Badge */}
+                    <div className="ml-0 md:ml-4 relative">
+                      <div className="absolute -inset-0.5 bg-gradient-to-br from-fitness-primary to-fitness-accent rounded-xl blur-md opacity-70"></div>
+                      <div className="relative bg-gradient-to-br from-fitness-primary to-fitness-accent text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg">
+                        {testimonials[currentTestimonial].achievement}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dots Navigation */}
+                <div className="flex justify-center gap-3 mt-10">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentTestimonial(index)}
+                      className={`relative h-3 rounded-full transition-all duration-500 ${
+                        index === currentTestimonial 
+                          ? 'w-12 bg-gradient-to-r from-fitness-primary to-fitness-accent' 
+                          : 'w-3 bg-white/30 hover:bg-white/50'
+                      }`}
+                      aria-label={`Go to testimonial ${index + 1}`}
+                    >
+                      {/* Active dot inner glow */}
+                      {index === currentTestimonial && (
+                        <div className="absolute inset-0 rounded-full bg-white/30 animate-pulse"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

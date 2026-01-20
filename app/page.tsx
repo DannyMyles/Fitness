@@ -377,7 +377,7 @@ export default function Home() {
               <Star size={16} className="text-yellow-400" />
               <span>Client Testimonials</span>
             </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[] mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-700 mb-4">
               What <span className="text-gradient-primary">Clients Say</span>
             </h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
@@ -518,10 +518,10 @@ export default function Home() {
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-600 mb-6">
               Ready to Transform Your Life?
             </h2>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
+            <p className="text-xl text-gray-900 mb-8 leading-relaxed">
               Start your fitness journey today with professional guidance and personalized training programs designed just for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
