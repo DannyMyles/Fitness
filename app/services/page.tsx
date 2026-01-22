@@ -139,7 +139,7 @@ export default function ServicesPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1534258936925-c48947387603?w=1920')"
+            backgroundImage: "url('/images/029.JPG')"
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-fitness-dark/95 via-fitness-dark/80 to-fitness-dark/60"></div>
@@ -268,7 +268,7 @@ export default function ServicesPage() {
             <div className={`relative transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <img
-                  src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800"
+                  src="/images/029.JPG"
                   alt="Fitness Training"
                   className="w-full h-auto"
                 />
@@ -331,15 +331,23 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="py-20 bg-gradient-to-br from-fitness-light via-white to-fitness-primary/5">
-        <div className="container mx-auto px-4">
+      {/* Process Section - Enhanced */}
+      <section className="py-24 bg-gradient-to-br from-fitness-light via-white to-fitness-primary/5 relative overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-1/4 w-72 h-72 bg-fitness-primary/5 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-fitness-accent/5 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-br from-fitness-primary/3 to-fitness-accent/3 rounded-full blur-3xl animate-pulse-glow"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Section Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 badge mb-4">
               <Zap size={16} />
               <span>How It Works</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
               Simple Steps to <span className="text-gradient-mixed">Success</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -347,94 +355,133 @@ export default function ServicesPage() {
             </p>
           </div>
 
+          {/* Process Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {processSteps.map((item, index) => (
               <div 
                 key={index}
                 className="relative text-center group"
               >
-                {/* Step Card Container */}
-                <div className="relative bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-fitness-lg hover:border-fitness-primary/30 transition-all duration-500">
-                  {/* Gradient Glow Background */}
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${
-                    index === 0 ? 'from-fitness-primary/10 to-fitness-accent/10' : 
-                    index === 1 ? 'from-fitness-accent/10 to-teal-500/10' : 
-                    index === 2 ? 'from-teal-500/10 to-cyan-500/10' : 
-                    'from-cyan-500/10 to-fitness-primary/10'
+                {/* Step Card Container - Enhanced with 3D effect */}
+                <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-lg border border-white/50 hover:shadow-fitness-lg transition-all duration-500 group-hover:-translate-y-2">
+                  {/* Gradient Border Effect on Hover */}
+                  <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${
+                    index === 0 ? 'from-fitness-primary via-fitness-accent to-fitness-primary' : 
+                    index === 1 ? 'from-fitness-accent via-teal-500 to-fitness-accent' : 
+                    index === 2 ? 'from-teal-500 via-cyan-500 to-teal-500' : 
+                    'from-cyan-500 via-fitness-primary to-cyan-500'
+                  } opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500`}></div>
+                  
+                  {/* Inner Glow */}
+                  <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${
+                    index === 0 ? 'from-fitness-primary/5 to-fitness-accent/5' : 
+                    index === 1 ? 'from-fitness-accent/5 to-teal-500/5' : 
+                    index === 2 ? 'from-teal-500/5 to-cyan-500/5' : 
+                    'from-cyan-500/5 to-fitness-primary/5'
                   } opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                   
-                  {/* Pulsing Glow Effect */}
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${
-                    index === 0 ? 'from-fitness-primary to-fitness-accent' : 
-                    index === 1 ? 'from-fitness-accent to-teal-500' : 
-                    index === 2 ? 'from-teal-500 to-cyan-500' : 
-                    'from-cyan-500 to-fitness-primary'
-                  } opacity-5 blur-xl animate-pulse-glow`}></div>
-                  
-                  {/* Step Circle */}
-                  <div className="relative inline-flex items-center justify-center w-28 h-28 mb-6">
-                    {/* Outer Ring - Animated */}
-                    <div className={`absolute inset-0 rounded-full border-2 border-dashed ${
+                  {/* Step Circle - Redesigned with cleaner layers */}
+                  <div className="relative inline-flex items-center justify-center w-32 h-32 mb-6 group-hover:scale-110 transition-transform duration-500">
+                    {/* Outer Ring - Rotating Dashed */}
+                    <div className={`absolute inset-0 rounded-full border-3 border-dashed ${
                       index === 0 ? 'border-fitness-primary' : 
                       index === 1 ? 'border-fitness-accent' : 
                       index === 2 ? 'border-teal-500' : 
                       'border-cyan-500'
-                    } opacity-40 animate-rotate`} style={{ animationDirection: 'reverse' }}></div>
+                    } opacity-30 animate-rotate`}></div>
                     
-                    {/* Middle Glow Ring */}
-                    <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
-                      index === 0 ? 'from-fitness-primary to-fitness-accent' : 
-                      index === 1 ? 'from-fitness-accent to-teal-500' : 
-                      index === 2 ? 'from-teal-500 to-cyan-500' : 
-                      'from-cyan-500 to-fitness-primary'
-                    } opacity-20 blur-2xl group-hover:opacity-40 transition-all duration-500`}></div>
+                    {/* Middle Ring - Gradient Glow */}
+                    <div className={`absolute inset-2 rounded-full bg-gradient-to-br ${
+                      index === 0 ? 'from-fitness-primary/20 to-fitness-accent/20' : 
+                      index === 1 ? 'from-fitness-accent/20 to-teal-500/20' : 
+                      index === 2 ? 'from-teal-500/20 to-cyan-500/20' : 
+                      'from-cyan-500/20 to-fitness-primary/20'
+                    } border-2 border-white/30`}></div>
                     
-                    {/* Inner Circle with Number */}
-                    <div className="relative w-24 h-24 bg-gradient-to-br from-white to-gray-50 text-white text-2xl font-bold rounded-full flex items-center justify-center shadow-fitness border-4 border-transparent bg-clip-border overflow-hidden">
-                      {/* Gradient Background for Number */}
+                    {/* Inner Circle - Glassmorphism with Number */}
+                    <div className="relative w-24 h-24 rounded-full flex items-center justify-center overflow-hidden shadow-fitness">
+                      {/* Gradient Background */}
                       <div className={`absolute inset-0 bg-gradient-to-br ${
                         index === 0 ? 'from-fitness-primary to-fitness-accent' : 
                         index === 1 ? 'from-fitness-accent to-teal-500' : 
                         index === 2 ? 'from-teal-500 to-cyan-500' : 
                         'from-cyan-500 to-fitness-primary'
                       }`}></div>
-                      <span className="relative z-10 drop-shadow-md">{item.step}</span>
+                      
+                      {/* Glass Overlay */}
+                      <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+                      
+                      {/* Number */}
+                      <span className="relative z-10 text-3xl font-bold text-white drop-shadow-lg">{item.step}</span>
                     </div>
                     
-                    {/* Sparkle Effect on Hover */}
-                    <div className="absolute top-0 right-2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300 shadow-lg"></div>
-                    <div className="absolute bottom-2 left-0 w-2 h-2 bg-white rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300 delay-100 shadow-lg"></div>
+                    {/* Floating Particles on Hover */}
+                    <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${
+                      index === 0 ? 'bg-fitness-primary' : 
+                      index === 1 ? 'bg-fitness-accent' : 
+                      index === 2 ? 'bg-teal-500' : 
+                      'bg-cyan-500'
+                    } opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-all duration-300 shadow-lg`}></div>
+                    <div className={`absolute -bottom-1 -left-1 w-3 h-3 rounded-full bg-white opacity-0 group-hover:opacity-100 group-hover:animate-pulse transition-all duration-300 delay-150 shadow-md`}></div>
                   </div>
                   
-                  {/* Title with Gradient */}
+                  {/* Title with Gradient Hover */}
                   <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-gradient-mixed transition-all duration-300">{item.title}</h3>
                   
                   {/* Description */}
                   <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">{item.description}</p>
                 </div>
                 
-                {/* Arrow Connector for desktop - Enhanced visibility */}
+                {/* Enhanced Arrow Connector - Desktop Only */}
                 {index < processSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 left-[105%] w-[calc(100%-2rem)]">
+                  <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 left-[calc(100%+1rem)] z-20">
+                    {/* Animated Path Connector */}
                     <div className="flex items-center">
-                      <div className={`h-0.5 flex-1 bg-gradient-to-r ${
-                        index === 0 ? 'from-fitness-primary to-fitness-accent' : 
-                        index === 1 ? 'from-fitness-accent to-teal-500' : 
-                        index === 2 ? 'from-teal-500 to-cyan-500' : 
-                        'from-cyan-500 to-fitness-primary'
-                      }`}></div>
-                      <ArrowRight size={20} className={`${
+                      {/* Line with Gradient Flow */}
+                      <div className="relative h-1 w-20 overflow-hidden">
+                        <div className={`absolute inset-0 bg-gradient-to-r ${
+                          index === 0 ? 'from-fitness-primary to-fitness-accent' : 
+                          index === 1 ? 'from-fitness-accent to-teal-500' : 
+                          index === 2 ? 'from-teal-500 to-cyan-500' : 
+                          'from-cyan-500 to-fitness-primary'
+                        } rounded-full`}></div>
+                        {/* Animated shine effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                      </div>
+                      
+                      {/* Arrow Icon with Glow */}
+                      <div className={`relative ${
                         index === 0 ? 'text-fitness-primary' : 
                         index === 1 ? 'text-fitness-accent' : 
                         index === 2 ? 'text-teal-500' : 
                         'text-cyan-500'
-                      } flex-shrink-0 mx-2`} />
-                      <div className={`h-0.5 flex-1 bg-gradient-to-r ${
-                        index === 0 ? 'from-fitness-accent to-fitness-primary' : 
-                        index === 1 ? 'from-teal-500 to-fitness-accent' : 
-                        index === 2 ? 'from-cyan-500 to-teal-500' : 
-                        'from-fitness-primary to-cyan-500'
-                      }`}></div>
+                      }`}>
+                        <div className={`absolute inset-0 blur-sm ${
+                          index === 0 ? 'bg-fitness-primary' : 
+                          index === 1 ? 'bg-fitness-accent' : 
+                          index === 2 ? 'bg-teal-500' : 
+                          'bg-cyan-500'
+                        } opacity-50`}></div>
+                        <ArrowRight size={24} className="relative" />
+                      </div>
+                      
+                      {/* Second Line */}
+                      <div className="relative h-1 w-16 overflow-hidden">
+                        <div className={`absolute inset-0 bg-gradient-to-r ${
+                          index === 0 ? 'from-fitness-accent to-fitness-primary' : 
+                          index === 1 ? 'from-teal-500 to-fitness-accent' : 
+                          index === 2 ? 'from-cyan-500 to-teal-500' : 
+                          'from-fitness-primary to-cyan-500'
+                        } rounded-full opacity-70`}></div>
+                      </div>
+                      
+                      {/* Pulsing Dot at End */}
+                      <div className={`absolute -right-2 top-1/2 -translate-y-1/2 w-3 h-3 rounded-full ${
+                        index === 0 ? 'bg-fitness-accent' : 
+                        index === 1 ? 'bg-teal-500' : 
+                        index === 2 ? 'bg-cyan-500' : 
+                        'bg-fitness-primary'
+                      } opacity-50 animate-pulse`}></div>
                     </div>
                   </div>
                 )}
@@ -455,10 +502,10 @@ export default function ServicesPage() {
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Ready to Transform Your Life?
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-xl mb-8">
               Contact me today to schedule your free consultation and start your journey.
             </p>
             <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-fitness-primary px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-fitness-lg">
@@ -475,7 +522,7 @@ export default function ServicesPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920')"
+            backgroundImage: "url('/images/002.jpg')"
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-fitness-dark/95 via-fitness-dark/90 to-fitness-primaryDark/80"></div>

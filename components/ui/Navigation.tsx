@@ -119,19 +119,13 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="relative">
-                <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-fitness-primary to-fitness-primaryDark rounded-xl group-hover:scale-110 transition-transform duration-500">
-                  <Dumbbell size={24} className="text-white" />
-                </div>
-                <div className="absolute inset-0 bg-fitness-primary/30 rounded-xl blur-lg opacity-0 group-hover:opacity-50 transition-opacity duration-500"></div>
-              </div>
               <div className="flex flex-col">
                   <Image
-                    src="/images/mark_logo.jpg"
+                    src="/images/001.jpg"
                     alt="Marksila 254"
                     width={88}
                     height={88}
-                    className="inline-block ml-1 -mt-1"
+                    className="inline-block ml-1 -mt-1 transform group-hover:rotate-6 transition-transform duration-500"
                   />
               </div>
             </Link>

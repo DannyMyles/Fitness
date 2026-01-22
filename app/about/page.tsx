@@ -91,7 +91,7 @@ export default function AboutPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920')"
+            backgroundImage: "url('/images/006.JPG')"
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-fitness-dark/95 via-fitness-dark/80 to-fitness-dark/60"></div>
@@ -118,7 +118,7 @@ export default function AboutPage() {
               Passionate about helping people transform their lives through fitness, 
               proper nutrition, and sustainable lifestyle changes.
             </p>
-          </div>
+          </div> 
         </div>
 
         {/* Scroll indicator */}
@@ -159,7 +159,7 @@ export default function AboutPage() {
             <div className={`relative transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <Image
-                  src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&h=1000&fit=crop"
+                  src="/images/026.JPG"
                   alt="Fitness Trainer"
                   width={600}
                   height={750}

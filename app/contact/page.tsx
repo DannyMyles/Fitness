@@ -8,6 +8,7 @@ import {
   MessageCircle, Calendar, ChevronRight,
   CheckCircle, ArrowRight
 } from 'lucide-react';
+import { FaWhatsapp } from "react-icons/fa6";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ export default function ContactPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1552674605-469523254d4d?w=1920')"
+            backgroundImage: "url('/images/019.JPG')"
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-fitness-dark/95 via-fitness-dark/80 to-fitness-dark/60"></div>
@@ -259,7 +260,7 @@ export default function ContactPage() {
             {/* Additional Info */}
             <div className="space-y-8">
               {/* Quick Contact Options */}
-              <div className="bg-gradient-to-br from-fitness-primary via-fitness-primaryDark to-fitness-accent rounded-3xl p-8 text-white relative overflow-hidden">
+              <div className="bg-gradient-to-br from-fitness-primary via-fitness-primaryDark to-fitness-accent rounded-3xl p-8 relative overflow-hidden">
                 {/* Background pattern */}
                 <div className="absolute inset-0">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
@@ -275,8 +276,8 @@ export default function ContactPage() {
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all duration-300 hover:translate-x-2"
                     >
-                      <div className="w-12 h-12 bg-[#25D366] rounded-xl flex items-center justify-center shadow-fitness">
-                        <MessageCircle size={24} />
+                      <div className="w-12 h-12 bg-[#25D366] text-white rounded-xl flex items-center justify-center shadow-fitness">
+                        <FaWhatsapp size={24} />
                       </div>
                       <div>
                         <p className="font-semibold">WhatsApp</p>

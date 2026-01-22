@@ -5,18 +5,18 @@ import Image from 'next/image';
 import { X, Instagram, Facebook, Twitter } from 'lucide-react';
 
 const galleryImages = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800', category: 'Training', title: 'Personal Training Session' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800', category: 'Workout', title: 'HIIT Class' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800', category: 'Gym', title: 'Strength Training' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', category: 'Results', title: 'Client Transformation' },
-  { id: 5, src: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800', category: 'Training', title: 'Cardio Session' },
-  { id: 6, src: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?w=800', category: 'Online', title: 'Virtual Training' },
-  { id: 7, src: 'https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?w=800', category: 'Nutrition', title: 'Meal Planning' },
-  { id: 8, src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800', category: 'Events', title: 'Fitness Workshop' },
-  { id: 9, src: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800', category: 'Workout', title: 'Group Fitness' },
-  { id: 10, src: 'https://images.unsplash.com/photo-1535743686920-55e4145369b9?w=800', category: 'Training', title: 'Stretching Session' },
-  { id: 11, src: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=800', category: 'Gym', title: 'Equipment Training' },
-  { id: 12, src: 'https://images.unsplash.com/photo-1593079831268-33813b74a812?w=800', category: 'Results', title: 'Before & After' },
+  { id: 1, src: '/images/004.JPG', category: 'Training', title: 'Personal Training Session' },
+  { id: 2, src: '/images/005.JPG', category: 'Workout', title: 'HIIT Class' },
+  { id: 3, src: '/images/006.JPG', category: 'Gym', title: 'Strength Training' },
+  { id: 4, src: '/images/007.JPG', category: 'Results', title: 'Client Transformation' },
+  { id: 5, src: '/images/008.JPG', category: 'Training', title: 'Cardio Session' },
+  { id: 6, src: '/images/026.JPG', category: 'Online', title: 'Virtual Training' },
+  { id: 7, src: '/images/004.JPG', category: 'Nutrition', title: 'Meal Planning' },
+  { id: 8, src: '/images/023.JPG', category: 'Events', title: 'Fitness Workshop' },
+  { id: 9, src: '/images/018.JPG', category: 'Workout', title: 'Group Fitness' },
+  { id: 10, src: '/images/004.JPG', category: 'Training', title: 'Stretching Session' },
+  { id: 11, src: '/images/027.JPG', category: 'Gym', title: 'Equipment Training' },
+  { id: 12, src: '/images/014.jpg', category: 'Results', title: 'Before & After' },
 ];
 
 const categories = ['All', 'Training', 'Workout', 'Gym', 'Results', 'Events', 'Nutrition', 'Online'];
@@ -36,7 +36,7 @@ export default function GalleryPage() {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920')"
+            backgroundImage: "url('/images/005.JPG')"
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-fitness-dark/90 to-fitness-primary/70"></div>
@@ -109,7 +109,7 @@ export default function GalleryPage() {
             Stay updated with daily fitness tips, workout videos, and client transformations on social media.
           </p>
           <div className="flex justify-center gap-6">
-            <a href="#" className="p-4 bg-gradient-to-br from-fitness-primary to-fitness-primaryDark text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">
+            <a href="#" className="p-4 bg-gradient-to-br from-fitness-primary to-fitness-primaryDark from-[#BE2D6B] to-[#771440] text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">
               <Instagram size={28} />
             </a>
             <a href="#" className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">

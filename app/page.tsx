@@ -43,10 +43,10 @@ const testimonials = [
 
 // Gallery images
 const galleryImages = [
-  { src: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop", alt: "Fitness Training" },
-  { src: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=300&fit=crop", alt: "Weight Training" },
-  { src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop", alt: "Personal Training" },
-  { src: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400&h=300&fit=crop", alt: "HIIT Workout" },
+  { src: "/images/004.JPG", alt: "Fitness Training" },
+  { src: "/images/028.JPG", alt: "Weight Training" },
+  { src: "/images/021.JPG", alt: "Personal Training" },
+  { src: "/images/007.JPG", alt: "HIIT Workout" },
 ];
 
 // Features data
@@ -154,7 +154,7 @@ export default function Home() {
             <div className="relative">
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <Image
-                  src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&h=1000&fit=crop"
+                  src="/images/026.JPG"
                   alt="Fitness Trainer"
                   width={600}
                   height={750}
@@ -255,7 +255,7 @@ export default function Home() {
                 description: "One-on-one customized training sessions tailored to your specific goals",
                 price: "From KES 2,000/session",
                 color: "from-orange-500 to-red-500",
-                image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600"
+                image: "/images/009.jpg"
               },
               {
                 icon: Users,
@@ -263,7 +263,7 @@ export default function Home() {
                 description: "Energetic group workouts with camaraderie and team motivation",
                 price: "From KES 500/session",
                 color: "from-teal-500 to-cyan-500",
-                image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600"
+                image: "/images/011.jpeg"
               },
               {
                 icon: Heart,
@@ -345,7 +345,7 @@ export default function Home() {
               >
                 <div className="relative inline-flex items-center justify-center w-24 h-24 mb-6">
                   <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${index === 0 ? 'from-fitness-primary to-fitness-accent' : index === 1 ? 'from-fitness-accent to-teal-500' : index === 2 ? 'from-teal-500 to-cyan-500' : 'from-cyan-500 to-fitness-primary'} opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-500`}></div>
-                  <div className="relative w-20 h-20 bg-gradient-to-br from-fitness-primary to-fitness-accent text-white text-2xl font-bold rounded-full flex items-center justify-center shadow-fitness transform transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+                  <div className="relative w-20 h-20 bg-gradient-to-br from-fitness-primary to-fitness-accent  text-2xl font-bold rounded-full flex items-center justify-center shadow-fitness transform transition-all duration-500 group-hover:scale-110 group-hover:-translate-y-2">
                     {item.step}
                   </div>
                 </div>
@@ -373,14 +373,14 @@ export default function Home() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-white/10 text-white px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm mb-4">
+            <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm font-semibold backdrop-blur-sm mb-4">
               <Star size={16} className="text-yellow-400" />
               <span>Client Testimonials</span>
             </div>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-700 mb-4">
               What <span className="text-gradient-primary">Clients Say</span>
             </h2>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
               Real stories from real people who transformed their lives.
             </p>
           </div>
@@ -409,7 +409,7 @@ export default function Home() {
                   <Quote size={48} className="text-fitness-primary/50" />
                 </div>
                 
-                <p className="text-xl md:text-2xl text-white leading-relaxed mb-8">
+                <p className="text-xl md:text-2xl leading-relaxed mb-8">
                   "{testimonials[currentTestimonial].text}"
                 </p>
                 
@@ -425,10 +425,10 @@ export default function Home() {
                         <Star key={i} size={16} className="fill-yellow-400 text-yellow-400" />
                       ))}
                     </div>
-                    <div className="font-bold text-white text-lg">{testimonials[currentTestimonial].name}</div>
+                    <div className="font-bold text-lg">{testimonials[currentTestimonial].name}</div>
                     <div className="text-gray-400 text-sm">{testimonials[currentTestimonial].role}</div>
                   </div>
-                  <div className="ml-4 bg-gradient-to-br from-fitness-primary to-fitness-accent text-white px-4 py-2 rounded-xl font-bold text-sm">
+                  <div className="ml-4 bg-gradient-to-br from-fitness-primary to-fitness-accent px-4 py-2 rounded-xl font-bold text-sm">
                     {testimonials[currentTestimonial].achievement}
                   </div>
                 </div>
@@ -484,7 +484,7 @@ export default function Home() {
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="w-full h-48 md:h-64 object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-48 md:h-64 lg:h-72 object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="absolute bottom-4 left-4 text-white">
