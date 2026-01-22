@@ -34,15 +34,15 @@ export default function ContactPage() {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+254 700 000 000', '+254 711 111 111'],
+      details: ['+254 701 437 959', '+254 711 111 111'],
       link: 'tel:+254700000000',
       color: 'from-orange-500 to-red-500'
     },
     {
       icon: Mail,
       title: 'Email',
-      details: ['info@marksila254.com', 'bookings@marksila254.com'],
-      link: 'mailto:info@marksila254.com',
+      details: ['markotundo777@gmail.com', 'bookings@marksila254.com'],
+      link: 'mailto:markotundo777@gmail.com',
       color: 'from-green-500 to-emerald-500'
     },
     {
@@ -194,7 +194,7 @@ export default function ContactPage() {
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="form-input"
-                        placeholder="+254 700 000 000"
+                        placeholder="+254 701 437 959"
                       />
                     </div>
                   </div>
@@ -271,7 +271,7 @@ export default function ContactPage() {
                   <h3 className="text-xl font-bold mb-6">Quick Contact Options</h3>
                   <div className="space-y-4">
                     <a 
-                      href="https://wa.me/254700000000"
+                      href="https://wa.me/254701437959"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all duration-300 hover:translate-x-2"

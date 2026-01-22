@@ -51,7 +51,7 @@ const WhatsAppWidget = () => {
               </p>
             </div>
             <a
-              href="https://wa.me/254700000000"
+              href="https://wa.me/254701437959"
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full bg-gradient-to-br from-[#25D366] to-[#20BD5A] text-white text-center py-3.5 rounded-xl font-semibold hover:shadow-fitness-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"

@@ -144,7 +144,7 @@ const Footer = () => {
             <div className="flex items-center gap-4">
               <div>
                 <Image
-                  src="/images/mark_logo.jpg"
+                  src="/images/017.PNG"
                   alt="Marksila 254"
                   width={100}
                   height={100}
@@ -262,7 +262,7 @@ const Footer = () => {
                 <div>
                   <p className="text-xs text-gray-400">Call Us</p>
                   <a href="tel:+254700000000" className="font-medium hover:text-fitness-primary transition-colors">
-                    +254 700 000 000
+                    +254 701 437 959
                   </a>
                 </div>
               </div>
@@ -273,8 +273,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Email Us</p>
-                  <a href="mailto:info@marksila254.com" className="font-medium hover:text-fitness-accent transition-colors">
-                    info@marksila254.com
+                  <a href="mailto:markotundo777@gmail.com" className="font-medium hover:text-fitness-accent transition-colors">
+                    markotundo777@gmail.com
                   </a>
                 </div>
               </div>

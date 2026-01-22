@@ -67,7 +67,7 @@ const Navigation = () => {
                   href="tel:+254700000000"
                   className="hover:text-fitness-primary transition-colors duration-300"
                 >
-                  +254 700 000 000
+                  +254 701 437 959
                 </a>
               </div>
               <div className="hidden md:block h-4 w-px bg-white/20"></div>
@@ -76,10 +76,10 @@ const Navigation = () => {
                   <Mail size={14} className="text-fitness-accent" />
                 </div>
                 <a 
-                  href="mailto:info@marksila254.com"
+                  href="mailto:markotundo777@gmail.com"
                   className="hover:text-fitness-accent transition-colors duration-300"
                 >
-                  info@marksila254.com
+                  markotundo777@gmail.com
                 </a>
               </div>
               <div className="hidden md:block h-4 w-px bg-white/20"></div>
@@ -119,7 +119,7 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col"> */}
                   <Image
                     src="/images/001.jpg"
                     alt="Marksila 254"
@@ -127,7 +127,7 @@ const Navigation = () => {
                     height={88}
                     className="inline-block ml-1 -mt-1 transform group-hover:rotate-6 transition-transform duration-500"
                   />
-              </div>
+              {/* </div> */}
             </Link>
 
             {/* Desktop Navigation */}

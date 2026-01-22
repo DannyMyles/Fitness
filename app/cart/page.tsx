@@ -190,7 +190,7 @@ export default function CartPage() {
                           value={shippingInfo.phone}
                           onChange={(e) => setShippingInfo({...shippingInfo, phone: e.target.value})}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
-                          placeholder="+254 700 000 000"
+                          placeholder="+254 701 437 959"
                         />
                       </div>
                     </div>
