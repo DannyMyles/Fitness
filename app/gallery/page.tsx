@@ -30,26 +30,52 @@ export default function GalleryPage() {
     : galleryImages.filter(img => img.category === activeCategory);
 
   return (
-    <div className="pt-8">
+    <div className="pt-0">
       {/* Hero Section */}
-      <section className="relative py-28 overflow-hidden">
+      <section className="relative py-28 md:py-32 overflow-hidden">
+        {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
           style={{
-            backgroundImage: "url('/images/005.JPG')"
+            backgroundImage: "url('/images/005.JPG')",
+            backgroundColor: '#FF6B35'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-fitness-dark/90 to-fitness-primary/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/70 to-gray-900/50"></div>
+          <div className="absolute inset-0 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDEwNywzNTUsMC4xKSIvPjwvc3ZnPg==')]"></div>
         </div>
         
         <div className="container relative z-10 mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Photo <span className="text-fitness-accent">Gallery</span>
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Photo <span className="text-[#FF6B35]">Gallery</span>
             </h1>
-            <p className="text-xl text-gray-200 leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
               Explore moments from training sessions, client transformations, fitness events, and more.
             </p>
+          </div>
+        </div>
+        
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 group">
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs text-white/70 group-hover:text-white transition-colors">Scroll to explore</span>
+            <div className="relative">
+              <div className="absolute inset-0 border-2 border-white/30 rounded-full animate-ping group-hover:border-white"></div>
+              <div className="w-10 h-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center group-hover:bg-white/20 group-hover:border-white/40 transition-all duration-300">
+                <svg 
+                  className="w-5 h-5 text-white transform group-hover:translate-y-0.5 transition-transform duration-300" 
+                  fill="none" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth="2" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </section>

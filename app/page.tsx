@@ -114,7 +114,7 @@ export default function Home() {
       <Hero />
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 badge mb-4">
