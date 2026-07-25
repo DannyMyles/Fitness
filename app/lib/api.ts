@@ -397,11 +397,21 @@ class ApiClient {
     },
 
     testimonials: {
-      getAll: () => 
+      getAll: () =>
         this.request('/api/v1/testimonials', { requiresAuth: false }),
-      
-      getOne: (id: string) => 
+
+      getOne: (id: string) =>
         this.request(`/api/v1/testimonials/${id}`, { requiresAuth: false }),
+    },
+
+    events: {
+      getAll: (params?: { upcoming?: boolean }) => {
+        const query = params?.upcoming ? '?upcoming=true' : '';
+        return this.request(`/api/v1/events${query}`, { requiresAuth: false });
+      },
+
+      getBySlug: (slug: string) =>
+        this.request(`/api/v1/events/${slug}`, { requiresAuth: false }),
     },
   }
 
@@ -438,12 +448,20 @@ class ApiClient {
     },
 
     user: {
-      getProfile: () => 
+      getProfile: () =>
         this.request('/api/v1/users/profile'),
-      
+
       updateProfile: (data: any) =>
         this.request('/api/v1/users/profile', {
           method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+    },
+
+    events: {
+      register: (slug: string, data: { attendeeName: string; attendeePhone: string }) =>
+        this.request(`/api/v1/events/${slug}/register`, {
+          method: 'POST',
           body: JSON.stringify(data),
         }),
     },
@@ -516,30 +534,60 @@ class ApiClient {
           method: 'POST',
           body: JSON.stringify(data),
         }),
-      
+
       update: (id: string, data: any) =>
         this.request(`/api/v1/trainings/${id}`, {
           method: 'PUT',
           body: JSON.stringify(data),
         }),
-      
+
       delete: (id: string) =>
         this.request(`/api/v1/trainings/${id}`, {
           method: 'DELETE',
         }),
     },
-    
-    testimonial: {
+
+    events: {
       create: (data: any) =>
-        this.request('/api/v1/testimonials', {
+        this.request('/api/v1/events', {
           method: 'POST',
           body: JSON.stringify(data),
         }),
-      
+
       update: (id: string, data: any) =>
-        this.request(`/api/v1/testimonials/${id}`, {
+        this.request(`/api/v1/events/${id}`, {
           method: 'PUT',
           body: JSON.stringify(data),
+        }),
+
+      delete: (id: string) =>
+        this.request(`/api/v1/events/${id}`, {
+          method: 'DELETE',
+        }),
+
+      getRegistrations: (id: string) =>
+        this.request(`/api/v1/events/${id}/registrations`),
+
+      updateRegistrationStatus: (id: string, status: string) =>
+        this.request(`/api/v1/events/registrations/${id}/status`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        }),
+    },
+
+    testimonial: {
+      create: (data: FormData) =>
+        this.request('/api/v1/testimonials', {
+          method: 'POST',
+          body: data,
+          headers: {},
+        }),
+
+      update: (id: string, data: FormData) =>
+        this.request(`/api/v1/testimonials/${id}`, {
+          method: 'PUT',
+          body: data,
+          headers: {},
         }),
       
       delete: (id: string) =>

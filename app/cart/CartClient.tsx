@@ -36,6 +36,7 @@ export default function CartClient() {
   const setQuantity = useCartStore((s) => s.setQuantity);
   const clearCart = useCartStore((s) => s.clear);
   const subtotal = useCartStore((s) => s.subtotal());
+  const hasHydrated = useCartStore((s) => s.hasHydrated);
 
   const shipping = subtotal > 5000 ? 0 : 500;
   const total = subtotal + shipping;
@@ -121,7 +122,11 @@ export default function CartClient() {
             {/* Main Content */}
             <div className="lg:col-span-2">
               {currentStep === 0 ? (
-                lines.length === 0 ? (
+                !hasHydrated ? (
+                  <div className="bg-white rounded-xl shadow-card p-12 text-center">
+                    <Loader2 size={32} className="mx-auto animate-spin text-gray-300 mb-4" />
+                  </div>
+                ) : lines.length === 0 ? (
                   <div className="bg-white rounded-xl shadow-card p-12 text-center">
                     <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
                     <h2 className="text-xl font-bold text-fitness-dark mb-2">Your cart is empty</h2>
@@ -357,7 +362,7 @@ export default function CartClient() {
             </div>
 
             {/* Order Summary */}
-            {currentStep === 0 && lines.length > 0 && (
+            {currentStep === 0 && hasHydrated && lines.length > 0 && (
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-xl shadow-card p-6 sticky top-24">
                   <h2 className="text-xl font-bold text-fitness-dark mb-6">Order Summary</h2>

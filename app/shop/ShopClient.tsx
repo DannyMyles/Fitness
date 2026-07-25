@@ -31,6 +31,7 @@ export default function ShopClient() {
   const setQuantity = useCartStore((s) => s.setQuantity);
   const subtotal = useCartStore((s) => s.subtotal());
   const cartCount = useCartStore((s) => s.count());
+  const hasHydrated = useCartStore((s) => s.hasHydrated);
 
   useEffect(() => {
     productService
@@ -54,11 +55,14 @@ export default function ShopClient() {
 
   const quantityInCart = useMemo(() => {
     const map = new Map<number, number>();
+    // Cart is localStorage-backed — treat it as empty until hydration
+    // completes so the first client render always matches SSR output.
+    if (!hasHydrated) return map;
     for (const line of lines) {
       map.set(line.productId, (map.get(line.productId) ?? 0) + line.quantity);
     }
     return map;
-  }, [lines]);
+  }, [lines, hasHydrated]);
 
   const productsJsonLd = {
     '@context': 'https://schema.org',
@@ -244,7 +248,7 @@ export default function ShopClient() {
                     const inCart = quantityInCart.get(product.id) ?? 0;
                     return (
                       <div key={product.id} className="card-fitness overflow-hidden group">
-                        <div className="relative h-56 overflow-hidden bg-gray-100">
+                        <Link href={`/shop/${product.slug}`} className="relative h-56 overflow-hidden bg-gray-100 block">
                           <img
                             src={product.images[0]}
                             alt={product.name}
@@ -260,14 +264,19 @@ export default function ShopClient() {
                               <span className="text-white font-semibold">Out of Stock</span>
                             </div>
                           )}
-                          <button className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition-colors">
+                          <button
+                            onClick={(e) => e.preventDefault()}
+                            className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                          >
                             <Heart size={18} className="text-gray-600" />
                           </button>
-                        </div>
+                        </Link>
 
                         <div className="p-5">
                           <p className="text-sm text-fitness-primary mb-1">{product.category?.name}</p>
-                          <h3 className="font-bold text-gray-900 mb-2">{product.name}</h3>
+                          <Link href={`/shop/${product.slug}`}>
+                            <h3 className="font-bold text-gray-900 mb-2 hover:text-fitness-primary transition-colors">{product.name}</h3>
+                          </Link>
                           <p className="text-sm text-gray-800 mb-3 line-clamp-2">{product.description}</p>
 
                           <div className="flex items-center justify-between mb-4">
@@ -314,7 +323,7 @@ export default function ShopClient() {
       </section>
 
       {/* Cart Button */}
-      {cartCount > 0 && (
+      {hasHydrated && cartCount > 0 && (
         <Link
           href="/cart"
           className="fixed bottom-6 right-6 z-40 bg-fitness-primary text-white px-6 py-3 rounded-full shadow-fitness-lg flex items-center gap-2 hover:bg-fitness-primary-dark transition-colors"

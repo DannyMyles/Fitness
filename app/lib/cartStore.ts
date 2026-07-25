@@ -14,6 +14,8 @@ export interface CartLine {
 
 interface CartState {
   lines: CartLine[];
+  hasHydrated: boolean;
+  setHasHydrated: (value: boolean) => void;
   addItem: (product: Product, quantity?: number, size?: string, color?: string) => void;
   removeItem: (productId: number, size?: string, color?: string) => void;
   setQuantity: (productId: number, quantity: number, size?: string, color?: string) => void;
@@ -30,6 +32,8 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       lines: [],
+      hasHydrated: false,
+      setHasHydrated: (value) => set({ hasHydrated: value }),
 
       addItem: (product, quantity = 1, size, color) => {
         set((state) => {
@@ -78,6 +82,17 @@ export const useCartStore = create<CartState>()(
       subtotal: () => get().lines.reduce((sum, l) => sum + l.price * l.quantity, 0),
       count: () => get().lines.reduce((sum, l) => sum + l.quantity, 0),
     }),
-    { name: 'mark254-cart' }
+    {
+      name: 'mark254-cart',
+      // Cart data is only known once localStorage has been read on the
+      // client — until then `hasHydrated` stays false everywhere (including
+      // on the server, which never rehydrates), so the very first client
+      // render always matches SSR output regardless of what's actually
+      // stored. Consumers gate cart-derived conditional UI on this flag to
+      // avoid hydration mismatches for returning visitors with items saved.
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
+    }
   )
 );

@@ -94,5 +94,22 @@ export const productService = {
       });
       return handle<Category>(res);
     },
+
+    updateCategory: async (id: number, data: { name?: string; description?: string }): Promise<Category> => {
+      const res = await fetch(`/api/commerce/admin/categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      return handle<Category>(res);
+    },
+
+    deleteCategory: async (id: number): Promise<void> => {
+      const res = await fetch(`/api/commerce/admin/categories/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Request failed with status ${res.status}`);
+      }
+    },
   },
 };

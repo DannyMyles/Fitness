@@ -9,6 +9,14 @@ export interface Testimonial {
   rating: number
   image: string
   avatarColor: string
+  achievement?: string
+  photoUrl?: string
+  photoInfo?: {
+    hasPhoto: boolean
+    contentType?: string
+    size?: number
+    url: string
+  }
   featured: boolean
   isActive: boolean
   createdAt: string
@@ -34,7 +42,9 @@ export interface CreateTestimonialRequest {
   rating: number
   image?: string
   avatarColor: string
+  achievement?: string
   featured: boolean
+  photoFile?: File | null
 }
 
 export const testimonialService = {
@@ -86,7 +96,21 @@ export const testimonialService = {
   // Create testimonial (admin only)
   createTestimonial: async (data: CreateTestimonialRequest): Promise<Testimonial> => {
     try {
-      return await api.admin.testimonial.create(data)
+      const formData = new FormData()
+      formData.append('name', data.name)
+      formData.append('role', data.role)
+      formData.append('content', data.content)
+      formData.append('rating', data.rating.toString())
+      formData.append('avatarColor', data.avatarColor)
+      formData.append('featured', data.featured.toString())
+
+      if (data.company) formData.append('company', data.company)
+      if (data.image) formData.append('image', data.image)
+      if (data.achievement) formData.append('achievement', data.achievement)
+      if (data.photoFile) formData.append('photo', data.photoFile)
+
+      const response = await api.admin.testimonial.create(formData)
+      return ((response as any).testimonial || response) as Testimonial
     } catch (error) {
       console.error('Error creating testimonial:', error)
       throw error
@@ -96,7 +120,20 @@ export const testimonialService = {
   // Update testimonial (admin only)
   updateTestimonial: async (id: string, data: Partial<CreateTestimonialRequest>): Promise<Testimonial> => {
     try {
-      return await api.admin.testimonial.update(id, data)
+      const formData = new FormData()
+      if (data.name) formData.append('name', data.name)
+      if (data.role) formData.append('role', data.role)
+      if (data.content) formData.append('content', data.content)
+      if (data.rating !== undefined) formData.append('rating', data.rating.toString())
+      if (data.avatarColor) formData.append('avatarColor', data.avatarColor)
+      if (data.featured !== undefined) formData.append('featured', data.featured.toString())
+      if (data.company !== undefined) formData.append('company', data.company)
+      if (data.image !== undefined) formData.append('image', data.image)
+      if (data.achievement !== undefined) formData.append('achievement', data.achievement)
+      if (data.photoFile) formData.append('photo', data.photoFile)
+
+      const response = await api.admin.testimonial.update(id, formData)
+      return ((response as any).testimonial || response) as Testimonial
     } catch (error) {
       console.error(`Error updating testimonial ${id}:`, error)
       throw error
@@ -185,6 +222,23 @@ export const testimonialService = {
   // Render stars
   renderStars: (rating: number): string => {
     return '★'.repeat(rating) + '☆'.repeat(5 - rating)
+  },
+
+  // Featured + active testimonials for public display (e.g. homepage carousel)
+  getFeaturedForDisplay: (testimonials: Testimonial[]): Testimonial[] => {
+    return testimonials.filter((t) => t.featured && t.isActive)
+  },
+
+  // Get the uploaded photo URL for a testimonial, or '' if none was uploaded
+  getPhotoUrl: (testimonial: Testimonial): string => {
+    if (!testimonial.photoInfo?.hasPhoto) return ''
+
+    if (process.env.NODE_ENV === 'development') {
+      return `/api/v1/testimonials/${testimonial.id}/photo`
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'
+    return `${baseUrl}${testimonial.photoInfo.url}`
   }
 }
 

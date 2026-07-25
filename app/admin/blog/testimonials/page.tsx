@@ -291,12 +291,20 @@ export default function TestimonialsManagementPage() {
                   <p className="font-medium text-gray-900 mb-2">Testimonial Details:</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-3">
-                      <div 
-                        className="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-xs"
-                        style={{ backgroundColor: testimonialToDelete.avatarColor }}
-                      >
-                        {testimonialService.getInitials(testimonialToDelete.name)}
-                      </div>
+                      {testimonialToDelete.photoInfo?.hasPhoto ? (
+                        <img
+                          src={testimonialService.getPhotoUrl(testimonialToDelete)}
+                          alt={testimonialToDelete.name}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-xs"
+                          style={{ backgroundColor: testimonialToDelete.avatarColor }}
+                        >
+                          {testimonialService.getInitials(testimonialToDelete.name)}
+                        </div>
+                      )}
                       <div>
                         <div className="font-medium text-gray-900">{testimonialToDelete.name}</div>
                         <div className="text-gray-700">{testimonialToDelete.role}</div>
@@ -547,12 +555,20 @@ export default function TestimonialsManagementPage() {
             <div key={testimonial.id} className="adventure-card group hover:shadow-adventure-lg transition-shadow">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="h-12 w-12 rounded-full flex items-center justify-center text-white font-semibold"
-                    style={{ backgroundColor: testimonial.avatarColor }}
-                  >
-                    {testimonial.image || testimonialService.getInitials(testimonial.name)}
-                  </div>
+                  {testimonial.photoInfo?.hasPhoto ? (
+                    <img
+                      src={testimonialService.getPhotoUrl(testimonial)}
+                      alt={testimonial.name}
+                      className="h-12 w-12 rounded-full object-cover flex-shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="h-12 w-12 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0"
+                      style={{ backgroundColor: testimonial.avatarColor }}
+                    >
+                      {testimonial.image || testimonialService.getInitials(testimonial.name)}
+                    </div>
+                  )}
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium text-gray-900">{testimonial.name}</h3>

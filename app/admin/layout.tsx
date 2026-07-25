@@ -1,18 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import {
   LayoutDashboard, Users, ShoppingBag, FileText,
-  LogOut, Menu, X, Dumbbell, ShoppingCart
+  LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar
 } from 'lucide-react';
 
 const sidebarLinks = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
   { icon: Users, label: 'Users', href: '/admin/users' },
   { icon: ShoppingBag, label: 'Products', href: '/admin/products' },
+  { icon: Tags, label: 'Categories', href: '/admin/categories' },
   { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
   { icon: Dumbbell, label: 'Services', href: '/admin/services' },
+  { icon: Calendar, label: 'Events', href: '/admin/events' },
   { icon: FileText, label: 'Blog', href: '/admin/blog' },
 ];
 
@@ -22,7 +26,29 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const pathname = usePathname() || '';
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const isAdmin = status === 'authenticated' && session?.user?.role === 'admin';
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.replace(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+    } else if (status === 'authenticated' && session?.user?.role !== 'admin') {
+      router.replace('/');
+    }
+  }, [status, session, router, pathname]);
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-gray-500">
+          <Loader2 size={32} className="animate-spin text-fitness-primary" />
+          <p>{status === 'loading' ? 'Loading...' : 'Redirecting...'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

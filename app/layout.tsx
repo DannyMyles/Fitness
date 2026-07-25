@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/ui/Navigation";
-import Footer from "@/components/ui/Footer";
-import WhatsAppWidget from "@/components/ui/WhatsAppWidget";
+import SiteChrome from "@/components/ui/SiteChrome";
 import AuthProvider from "./providers/AuthProvider";
 
 const inter = Inter({ 
@@ -90,12 +88,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
         />
         <AuthProvider>
-          <Navigation />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <WhatsAppWidget />
+          <SiteChrome>{children}</SiteChrome>
         </AuthProvider>
       </body>
     </html>

@@ -5,42 +5,12 @@ import Hero from "@/components/ui/Hero";
 import CtaSection from "@/components/ui/CtaSection";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Dumbbell, Heart, Zap, Clock, Users, Award, 
+import {
+  Dumbbell, Heart, Zap, Clock, Users, Award,
   ChevronRight, ArrowRight, Star, Play, Quote,
-  ArrowLeft, ArrowRight as ArrowRightIcon
+  ArrowLeft, ArrowRight as ArrowRightIcon, Loader2
 } from 'lucide-react';
-
-// Testimonials data
-const testimonials = [
-  {
-    id: 1,
-    name: "Sarah M.",
-    role: "Weight Loss Client",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop",
-    rating: 5,
-    text: "Marksila254 transformed my life! I lost 30kg in 6 months with personalized training and nutrition guidance. The support and motivation kept me going even on tough days.",
-    achievement: "-30kg Lost"
-  },
-  {
-    id: 2,
-    name: "James K.",
-    role: "Muscle Building",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",
-    rating: 5,
-    text: "The best personal trainer in Nairobi! Customized programs that actually work. I've gained significant muscle mass and improved my overall strength dramatically.",
-    achievement: "+15kg Muscle"
-  },
-  {
-    id: 3,
-    name: "Emily R.",
-    role: "Fitness Enthusiast",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
-    rating: 5,
-    text: "Amazing energy and expertise! The group classes are incredibly motivating. I've never felt stronger or more confident in my fitness journey.",
-    achievement: "Marathon Ready"
-  }
-];
+import { testimonialService, Testimonial } from '@/app/api_services/testimonialService';
 
 // Gallery images
 const galleryImages = [
@@ -79,25 +49,37 @@ const features = [
 ];
 
 export default function HomeClient() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [isLoadingTestimonials, setIsLoadingTestimonials] = useState(true);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
-    
+    testimonialService
+      .getAllTestimonials()
+      .then((res) => setTestimonials(testimonialService.getFeaturedForDisplay(res.testimonials)))
+      .catch(() => setTestimonials([]))
+      .finally(() => setIsLoadingTestimonials(false));
+  }, []);
+
+  useEffect(() => {
+    if (!isAutoPlaying || testimonials.length === 0) return;
+
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, testimonials.length]);
 
   const nextTestimonial = () => {
+    if (testimonials.length === 0) return;
     setIsAutoPlaying(false);
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
   };
 
   const prevTestimonial = () => {
+    if (testimonials.length === 0) return;
     setIsAutoPlaying(false);
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
@@ -251,6 +233,7 @@ export default function HomeClient() {
       </section>
 
       {/* Testimonials Section */}
+      {(isLoadingTestimonials || testimonials.length > 0) && (
       <section className="py-20 bg-gray-50 relative overflow-hidden">
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
@@ -267,22 +250,31 @@ export default function HomeClient() {
           </div>
 
           <div className="max-w-4xl mx-auto">
+            {isLoadingTestimonials ? (
+              <div className="flex items-center justify-center py-16 text-gray-400">
+                <Loader2 className="animate-spin" size={32} />
+              </div>
+            ) : (
             <div className="relative bg-white rounded-3xl p-8 md:p-12 shadow-card border border-gray-100">
               {/* Navigation Buttons */}
-              <button
-                onClick={prevTestimonial}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all duration-300 hover:scale-110"
-                aria-label="Previous testimonial"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <button
-                onClick={nextTestimonial}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all duration-300 hover:scale-110"
-                aria-label="Next testimonial"
-              >
-                <ArrowRightIcon size={20} />
-              </button>
+              {testimonials.length > 1 && (
+                <>
+                  <button
+                    onClick={prevTestimonial}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all duration-300 hover:scale-110"
+                    aria-label="Previous testimonial"
+                  >
+                    <ArrowLeft size={20} />
+                  </button>
+                  <button
+                    onClick={nextTestimonial}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-all duration-300 hover:scale-110"
+                    aria-label="Next testimonial"
+                  >
+                    <ArrowRightIcon size={20} />
+                  </button>
+                </>
+              )}
 
               {/* Testimonial Content */}
               <div className="text-center">
@@ -291,15 +283,24 @@ export default function HomeClient() {
                 </div>
 
                 <p className="text-xl md:text-2xl leading-relaxed mb-8 text-gray-800">
-                  "{testimonials[currentTestimonial].text}"
+                  "{testimonials[currentTestimonial].content}"
                 </p>
 
                 <div className="flex items-center justify-center gap-6">
-                  <img
-                    src={testimonials[currentTestimonial].image}
-                    alt={testimonials[currentTestimonial].name}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-fitness-primary"
-                  />
+                  {testimonials[currentTestimonial].photoInfo?.hasPhoto ? (
+                    <img
+                      src={testimonialService.getPhotoUrl(testimonials[currentTestimonial])}
+                      alt={testimonials[currentTestimonial].name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-fitness-primary flex-shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center border-2 border-fitness-primary text-white font-bold text-lg flex-shrink-0"
+                      style={{ backgroundColor: testimonials[currentTestimonial].avatarColor }}
+                    >
+                      {testimonials[currentTestimonial].image || testimonialService.getInitials(testimonials[currentTestimonial].name)}
+                    </div>
+                  )}
                   <div className="text-left">
                     <div className="flex items-center gap-2 mb-1">
                       {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
@@ -309,38 +310,44 @@ export default function HomeClient() {
                     <div className="font-bold text-lg text-gray-900">{testimonials[currentTestimonial].name}</div>
                     <div className="text-gray-500 text-sm">{testimonials[currentTestimonial].role}</div>
                   </div>
-                  <div className="ml-4 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white px-4 py-2 rounded-xl font-bold text-sm">
-                    {testimonials[currentTestimonial].achievement}
-                  </div>
+                  {testimonials[currentTestimonial].achievement && (
+                    <div className="ml-4 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white px-4 py-2 rounded-xl font-bold text-sm">
+                      {testimonials[currentTestimonial].achievement}
+                    </div>
+                  )}
                 </div>
               </div>
 
               {/* Dots Navigation */}
-              <div className="flex justify-center gap-2 mt-8">
-                {testimonials.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setIsAutoPlaying(false);
-                      setCurrentTestimonial(index);
-                    }}
-                    className="p-2 flex items-center justify-center"
-                    aria-label={`Go to testimonial ${index + 1}`}
-                  >
-                    <span
-                      className={`h-3 rounded-full transition-all duration-300 ${
-                        index === currentTestimonial
-                          ? 'bg-gradient-to-r from-fitness-primary to-fitness-primary-dark w-8'
-                          : 'w-3 bg-gray-200 hover:bg-gray-300'
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
+              {testimonials.length > 1 && (
+                <div className="flex justify-center gap-2 mt-8">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setIsAutoPlaying(false);
+                        setCurrentTestimonial(index);
+                      }}
+                      className="p-2 flex items-center justify-center"
+                      aria-label={`Go to testimonial ${index + 1}`}
+                    >
+                      <span
+                        className={`h-3 rounded-full transition-all duration-300 ${
+                          index === currentTestimonial
+                            ? 'bg-gradient-to-r from-fitness-primary to-fitness-primary-dark w-8'
+                            : 'w-3 bg-gray-200 hover:bg-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+            )}
           </div>
         </div>
       </section>
+      )}
 
       {/* Gallery Preview Section — compact teaser, full grid lives on /gallery */}
       <section className="py-16 bg-white">

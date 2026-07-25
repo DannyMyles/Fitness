@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  ArrowLeft, 
-  Save, 
+import {
+  ArrowLeft,
+  Save,
   Star,
   User,
   Building,
@@ -12,7 +12,9 @@ import {
   Palette,
   Eye,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Upload,
+  X
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateTestimonialRequest, testimonialService } from '@/app/api_services/testimonialService'
@@ -21,7 +23,8 @@ export default function CreateTestimonialPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+
   // Form state
   const [formData, setFormData] = useState<CreateTestimonialRequest>({
     name: '',
@@ -31,7 +34,32 @@ export default function CreateTestimonialPage() {
     rating: 5,
     avatarColor: '#3b82f6',
     featured: true,
+    photoFile: null,
   })
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB')
+      return
+    }
+
+    setFormData({ ...formData, photoFile: file })
+    const reader = new FileReader()
+    reader.onload = (e) => setPhotoPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const removePhoto = () => {
+    setFormData({ ...formData, photoFile: null })
+    setPhotoPreview(null)
+  }
 
   const avatarColors = [
     '#3b82f6', // Blue
@@ -256,11 +284,25 @@ export default function CreateTestimonialPage() {
                       ? 'text-red-500' 
                       : 'text-green-500'
                   }`}>
-                    {formData.content.length < 20 ? 'Minimum 20 characters' : 
-                     formData.content.length > 500 ? 'Maximum 500 characters' : 
+                    {formData.content.length < 20 ? 'Minimum 20 characters' :
+                     formData.content.length > 500 ? 'Maximum 500 characters' :
                      'Good length'}
                   </span>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Achievement Badge (optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.achievement ?? ''}
+                  onChange={(e) => setFormData({...formData, achievement: e.target.value})}
+                  placeholder="e.g. -30kg Lost, +15kg Muscle"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Shown as a highlight badge next to the testimonial, if provided</p>
               </div>
             </div>
           </div>
@@ -270,21 +312,56 @@ export default function CreateTestimonialPage() {
         <div className="space-y-6">
           {/* Avatar Preview */}
           <div className="adventure-card">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Avatar Preview</h3>
-            
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Photo / Avatar</h3>
+
             <div className="space-y-4">
               <div className="flex items-center justify-center">
-                <div 
-                  className="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
-                  style={{ backgroundColor: formData.avatarColor }}
-                >
-                  {testimonialService.getInitials(formData.name || 'JD')}
-                </div>
+                {photoPreview ? (
+                  <div className="relative">
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      className="h-24 w-24 rounded-full object-cover shadow-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={removePhoto}
+                      className="absolute -top-1 -right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      disabled={loading}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg"
+                    style={{ backgroundColor: formData.avatarColor }}
+                  >
+                    {testimonialService.getInitials(formData.name || 'JD')}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="flex-1 cursor-pointer block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoChange}
+                    className="hidden"
+                    disabled={loading}
+                  />
+                  <div className="flex items-center justify-center gap-2 bg-accent-50 text-accent-700 py-2 px-4 rounded-lg hover:bg-accent-100 transition-colors text-sm font-medium">
+                    <Upload className="h-4 w-4" />
+                    {photoPreview ? 'Replace Photo' : 'Upload Photo'}
+                  </div>
+                </label>
+                <p className="text-xs text-gray-500 mt-2">Optional — max 5MB. Without a photo, a colored initials avatar is used instead.</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Avatar Color
+                  Avatar Color {photoPreview && <span className="text-gray-400 font-normal">(used if photo is removed)</span>}
                 </label>
                 <div className="grid grid-cols-5 gap-2">
                   {avatarColors.map((color) => (
@@ -349,12 +426,16 @@ export default function CreateTestimonialPage() {
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div 
-                    className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"
-                    style={{ backgroundColor: formData.avatarColor }}
-                  >
-                    {testimonialService.getInitials(formData.name || 'JD')}
-                  </div>
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="" className="h-10 w-10 rounded-full object-cover" />
+                  ) : (
+                    <div
+                      className="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold"
+                      style={{ backgroundColor: formData.avatarColor }}
+                    >
+                      {testimonialService.getInitials(formData.name || 'JD')}
+                    </div>
+                  )}
                   <div>
                     <p className="font-medium text-gray-900">
                       {formData.name || 'John Doe'}

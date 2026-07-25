@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Save, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { productService, ProductInput } from '@/app/api_services/productService'
@@ -115,7 +116,16 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-gray-700">Category</label>
+              <Link
+                href="/admin/categories"
+                target="_blank"
+                className="text-xs text-accent-600 hover:text-accent-700 font-medium"
+              >
+                + Manage categories
+              </Link>
+            </div>
             <select
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
