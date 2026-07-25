@@ -12,10 +12,8 @@ import {
   Shield,
   CheckCircle,
   XCircle,
-  Edit, 
-  Trash2, 
-  Eye,
-  MoreVertical,
+  Edit,
+  Trash2,
   Download,
   AlertCircle,
   RefreshCw,
@@ -564,14 +562,6 @@ export default function UsersManagementPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-1">
-                            <Link
-                              href={`/admin/users/${user._id}`}
-                              className="p-2 hover:bg-blue-100 rounded-lg transition-colors text-blue-600"
-                              title="View Profile"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Link>
-                            
                             <Link
                               href={`/admin/users/edit/${user._id}`}
                               className="p-2 hover:bg-orange-100 rounded-lg transition-colors text-[#FF6B35]"

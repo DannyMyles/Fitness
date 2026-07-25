@@ -480,14 +480,6 @@ export default function BlogManagementPage() {
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
-                        <Link
-                          href={`/blog/${blog.slug}`}
-                          target="_blank"
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
-                          title="Preview"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
                       </div>
                     </td>
                   </tr>

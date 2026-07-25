@@ -668,17 +668,6 @@ export default function EditBlogPage() {
             </div>
           </div>
 
-          {/* Preview Button */}
-          <div className="adventure-card">
-            <Link
-              href={`/blog/${id}`}
-              target="_blank"
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
-            >
-              <Eye className="h-4 w-4" />
-              Preview Blog Post
-            </Link>
-          </div>
         </div>
       </form>
 

@@ -103,7 +103,7 @@ export default function CreateTestimonialPage() {
 
       const response = await testimonialService.createTestimonial(testimonialData)
       toast.success('Testimonial created successfully!')
-      router.push('/admin/testimonials')
+      router.push('/admin/blog/testimonials')
       
     } catch (err: any) {
       console.error('Error creating testimonial:', err)

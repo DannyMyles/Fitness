@@ -44,10 +44,10 @@ const Footer = () => {
   ];
 
   const services = [
-    { name: 'Personal Training', href: '/services/personal-training' },
-    { name: 'Group Classes', href: '/services/group-classes' },
-    { name: 'Online Training', href: '/services/online-training' },
-    { name: 'Nutrition Coaching', href: '/services/nutrition-coaching' },
+    { name: 'Personal Training', href: '/services' },
+    { name: 'Group Classes', href: '/services' },
+    { name: 'Online Training', href: '/services' },
+    { name: 'Nutrition Coaching', href: '/services' },
     { name: 'Fitness Shop', href: '/shop' },
   ];
 
@@ -59,45 +59,41 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white">
-      {/* Animated Background */}
+    <footer className="relative overflow-hidden bg-gray-50 text-gray-700 border-t border-gray-100">
+      {/* Background accents */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-fitness-primary/5 via-transparent to-transparent"></div>
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-fitness-primary/5 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-fitness-accent/5 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-grid"></div>
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-fitness-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-fitness-primary-dark/5 rounded-full blur-3xl"></div>
       </div>
 
       {/* Floating Elements */}
-      <div className="absolute top-10 left-10 w-6 h-6 rounded-full bg-fitness-primary/30 animate-float"></div>
-      <div className="absolute top-20 right-20 w-8 h-8 rounded-full bg-fitness-accent/30 animate-float-delayed"></div>
-      <div className="absolute bottom-20 left-1/3 w-4 h-4 rounded-full bg-white/20 animate-float"></div>
+      <div className="absolute top-10 left-10 w-6 h-6 rounded-full bg-fitness-primary/20 animate-float"></div>
+      <div className="absolute top-20 right-20 w-8 h-8 rounded-full bg-fitness-accent/20 animate-float-delayed"></div>
 
       <div className="container mx-auto px-4 py-16 relative z-10">
         {/* Newsletter Banner */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border border-gray-800 p-8 mb-16"
+          className="relative overflow-hidden rounded-3xl bg-white border border-gray-200 shadow-card p-8 mb-16"
         >
-          <div className="absolute top-0 left-0 w-32 h-32 bg-fitness-primary/10 rounded-full -translate-x-16 -translate-y-16"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-fitness-accent/10 rounded-full translate-x-16 translate-y-16"></div>
-          
+          <div className="absolute top-0 left-0 w-32 h-32 bg-fitness-primary/5 rounded-full -translate-x-16 -translate-y-16"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-fitness-primary/5 rounded-full translate-x-16 translate-y-16"></div>
+
           <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-fitness-primary to-fitness-accent text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <div className="inline-flex items-center gap-2 bg-fitness-primary/10 text-fitness-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
                 <Sparkles size={16} />
                 <span>Exclusive Content</span>
               </div>
-              <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent">
+              <h3 className="text-3xl font-bold mb-3 text-fitness-dark">
                 Transform Your Fitness Journey
               </h3>
-              <p className="text-gray-300 max-w-xl">
+              <p className="text-gray-600 max-w-xl">
                 Join our community of fitness enthusiasts. Get weekly workout plans, nutrition tips, and exclusive discounts delivered to your inbox.
               </p>
             </div>
-            
+
             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <div className="relative">
                 <input
@@ -105,7 +101,7 @@ const Footer = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full sm:w-80 px-5 py-4 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition-all duration-300"
+                  className="w-full sm:w-80 px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-fitness-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition-all duration-300"
                 />
               </div>
               <motion.button
@@ -144,33 +140,33 @@ const Footer = () => {
             <div className="flex items-center gap-4">
               <div>
                 <Image
-                  src="/images/017.PNG"
+                  src="/images/logo.svg"
                   alt="Marksila 254"
-                  width={100}
-                  height={100}
-                  className="inline-block"
+                  width={180}
+                  height={146}
+                  className="h-20 w-auto inline-block"
                 />
-                <p className="text-sm text-gray-400 mt-1">Love Your Body</p>
+                <p className="text-sm text-gray-500 mt-1">Love Your Body</p>
               </div>
             </div>
             
-            <p className="text-gray-300 leading-relaxed max-w-md">
+            <p className="text-gray-600 leading-relaxed max-w-md">
               Transforming lives through expert fitness training, nutrition guidance, and personalized workout programs tailored to your goals.
             </p>
-            
+
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.05 }}
-                  className="p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800"
+                  className="p-3 rounded-xl bg-white border border-gray-200 shadow-sm"
                 >
                   <div className="flex items-center gap-2">
                     <feature.icon size={16} className="text-fitness-primary" />
-                    <span className="text-sm text-gray-300">{feature.text}</span>
+                    <span className="text-sm text-gray-600">{feature.text}</span>
                   </div>
-                  <div className="text-xl font-bold mt-1">{feature.count}</div>
+                  <div className="text-xl font-bold mt-1 text-fitness-dark">{feature.count}</div>
                 </motion.div>
               ))}
             </div>
@@ -183,24 +179,24 @@ const Footer = () => {
             transition={{ delay: 0.1 }}
             className="space-y-6"
           >
-            <h4 className="text-lg font-semibold relative">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-fitness-primary to-fitness-accent rounded-full"></span>
+            <h4 className="text-lg font-semibold relative text-fitness-dark">
+              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary rounded-full"></span>
               Quick Links
             </h4>
             <ul className="space-y-2">
               {quickLinks.map((link, index) => (
-                <motion.li 
+                <motion.li
                   key={index}
                   whileHover={{ x: 5 }}
                   onMouseEnter={() => setIsHovered(index)}
                   onMouseLeave={() => setIsHovered(-1)}
                 >
-                  <Link 
-                    href={link.href} 
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all duration-300 group"
+                  <Link
+                    href={link.href}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition-all duration-300 group"
                   >
-                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${isHovered === index ? 'from-fitness-primary to-fitness-accent' : 'from-gray-600 to-gray-600'} transition-all duration-300`}></div>
-                    <span className="text-gray-300 group-hover:text-white group-hover:translate-x-1 transition-all duration-300">
+                    <div className={`w-1.5 h-1.5 rounded-full ${isHovered === index ? 'bg-fitness-primary' : 'bg-gray-300'} transition-all duration-300`}></div>
+                    <span className="text-gray-600 group-hover:text-fitness-dark group-hover:translate-x-1 transition-all duration-300">
                       {link.name}
                     </span>
                   </Link>
@@ -210,30 +206,30 @@ const Footer = () => {
           </motion.div>
 
           {/* Services */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="space-y-6"
           >
-            <h4 className="text-lg font-semibold relative">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-fitness-accent to-fitness-primary rounded-full"></span>
+            <h4 className="text-lg font-semibold relative text-fitness-dark">
+              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary-dark rounded-full"></span>
               Services
             </h4>
             <ul className="space-y-2">
               {services.map((service, index) => (
-                <motion.li 
+                <motion.li
                   key={index}
                   whileHover={{ x: 5 }}
                   onMouseEnter={() => setIsHovered(index + 10)}
                   onMouseLeave={() => setIsHovered(-1)}
                 >
-                  <Link 
-                    href={service.href} 
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all duration-300 group"
+                  <Link
+                    href={service.href}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition-all duration-300 group"
                   >
-                    <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${isHovered === index + 10 ? 'from-fitness-primary to-fitness-accent' : 'from-gray-600 to-gray-600'} transition-all duration-300`}></div>
-                    <span className="text-gray-300 group-hover:text-white group-hover:translate-x-1 transition-all duration-300">
+                    <div className={`w-1.5 h-1.5 rounded-full ${isHovered === index + 10 ? 'bg-fitness-primary' : 'bg-gray-300'} transition-all duration-300`}></div>
+                    <span className="text-gray-600 group-hover:text-fitness-dark group-hover:translate-x-1 transition-all duration-300">
                       {service.name}
                     </span>
                   </Link>
@@ -249,31 +245,31 @@ const Footer = () => {
             transition={{ delay: 0.3 }}
             className="space-y-6"
           >
-            <h4 className="text-lg font-semibold relative">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-fitness-primary to-fitness-accent rounded-full"></span>
+            <h4 className="text-lg font-semibold relative text-fitness-dark">
+              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary rounded-full"></span>
               Connect With Us
             </h4>
-            
+
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800 hover:border-fitness-primary/50 transition-all duration-300">
-                <div className="p-2 bg-fitness-primary/20 rounded-lg">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-primary/50 shadow-sm transition-all duration-300">
+                <div className="p-2 bg-fitness-primary/10 rounded-lg">
                   <Phone size={18} className="text-fitness-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Call Us</p>
-                  <a href="tel:+254700000000" className="font-medium hover:text-fitness-primary transition-colors">
+                  <p className="text-xs text-gray-500">Call Us</p>
+                  <a href="tel:+254700000000" className="font-medium text-fitness-dark hover:text-fitness-primary transition-colors">
                     +254 701 437 959
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-gray-800 hover:border-fitness-accent/50 transition-all duration-300">
-                <div className="p-2 bg-fitness-accent/20 rounded-lg">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-accent/50 shadow-sm transition-all duration-300">
+                <div className="p-2 bg-fitness-accent/10 rounded-lg">
                   <Mail size={18} className="text-fitness-accent" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Email Us</p>
-                  <a href="mailto:markotundo777@gmail.com" className="font-medium hover:text-fitness-accent transition-colors">
+                  <p className="text-xs text-gray-500">Email Us</p>
+                  <a href="mailto:markotundo777@gmail.com" className="font-medium text-fitness-dark hover:text-fitness-accent transition-colors">
                     markotundo777@gmail.com
                   </a>
                 </div>
@@ -282,7 +278,7 @@ const Footer = () => {
 
             {/* Social Links */}
             <div>
-              <p className="text-sm text-gray-400 mb-3">Follow Our Journey</p>
+              <p className="text-sm text-gray-500 mb-3">Follow Our Journey</p>
               <div className="flex gap-2">
                 {socialLinks.map((social, index) => (
                   <motion.a
@@ -291,7 +287,7 @@ const Footer = () => {
                     aria-label={social.label}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`w-10 h-10 rounded-lg bg-white/10 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-300 hover:shadow-lg ${social.color}`}
+                    className={`w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-white transition-all duration-300 hover:shadow-lg ${social.color}`}
                   >
                     <social.icon size={18} />
                   </motion.a>
@@ -302,30 +298,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="border-t border-gray-800 pt-8"
+          className="border-t border-gray-200 pt-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="text-gray-400 text-sm">
-              <p>© {currentYear} <span className="text-white font-semibold">Marksila254</span>. All rights reserved.</p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-gray-500 text-sm">
+              <p>© {currentYear} <span className="text-fitness-dark font-semibold">Marksila254</span>. All rights reserved.</p>
             </div>
-            
-            <div className="flex items-center gap-8 text-sm">
-              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors hover:underline">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors hover:underline">
-                Terms & Conditions
-              </Link>
-              <Link href="/sitemap" className="text-gray-400 hover:text-white transition-colors hover:underline">
-                Sitemap
-              </Link>
-            </div>
-            
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+
+            <div className="flex items-center gap-2 text-sm text-gray-500">
               <span>Made with</span>
               <Heart size={16} className="text-red-500 animate-pulse" />
               <span>in Nairobi</span>

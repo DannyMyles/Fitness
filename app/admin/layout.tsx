@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, Users, ShoppingBag, Calendar, 
-  Image, Settings, LogOut, Menu, X, Dumbbell,
-  TrendingUp, DollarSign, ShoppingCart, Eye
+import {
+  LayoutDashboard, Users, ShoppingBag, FileText,
+  LogOut, Menu, X, Dumbbell, ShoppingCart
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -13,9 +12,8 @@ const sidebarLinks = [
   { icon: Users, label: 'Users', href: '/admin/users' },
   { icon: ShoppingBag, label: 'Products', href: '/admin/products' },
   { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-  { icon: Calendar, label: 'Events', href: '/admin/events' },
-  { icon: Image, label: 'Gallery', href: '/admin/gallery' },
-  { icon: Settings, label: 'Settings', href: '/admin/settings' },
+  { icon: Dumbbell, label: 'Services', href: '/admin/services' },
+  { icon: FileText, label: 'Blog', href: '/admin/blog' },
 ];
 
 export default function AdminLayout({

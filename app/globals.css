@@ -46,10 +46,10 @@
   --animate-gradient-shift: gradient-shift 3s ease infinite;
 
   /* Background images */
-  --gradient-fitness: linear-gradient(135deg, #FF6B35 0%, #E55A2B 50%, #0BA154 100%);
+  --gradient-fitness: linear-gradient(135deg, #FF6B35 0%, #E55A2B 50%, #D44A1B 100%);
   --gradient-hero: linear-gradient(135deg, #1A1A2E 0%, #2D3142 50%, #4A4A5A 100%);
   --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
-  --gradient-text: linear-gradient(90deg, #FF6B35, #0BA154);
+  --gradient-text: linear-gradient(90deg, #FF6B35, #D44A1B);
 
   /* Box shadows */
   --shadow-fitness: 0 10px 40px -10px rgba(255, 107, 53, 0.3);
@@ -298,6 +298,40 @@
     transform: translateY(-5px);
   }
 
+  /* Fitness CTA button — same treatment as .btn-primary, used on Shop/Cart */
+  .btn-fitness {
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 50%, #D44A1B 100%);
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-fitness:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+  }
+
+  /* Fitness card — like .card-modern but no built-in padding, so a
+     full-bleed image can sit flush at the top (used on Shop/Cart) */
+  .card-fitness {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f3f4f6;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-fitness:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+  }
+
   /* Feature card */
   .feature-card {
     background: white;
@@ -316,7 +350,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background: linear-gradient(90deg, #FF6B35, #0BA154);
+    background: linear-gradient(90deg, #FF6B35, #D44A1B);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -389,43 +423,6 @@
     border-color: #d1d5db;
   }
 
-  /* Navigation link */
-  .nav-link {
-    color: #4b5563;
-    font-weight: 500;
-    padding: 0.5rem 0;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, #FF6B35, #0BA154);
-    border-radius: 1px;
-    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nav-link:hover {
-    color: #FF6B35;
-  }
-
-  .nav-link:hover::after {
-    width: 100%;
-  }
-
-  .nav-link-active {
-    color: #FF6B35;
-  }
-
-  .nav-link-active::after {
-    width: 100%;
-  }
-
   /* Section title */
   .section-title {
     position: relative;
@@ -441,7 +438,7 @@
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background: linear-gradient(90deg, #FF6B35, #0BA154);
+    background: linear-gradient(90deg, #FF6B35, #D44A1B);
     border-radius: 2px;
   }
 
@@ -471,7 +468,7 @@
   }
 
   .social-icon:hover {
-    background: linear-gradient(135deg, #FF6B35 0%, #0BA154 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #D44A1B 100%);
     color: white;
     transform: translateY(-4px) rotate(5deg);
     box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
@@ -483,11 +480,15 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(11, 161, 84, 0.1) 100%);
+    background: rgba(255, 107, 53, 0.1);
     border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #FF6B35;
+    /* Darker than the brand orange (#FF6B35) specifically for text — the
+       vibrant brand shade fails WCAG AA contrast (~2.6:1) on light
+       backgrounds. This passes 4.5:1+ with margin across the badge's
+       various section-tinted backgrounds while staying clearly orange. */
+    color: #B33A0D;
   }
 
   /* Icon box */
@@ -510,7 +511,7 @@
   .stats-number {
     font-size: 2.5rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #FF6B35 0%, #0BA154 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #D44A1B 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -532,7 +533,7 @@
   }
 
   .text-gradient-mixed {
-    background: linear-gradient(135deg, #FF6B35 0%, #0BA154 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #D44A1B 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -633,7 +634,7 @@
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 50%, #0BA154 100%);
+    background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 50%, #D44A1B 100%);
   }
 
   .bg-gradient-dark {
@@ -931,7 +932,7 @@
   content: '';
   position: absolute;
   inset: -2px;
-  background: linear-gradient(135deg, #FF6B35, #0BA154, #FF6B35);
+  background: linear-gradient(135deg, #FF6B35, #D44A1B, #FF6B35);
   background-size: 300% 300%;
   border-radius: inherit;
   z-index: -1;

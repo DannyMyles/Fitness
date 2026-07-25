@@ -368,7 +368,7 @@ export default function TestimonialsManagementPage() {
             Import
           </button>
           <Link
-            href="/admin/testimonials/create"
+            href="/admin/blog/testimonials/create"
             className="btn-adventure flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
@@ -590,7 +590,7 @@ export default function TestimonialsManagementPage() {
                     </button>
                     
                     <Link
-                      href={`/admin/testimonials/edit/${testimonial.id}`}
+                      href={`/admin/blog/testimonials/edit/${testimonial.id}`}
                       className="p-1.5 hover:bg-accent-50 rounded-lg transition-colors text-accent-600"
                       title="Edit"
                     >
@@ -686,7 +686,7 @@ export default function TestimonialsManagementPage() {
             )}
             {testimonials.length === 0 && (
               <Link
-                href="/admin/testimonials/create"
+                href="/admin/blog/testimonials/create"
                 className="btn-adventure inline-flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />

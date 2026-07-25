@@ -54,35 +54,34 @@ const Navigation = () => {
   return (
     <>
       {/* Top Contact Bar */}
-      <div className="bg-gradient-to-r from-fitness-dark via-fitness-secondary to-fitness-dark text-gray-600 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-fitness-primary/20 to-fitness-accent/20 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+      <div className="bg-gray-50 text-gray-600 border-b border-gray-100 relative">
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center py-2 text-sm">
             <div className="hidden md:flex flex-wrap items-center gap-x-6 gap-y-2 mb-2 md:mb-0">
               <div className="flex items-center gap-2 group">
-                <div className="p-1.5 bg-fitness-primary/20 rounded-lg group-hover:bg-fitness-primary/30 transition-colors">
+                <div className="p-1.5 bg-fitness-primary/10 rounded-lg group-hover:bg-fitness-primary/20 transition-colors">
                   <Phone size={14} className="text-fitness-primary" />
                 </div>
-                <a 
+                <a
                   href="tel:+254700000000"
                   className="hover:text-fitness-primary transition-colors duration-300"
                 >
                   +254 701 437 959
                 </a>
               </div>
-              <div className="hidden md:block h-4 w-px bg-white/20"></div>
+              <div className="hidden md:block h-4 w-px bg-gray-200"></div>
               <div className="flex items-center gap-2 group">
-                <div className="p-1.5 bg-fitness-accent/20 rounded-lg group-hover:bg-fitness-accent/30 transition-colors">
+                <div className="p-1.5 bg-fitness-accent/10 rounded-lg group-hover:bg-fitness-accent/20 transition-colors">
                   <Mail size={14} className="text-fitness-accent" />
                 </div>
-                <a 
+                <a
                   href="mailto:markotundo777@gmail.com"
                   className="hover:text-fitness-accent transition-colors duration-300"
                 >
                   markotundo777@gmail.com
                 </a>
               </div>
-              <div className="hidden md:block h-4 w-px bg-white/20"></div>
+              <div className="hidden md:block h-4 w-px bg-gray-200"></div>
               <div className="flex items-center gap-2 text-fitness-accent font-medium">
                 <div className="relative">
                   <Clock size={14} />
@@ -91,13 +90,13 @@ const Navigation = () => {
                 Available 6AM - 9PM
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
                 className="flex items-center gap-2 text-sm hover:text-fitness-primary transition-all duration-300 hover:scale-105"
               >
-                <div className="p-1.5 bg-white/10 rounded-lg">
+                <div className="p-1.5 bg-gray-100 rounded-lg">
                   <User size={14} />
                 </div>
                 <span>Login</span>
@@ -119,41 +118,34 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
-              {/* <div className="flex flex-col"> */}
-                  <Image
-                    src="/images/001.jpg"
-                    alt="Marksila 254"
-                    width={88}
-                    height={88}
-                    className="inline-block ml-1 -mt-1 transform group-hover:rotate-6 transition-transform duration-500"
-                  />
-              {/* </div> */}
+              <Image
+                src="/images/logo.svg"
+                alt="Marksila 254"
+                width={160}
+                height={130}
+                className="h-14 md:h-17 w-auto transform group-hover:rotate-6 transition-transform duration-500"
+              />
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-1">
+            {/* Desktop Navigation — pill style */}
+            <nav className="hidden lg:flex items-center gap-1 bg-gray-100/80 rounded-full p-1.5">
               {navigation.main.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-4 py-3 font-medium transition-all duration-300 relative ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                     isActiveLink(item.href)
-                      ? 'text-fitness-primary'
-                      : 'text-gray-800 hover:text-fitness-primary'
+                      ? 'bg-white text-fitness-primary shadow-sm'
+                      : 'text-gray-600 hover:text-fitness-dark hover:bg-white/60'
                   }`}
                 >
-                  <span className="relative">
-                    {item.name}
-                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-fitness-primary to-fitness-accent transition-all duration-300 ${
-                      isActiveLink(item.href) ? 'w-full' : 'w-0 hover:w-full'
-                    }`}></span>
-                  </span>
+                  {item.name}
                 </Link>
               ))}
             </nav>
 
             {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-3">
               <Link
                 href="/shop"
                 className="relative p-2.5 text-gray-700 hover:text-fitness-primary transition-all duration-300 hover:scale-110 group"
@@ -162,11 +154,11 @@ const Navigation = () => {
                   <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
                   <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                 </svg>
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-fitness-primary to-fitness-accent text-white text-xs rounded-full flex items-center justify-center font-bold shadow-fitness">0</span>
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white text-xs rounded-full flex items-center justify-center font-bold shadow-fitness">0</span>
               </Link>
               <Link
                 href="/contact"
-                className="btn-primary flex items-center gap-2 hover:shadow-fitness-lg transform hover:-translate-y-1"
+                className="btn-primary rounded-full! flex items-center gap-2 hover:shadow-fitness-lg transform hover:-translate-y-1"
               >
                 <Zap size={18} />
                 Get Started

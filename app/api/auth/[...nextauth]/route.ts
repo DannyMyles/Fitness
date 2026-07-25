@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Email and password are required")
           }
 
-          const backendBaseUrl = process.env.BACKEND_URL || 'https://istc-admin.onrender.com'
+          const backendBaseUrl = process.env.BACKEND_URL || 'http://localhost:4000'
           const backendUrl = `${backendBaseUrl}/api/v1/auth/login`
           
           console.log('[NextAuth] Attempting login to:', backendUrl)

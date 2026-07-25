@@ -136,7 +136,7 @@ export default function EditTestimonialPage() {
 
       await testimonialService.updateTestimonial(testimonialId, testimonialData)
       toast.success('Testimonial updated successfully!')
-      router.push('/admin/testimonials')
+      router.push('/admin/blog/testimonials')
       
     } catch (err: any) {
       console.error('Error updating testimonial:', err)

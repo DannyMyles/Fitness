@@ -199,7 +199,7 @@ getBlogImageUrl: (blog: Blog): string => {
     }
     
     // For production, construct full URL
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://istc-admin.onrender.com';
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
     return `${baseUrl}${blog.imageInfo.url}`;
   }
   
