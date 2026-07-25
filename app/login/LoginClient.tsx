@@ -125,9 +125,9 @@ export default function LoginClient() {
                 <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-fitness-primary focus:ring-fitness-primary" />
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-fitness-primary hover:underline">
+              <Link href="/forgot-password" className="text-sm text-fitness-primary hover:underline">
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button

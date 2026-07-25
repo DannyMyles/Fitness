@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Phone, Mail, MapPin, Clock, Send, 
+import {
+  Phone, Mail, MapPin, Clock, Send,
   Facebook, Twitter, Instagram, Linkedin,
   MessageCircle, Calendar,
-  CheckCircle, ArrowRight
+  CheckCircle, ArrowRight, AlertCircle
 } from 'lucide-react';
 import { FaWhatsapp } from "react-icons/fa6";
 import PageHero from '@/components/ui/PageHero';
@@ -21,14 +21,32 @@ export default function ContactClient() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSubmitted(true);
-    setIsSubmitting(false);
+    setError('');
+
+    try {
+      const res = await fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || data.message || 'Failed to send message');
+      }
+
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', service: '', message: '' });
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again or reach out via WhatsApp.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -141,6 +159,12 @@ export default function ContactClient() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                      <AlertCircle size={20} className="text-red-500 flex-shrink-0" />
+                      <p className="text-sm text-red-600">{error}</p>
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
