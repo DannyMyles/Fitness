@@ -104,6 +104,18 @@ export default function CreateBlogPage() {
       toast.error('Please fill in all required fields (Title, Content, and Category)')
       return
     }
+    if (formData.excerpt.length > 300) {
+      toast.error('Excerpt must be 300 characters or fewer')
+      return
+    }
+    if ((formData.metaTitle?.length || 0) > 200) {
+      toast.error('Meta title must be 200 characters or fewer')
+      return
+    }
+    if ((formData.metaDescription?.length || 0) > 160) {
+      toast.error('Meta description must be 160 characters or fewer')
+      return
+    }
 
     setLoading(true)
 
@@ -212,6 +224,7 @@ export default function CreateBlogPage() {
               onChange={(e) => handleChange('excerpt', e.target.value)}
               placeholder="A brief summary or introduction to your blog post..."
               rows={3}
+              maxLength={300}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
               disabled={loading}
             />
@@ -455,6 +468,7 @@ export default function CreateBlogPage() {
                 value={formData.metaTitle || ''}
                 onChange={(e) => handleChange('metaTitle', e.target.value)}
                 placeholder="SEO title for search engines"
+                maxLength={200}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
                 disabled={loading}
               />
@@ -472,6 +486,7 @@ export default function CreateBlogPage() {
                 onChange={(e) => handleChange('metaDescription', e.target.value)}
                 placeholder="SEO description for search engines"
                 rows={3}
+                maxLength={160}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
                 disabled={loading}
               />

@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { api } from '@/app/lib/api';
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 export default function ResetPasswordClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,8 +33,8 @@ export default function ResetPasswordClient() {
       setError('Passwords do not match');
       return;
     }
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (!PASSWORD_REGEX.test(newPassword)) {
+      setError('Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&)');
       return;
     }
 
@@ -112,6 +114,29 @@ export default function ResetPasswordClient() {
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                     </button>
                   </div>
+                  {newPassword && (
+                    <ul className="mt-2 space-y-1">
+                      {[
+                        { label: 'At least 8 characters', met: newPassword.length >= 8 },
+                        { label: 'One uppercase letter', met: /[A-Z]/.test(newPassword) },
+                        { label: 'One lowercase letter', met: /[a-z]/.test(newPassword) },
+                        { label: 'One number', met: /\d/.test(newPassword) },
+                        { label: 'One special character (@$!%*?&)', met: /[@$!%*?&]/.test(newPassword) },
+                      ].map((req) => (
+                        <li
+                          key={req.label}
+                          className={`flex items-center gap-2 text-xs ${req.met ? 'text-green-600' : 'text-gray-400'}`}
+                        >
+                          {req.met ? (
+                            <CheckCircle size={14} />
+                          ) : (
+                            <span className="h-3.5 w-3.5 rounded-full border border-current" />
+                          )}
+                          {req.label}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
 
                 <div>

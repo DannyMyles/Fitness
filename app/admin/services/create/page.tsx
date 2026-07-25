@@ -53,6 +53,7 @@ export default function CreateServicePage() {
     if (formData.features.filter((f) => f.trim()).length === 0) {
       throw new Error('At least one feature is required')
     }
+    if ((formData.order ?? 0) < 0) throw new Error('Order cannot be negative')
     return true
   }
 

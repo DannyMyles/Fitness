@@ -11,6 +11,8 @@ import {
 import { FaWhatsapp } from "react-icons/fa6";
 import PageHero from '@/components/ui/PageHero';
 
+const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
+
 export default function ContactClient() {
   const [formData, setFormData] = useState({
     name: '',
@@ -25,8 +27,14 @@ export default function ContactClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
+
+    if (!PHONE_REGEX.test(formData.phone.trim())) {
+      setError('Please enter a valid phone number');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const res = await fetch('/api/v1/contact', {
@@ -171,6 +179,7 @@ export default function ContactClient() {
                       <input
                         type="text"
                         required
+                        maxLength={100}
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
                         className="form-input"
@@ -182,6 +191,7 @@ export default function ContactClient() {
                       <input
                         type="tel"
                         required
+                        maxLength={20}
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                         className="form-input"
@@ -189,11 +199,13 @@ export default function ContactClient() {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
                     <input
                       type="email"
+                      required
+                      maxLength={255}
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       className="form-input"
@@ -219,6 +231,7 @@ export default function ContactClient() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Your Message *</label>
                     <textarea
                       required
+                      maxLength={5000}
                       value={formData.message}
                       onChange={(e) => setFormData({...formData, message: e.target.value})}
                       className="form-input resize-none"
@@ -251,21 +264,24 @@ export default function ContactClient() {
             {/* Additional Info */}
             <div className="space-y-8">
               {/* Quick Contact Options */}
-              <div className="bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-3xl p-8 relative overflow-hidden">
-                {/* Background pattern */}
-                <div className="absolute inset-0">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
-                </div>
-                
+              <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-fitness-primary via-fitness-primary to-fitness-primary-dark p-8 shadow-fitness-lg ring-1 ring-white/10">
+                {/* Spotlight + texture layers */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.18),transparent_45%)]" />
+                <div className="absolute inset-0 opacity-[0.15] bg-pattern-dots" />
+
+                {/* Decorative blurred orbs */}
+                <div className="absolute -top-16 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -left-10 w-56 h-56 bg-fitness-primary-dark/40 rounded-full blur-3xl" />
+
                 <div className="relative z-10">
-                  <h3 className="text-xl font-bold mb-6">Quick Contact Options</h3>
+                  <h3 className="text-xl font-bold mb-1">Quick Contact Options</h3>
+                  <div className="w-10 h-1 bg-white/40 rounded-full mb-6" />
                   <div className="space-y-4">
-                    <a 
+                    <a
                       href="https://wa.me/254701437959"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-4 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all duration-300 hover:translate-x-2"
+                      className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:translate-x-2"
                     >
                       <div className="w-12 h-12 bg-[#25D366] text-white rounded-xl flex items-center justify-center shadow-fitness">
                         <FaWhatsapp size={24} />
@@ -276,9 +292,9 @@ export default function ContactClient() {
                       </div>
                       <ArrowRight size={20} className="ml-auto" />
                     </a>
-                    <Link 
+                    <Link
                       href="/events"
-                      className="flex items-center gap-4 p-4 bg-white/10 rounded-2xl hover:bg-white/20 transition-all duration-300 hover:translate-x-2"
+                      className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:translate-x-2"
                     >
                       <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-fitness">
                         <Calendar size={24} />

@@ -16,6 +16,8 @@ const upcomingHighlights = [
   { month: 'Next Month', count: 6 },
 ];
 
+const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
+
 const processSteps = [
   { step: '01', title: 'Choose Event', description: 'Browse our upcoming events and select one that fits your goals.' },
   { step: '02', title: 'Register', description: 'Click the Register button and fill in your details to secure your spot.' },
@@ -75,6 +77,10 @@ export default function EventsClient() {
     e.preventDefault();
     if (!registeringEvent) return;
     setFormError('');
+    if (!PHONE_REGEX.test(attendeePhone.trim())) {
+      setFormError('Please enter a valid phone number');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const result = await eventService.register(registeringEvent.slug, { attendeeName, attendeePhone });
@@ -104,10 +110,10 @@ export default function EventsClient() {
       priceCurrency: 'KES',
       availability: event.spotsRemaining > 0 ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
     },
-    performer: {
+    performer: event.trainers.map((name) => ({
       '@type': 'Person',
-      name: event.trainer,
-    },
+      name,
+    })),
   }));
 
   return (
@@ -154,6 +160,7 @@ export default function EventsClient() {
                   <input
                     type="text"
                     required
+                    maxLength={100}
                     value={attendeeName}
                     onChange={(e) => setAttendeeName(e.target.value)}
                     className="form-input"
@@ -164,6 +171,7 @@ export default function EventsClient() {
                   <input
                     type="tel"
                     required
+                    maxLength={20}
                     value={attendeePhone}
                     onChange={(e) => setAttendeePhone(e.target.value)}
                     placeholder="+254 701 437 959"
@@ -353,15 +361,22 @@ export default function EventsClient() {
                   </div>
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-sm">
-                          {event.trainer.split(' ').map(n => n[0]).join('')}
-                        </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-10 h-10 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-full flex items-center justify-center">
+                          <span className="text-white font-medium text-sm">
+                            {event.trainers[0]?.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </span>
+                        </div>
+                        {event.trainers.length > 1 && (
+                          <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-white border border-gray-200 rounded-full flex items-center justify-center text-[10px] font-bold text-fitness-primary">
+                            +{event.trainers.length - 1}
+                          </span>
+                        )}
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500">Trainer</p>
-                        <p className="text-sm font-medium text-gray-700">{event.trainer}</p>
+                      <div className="min-w-0">
+                        <p className="text-xs text-gray-500">{event.trainers.length > 1 ? 'Trainers' : 'Trainer'}</p>
+                        <p className="text-sm font-medium text-gray-700 truncate">{event.trainers.join(', ')}</p>
                       </div>
                     </div>
                     <button

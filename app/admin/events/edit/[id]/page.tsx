@@ -12,9 +12,19 @@ import {
   AlertCircle,
   Sparkles,
   Loader2,
+  Upload,
+  X,
+  Users,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateEventRequest, eventService } from '@/app/api_services/eventService'
+
+function toLines(value: string): string[] {
+  return value
+    .split(/\r?\n|,/)
+    .map((v) => v.trim())
+    .filter(Boolean)
+}
 
 export default function EditEventPage() {
   const router = useRouter()
@@ -24,6 +34,8 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [trainersInput, setTrainersInput] = useState('')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<CreateEventRequest & { date: string }>({
     title: '',
@@ -31,8 +43,9 @@ export default function EditEventPage() {
     date: '',
     time: '',
     location: '',
-    trainer: '',
-    image: '',
+    trainers: [],
+    imageUrl: '',
+    imageFile: null,
     price: 0,
     maxSpots: 20,
     popular: false,
@@ -56,13 +69,16 @@ export default function EditEventPage() {
         date: new Date(event.date).toISOString().slice(0, 10),
         time: event.time,
         location: event.location,
-        trainer: event.trainer,
-        image: event.image,
+        trainers: event.trainers,
+        imageUrl: event.imageInfo?.type === 'external' ? event.image : '',
+        imageFile: null,
         price: event.price,
         maxSpots: event.maxSpots,
         popular: event.popular,
         published: event.published !== false,
       })
+      setTrainersInput(event.trainers.join(', '))
+      if (event.imageInfo?.hasImage) setImagePreview(event.image)
     } catch (err: any) {
       console.error('Error fetching event:', err)
       setError(err.message || 'Failed to load event')
@@ -72,14 +88,46 @@ export default function EditEventPage() {
     }
   }
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB')
+      return
+    }
+
+    setFormData({ ...formData, imageFile: file, imageUrl: '' })
+    const reader = new FileReader()
+    reader.onload = (e) => setImagePreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleImageUrlChange = (url: string) => {
+    setFormData({ ...formData, imageUrl: url, imageFile: null })
+    setImagePreview(url || null)
+  }
+
+  const removeImage = () => {
+    setFormData({ ...formData, imageFile: null, imageUrl: '' })
+    setImagePreview(null)
+  }
+
   const validateForm = () => {
     if (!formData.title.trim()) throw new Error('Title is required')
     if (!formData.description.trim()) throw new Error('Description is required')
     if (!formData.date) throw new Error('Date is required')
     if (!formData.time.trim()) throw new Error('Time is required')
     if (!formData.location.trim()) throw new Error('Location is required')
-    if (!formData.trainer.trim()) throw new Error('Trainer is required')
-    if (!formData.image.trim()) throw new Error('Image URL is required')
+    if (toLines(trainersInput).length === 0) throw new Error('At least one trainer is required')
+    if (!formData.imageFile && !formData.imageUrl?.trim() && !imagePreview) {
+      throw new Error('An image (upload or URL) is required')
+    }
+    if (formData.price < 0) throw new Error('Price cannot be negative')
     if (formData.maxSpots < 1) throw new Error('Max spots must be at least 1')
     return true
   }
@@ -93,6 +141,7 @@ export default function EditEventPage() {
       validateForm()
       await eventService.updateEvent(eventId, {
         ...formData,
+        trainers: toLines(trainersInput),
         date: new Date(formData.date).toISOString(),
       })
       toast.success('Event updated successfully!')
@@ -220,14 +269,19 @@ export default function EditEventPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Trainer *</label>
+                  <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    Trainer(s) *
+                  </label>
                   <input
                     type="text"
-                    value={formData.trainer}
-                    onChange={(e) => setFormData({ ...formData, trainer: e.target.value })}
+                    value={trainersInput}
+                    onChange={(e) => setTrainersInput(e.target.value)}
+                    placeholder="Marksila254, Victor Olumaasai"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">Separate multiple trainers with commas</p>
                 </div>
               </div>
 
@@ -262,18 +316,45 @@ export default function EditEventPage() {
               <span className="p-2 bg-purple-50 rounded-lg">
                 <ImageIcon className="h-5 w-5 text-purple-600" />
               </span>
-              Image
+              Event Image
             </h3>
+
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    disabled={saving}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 mb-3">Upload an image or enter a URL below</p>
+                  <label className="inline-block cursor-pointer">
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={saving} />
+                    <div className="bg-accent-50 text-accent-700 py-2 px-4 rounded-lg hover:bg-accent-100 transition-colors text-center text-sm font-medium">
+                      Upload File
+                    </div>
+                  </label>
+                </div>
+              )}
+            </div>
+
             <input
               type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              value={formData.imageUrl}
+              onChange={(e) => handleImageUrlChange(e.target.value)}
+              placeholder="/images/012.jpeg or https://example.com/image.jpg"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-              required
+              disabled={saving || !!formData.imageFile}
             />
-            {formData.image && (
-              <div className="mt-4 h-40 rounded-lg bg-cover bg-center border border-gray-200" style={{ backgroundImage: `url(${formData.image})` }} />
-            )}
+            <p className="mt-2 text-xs text-gray-500">Upload a new file (max 5MB) or paste an image path/URL to replace the current image</p>
           </div>
         </div>
 
@@ -320,6 +401,7 @@ export default function EditEventPage() {
               <p className="text-sm text-gray-600 mt-1 line-clamp-3">
                 {formData.description || 'Event description will appear here...'}
               </p>
+              <p className="text-xs text-gray-500 mt-2">{trainersInput || 'Trainer(s)'}</p>
               <p className="text-sm font-bold text-fitness-primary mt-3">
                 {formData.price > 0 ? `KES ${formData.price.toLocaleString()}` : 'Free'}
               </p>

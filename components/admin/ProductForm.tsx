@@ -59,12 +59,18 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
       return
     }
 
+    const priceValue = Number(price)
+    if (!Number.isFinite(priceValue) || priceValue <= 0) {
+      toast.error('Price must be a positive number')
+      return
+    }
+
     setSaving(true)
     try {
       await onSubmit({
         name,
         description,
-        price: Number(price),
+        price: priceValue,
         categoryId: Number(categoryId),
         images: imageList,
         sizes: toLines(sizes),
@@ -89,6 +95,7 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={200}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
             placeholder="Mark 254 Performance Tee"
           />
@@ -100,6 +107,7 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
+            maxLength={5000}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
           />
         </div>
@@ -110,6 +118,7 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
             <input
               type="number"
               min={0}
+              step="1"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"

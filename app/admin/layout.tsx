@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { Toaster } from 'react-hot-toast';
 import {
   LayoutDashboard, Users, ShoppingBag, FileText,
   LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar
@@ -52,6 +53,15 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: { borderRadius: '12px', padding: '12px 16px' },
+          success: { iconTheme: { primary: '#FF6B35', secondary: '#fff' } },
+        }}
+      />
+
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 

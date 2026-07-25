@@ -170,6 +170,18 @@ export default function EditBlogPage() {
       );
       return;
     }
+    if ((formData.excerpt?.length || 0) > 300) {
+      toast.error("Excerpt must be 300 characters or fewer");
+      return;
+    }
+    if ((formData.metaTitle?.length || 0) > 200) {
+      toast.error("Meta title must be 200 characters or fewer");
+      return;
+    }
+    if ((formData.metaDescription?.length || 0) > 160) {
+      toast.error("Meta description must be 160 characters or fewer");
+      return;
+    }
 
     setSaving(true);
 
@@ -306,6 +318,7 @@ export default function EditBlogPage() {
               onChange={(e) => handleChange("excerpt", e.target.value)}
               placeholder="A brief summary or introduction to your blog post..."
               rows={3}
+              maxLength={300}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
               disabled={saving}
             />
@@ -640,6 +653,7 @@ export default function EditBlogPage() {
                 value={formData.metaTitle || ""}
                 onChange={(e) => handleChange("metaTitle", e.target.value)}
                 placeholder="SEO title for search engines"
+                maxLength={200}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
                 disabled={saving}
               />
@@ -659,6 +673,7 @@ export default function EditBlogPage() {
                 }
                 placeholder="SEO description for search engines"
                 rows={3}
+                maxLength={160}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent resize-none"
                 disabled={saving}
               />

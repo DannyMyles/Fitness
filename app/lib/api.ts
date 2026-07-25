@@ -548,16 +548,18 @@ class ApiClient {
     },
 
     events: {
-      create: (data: any) =>
+      create: (data: FormData) =>
         this.request('/api/v1/events', {
           method: 'POST',
-          body: JSON.stringify(data),
+          body: data,
+          headers: {},
         }),
 
-      update: (id: string, data: any) =>
+      update: (id: string, data: FormData) =>
         this.request(`/api/v1/events/${id}`, {
           method: 'PUT',
-          body: JSON.stringify(data),
+          body: data,
+          headers: {},
         }),
 
       delete: (id: string) =>

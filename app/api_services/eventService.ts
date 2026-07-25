@@ -8,8 +8,15 @@ export interface EventItem {
   date: string
   time: string
   location: string
-  trainer: string
+  trainers: string[]
   image: string
+  imageInfo?: {
+    hasImage: boolean
+    type?: 'uploaded' | 'external'
+    contentType?: string
+    size?: number
+    url: string
+  }
   price: number
   maxSpots: number
   spotsRemaining: number
@@ -45,8 +52,9 @@ export interface CreateEventRequest {
   date: string
   time: string
   location: string
-  trainer: string
-  image: string
+  trainers: string[]
+  imageUrl?: string
+  imageFile?: File | null
   price: number
   maxSpots: number
   popular?: boolean
@@ -88,7 +96,24 @@ export const eventService = {
 
   createEvent: async (data: CreateEventRequest): Promise<EventItem> => {
     try {
-      const response = await api.admin.events.create(data)
+      const formData = new FormData()
+      formData.append('title', data.title)
+      formData.append('description', data.description)
+      formData.append('date', data.date)
+      formData.append('time', data.time)
+      formData.append('location', data.location)
+      formData.append('trainers', JSON.stringify(data.trainers))
+      formData.append('price', data.price.toString())
+      formData.append('maxSpots', data.maxSpots.toString())
+      if (data.popular !== undefined) formData.append('popular', data.popular.toString())
+      if (data.published !== undefined) formData.append('published', data.published.toString())
+      if (data.imageFile) {
+        formData.append('image', data.imageFile)
+      } else if (data.imageUrl) {
+        formData.append('imageUrl', data.imageUrl)
+      }
+
+      const response = await api.admin.events.create(formData)
       return ((response as any).event || response) as EventItem
     } catch (error) {
       console.error('Error creating event:', error)
@@ -98,7 +123,24 @@ export const eventService = {
 
   updateEvent: async (id: string, data: UpdateEventRequest): Promise<EventItem> => {
     try {
-      const response = await api.admin.events.update(id, data)
+      const formData = new FormData()
+      if (data.title) formData.append('title', data.title)
+      if (data.description) formData.append('description', data.description)
+      if (data.date) formData.append('date', data.date)
+      if (data.time) formData.append('time', data.time)
+      if (data.location) formData.append('location', data.location)
+      if (data.trainers) formData.append('trainers', JSON.stringify(data.trainers))
+      if (data.price !== undefined) formData.append('price', data.price.toString())
+      if (data.maxSpots !== undefined) formData.append('maxSpots', data.maxSpots.toString())
+      if (data.popular !== undefined) formData.append('popular', data.popular.toString())
+      if (data.published !== undefined) formData.append('published', data.published.toString())
+      if (data.imageFile) {
+        formData.append('image', data.imageFile)
+      } else if (data.imageUrl) {
+        formData.append('imageUrl', data.imageUrl)
+      }
+
+      const response = await api.admin.events.update(id, formData)
       return ((response as any).event || response) as EventItem
     } catch (error) {
       console.error(`Error updating event ${id}:`, error)
@@ -146,7 +188,12 @@ export const eventService = {
   },
 
   isUpcoming: (dateString: string): boolean => {
-    return new Date(dateString) >= new Date()
+    // `date` only stores a calendar date (midnight) — compare against the
+    // start of today, not the exact current instant, so a same-day event
+    // doesn't look "already passed" once it's past midnight.
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    return new Date(dateString) >= startOfToday
   },
 
   statusDisplayName: (status: string): string => {

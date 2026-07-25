@@ -14,6 +14,7 @@ import { orderService } from '@/app/api_services/orderService';
 import { CreateOrderResponse } from '@/types/commerce';
 
 const steps = ['Cart', 'Shipping', 'Payment', 'Confirm'];
+const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
 
 export default function CartClient() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function CartClient() {
     city: '',
     notes: ''
   });
+  const [shippingError, setShippingError] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [confirmedOrder, setConfirmedOrder] = useState<CreateOrderResponse | null>(null);
@@ -212,15 +214,27 @@ export default function CartClient() {
                     className="space-y-4"
                     onSubmit={(e) => {
                       e.preventDefault();
+                      setShippingError('');
+                      if (!PHONE_REGEX.test(shippingInfo.phone.trim())) {
+                        setShippingError('Please enter a valid phone number');
+                        return;
+                      }
                       setCurrentStep(2);
                     }}
                   >
+                    {shippingError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                        <AlertCircle size={20} className="text-red-500 shrink-0" />
+                        <p className="text-sm text-red-600">{shippingError}</p>
+                      </div>
+                    )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                         <input
                           type="text"
                           required
+                          maxLength={100}
                           value={shippingInfo.name}
                           onChange={(e) => setShippingInfo({...shippingInfo, name: e.target.value})}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
@@ -232,6 +246,7 @@ export default function CartClient() {
                         <input
                           type="tel"
                           required
+                          maxLength={20}
                           value={shippingInfo.phone}
                           onChange={(e) => setShippingInfo({...shippingInfo, phone: e.target.value})}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
@@ -245,6 +260,7 @@ export default function CartClient() {
                       <input
                         type="email"
                         required
+                        maxLength={255}
                         value={shippingInfo.email}
                         onChange={(e) => setShippingInfo({...shippingInfo, email: e.target.value})}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
@@ -257,6 +273,7 @@ export default function CartClient() {
                       <input
                         type="text"
                         required
+                        maxLength={400}
                         value={shippingInfo.address}
                         onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
@@ -269,6 +286,7 @@ export default function CartClient() {
                       <input
                         type="text"
                         required
+                        maxLength={100}
                         value={shippingInfo.city}
                         onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
@@ -279,6 +297,7 @@ export default function CartClient() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Order Notes (Optional)</label>
                       <textarea
+                        maxLength={500}
                         value={shippingInfo.notes}
                         onChange={(e) => setShippingInfo({...shippingInfo, notes: e.target.value})}
                         className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
