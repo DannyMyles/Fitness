@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import DashboardStats from '@/components/admin/DashboardStats';
 import RecentActivity from '@/components/admin/RecentActivity';
+import EmptyState from '@/components/ui/EmptyState';
 import { orderService } from '@/app/api_services/orderService';
 import { productService } from '@/app/api_services/productService';
 import { Order, Product } from '@/types/commerce';
@@ -132,8 +133,8 @@ export default function AdminDashboard() {
                   </tr>
                 ) : recentOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-8 text-gray-400">
-                      No orders yet
+                    <td colSpan={5} className="p-0">
+                      <EmptyState compact icon={ShoppingCart} title="No orders yet" />
                     </td>
                   </tr>
                 ) : (
@@ -186,8 +187,12 @@ export default function AdminDashboard() {
             <tbody>
               {topProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-8 text-gray-400">
-                    {loading ? 'Loading…' : 'No sales yet'}
+                  <td colSpan={4} className="p-0">
+                    {loading ? (
+                      <div className="text-center py-8 text-gray-400">Loading…</div>
+                    ) : (
+                      <EmptyState compact icon={ShoppingBag} title="No sales yet" />
+                    )}
                   </td>
                 </tr>
               ) : (

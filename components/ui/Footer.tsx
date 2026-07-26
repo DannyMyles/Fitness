@@ -12,6 +12,13 @@ import {
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
+const legalLinks = [
+  { name: 'Privacy Policy', href: '/privacy-policy' },
+  { name: 'Terms & Conditions', href: '/terms-and-conditions' },
+  { name: 'Cookie Policy', href: '/cookie-policy' },
+  { name: 'Refund & Returns', href: '/refund-policy' },
+];
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
@@ -302,8 +309,20 @@ const Footer = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="border-t border-gray-200 pt-8"
+          className="border-t border-gray-200 pt-8 space-y-6"
         >
+          <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
+            {legalLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-sm text-gray-500 hover:text-fitness-primary transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-gray-500 text-sm">
               <p>© {currentYear} <span className="text-fitness-dark font-semibold">Marksila254</span>. All rights reserved.</p>

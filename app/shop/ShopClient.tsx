@@ -119,14 +119,14 @@ export default function ShopClient() {
                   Apparel, drinkware, and training gear built for the way you train. Your body, your rules.
                 </p>
               </div>
-              <div className="lg:col-span-5 relative h-56 md:h-64">
+              <div className="lg:col-span-5 relative h-72 md:h-80">
                 {heroTiles.map((tile, i) => (
                   <div
                     key={tile.src}
-                    className={`absolute ${tile.z} ${tile.rotate} w-36 h-44 md:w-44 md:h-52 rounded-2xl overflow-hidden shadow-2xl bg-white border-4 border-white/10`}
+                    className={`absolute ${tile.z} ${tile.rotate} w-44 h-52 md:w-56 md:h-64 rounded-2xl overflow-hidden shadow-2xl bg-white border-4 border-white/10`}
                     style={{ left: `${i * 26}%`, top: i % 2 ? '10%' : '0' }}
                   >
-                    <Image src={tile.src} alt="" fill className="object-contain p-2" sizes="200px" />
+                    <Image src={tile.src} alt="" fill className="object-contain p-2" sizes="260px" />
                   </div>
                 ))}
               </div>

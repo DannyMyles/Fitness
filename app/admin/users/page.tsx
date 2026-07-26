@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
+import {
+  Plus,
+  Search,
+  Filter,
   Mail, 
   Shield,
   CheckCircle,
@@ -21,6 +21,7 @@ import {
   Loader2
 } from 'lucide-react'
 import { User, userService } from '@/app/api_services/userService'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function UsersManagementPage() {
   const router = useRouter()
@@ -606,27 +607,27 @@ export default function UsersManagementPage() {
                 </div>
               </div>
             </>
+          ) : searchQuery || filter !== 'all' || roleFilter !== 'all' ? (
+            <EmptyState
+              icon={Search}
+              title="No users match your filters"
+              description="Try adjusting your search or filter criteria."
+              action={{
+                label: 'Clear Filters',
+                onClick: () => {
+                  setSearchQuery('')
+                  setFilter('all')
+                  setRoleFilter('all')
+                },
+              }}
+            />
           ) : (
-            <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <UserIcon className="h-12 w-12 mx-auto" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
-              <p className="text-gray-600">
-                {searchQuery || filter !== 'all' || roleFilter !== 'all' 
-                  ? 'Try adjusting your search or filter criteria'
-                  : 'Get started by creating a new user'}
-              </p>
-              {(!searchQuery && filter === 'all' && roleFilter === 'all') && (
-                <Link
-                  href="/admin/users/create"
-                  className="btn-adventure inline-flex items-center gap-2 mt-4"
-                >
-                  <Plus className="h-5 w-5" />
-                  Add User
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              icon={UserIcon}
+              title="No users yet"
+              description="Get started by creating a new user."
+              action={{ label: 'Add User', icon: Plus, href: '/admin/users/create' }}
+            />
           )}
         </div>
       )}

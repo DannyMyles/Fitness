@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { useState, useEffect } from 'react'
 import { blogService } from '@/app/api_services/blogService'
 import { userService } from '@/app/api_services/userService'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface Activity {
   id: string
@@ -158,6 +159,9 @@ export default function RecentActivity() {
       </div>
 
       <div className="space-y-4">
+        {activities.length === 0 && (
+          <EmptyState compact icon={Clock} title="No recent activity" description="New blog posts and user sign-ups will show up here." />
+        )}
         {activities.map((activity) => {
           const Icon = activity.icon
           return (

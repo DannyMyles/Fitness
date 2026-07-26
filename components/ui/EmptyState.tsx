@@ -15,6 +15,8 @@ interface EmptyStateProps {
   action?: EmptyStateAction;
   secondaryAction?: EmptyStateAction;
   className?: string;
+  /** Smaller icon/spacing for use inside dense contexts like table cells. */
+  compact?: boolean;
 }
 
 export default function EmptyState({
@@ -24,6 +26,7 @@ export default function EmptyState({
   action,
   secondaryAction,
   className = '',
+  compact = false,
 }: EmptyStateProps) {
   const renderAction = (a: EmptyStateAction, primary: boolean) => {
     const content = (
@@ -46,6 +49,22 @@ export default function EmptyState({
       </button>
     );
   };
+
+  if (compact) {
+    return (
+      <div className={`flex flex-col items-center justify-center text-center py-6 px-4 ${className}`}>
+        <Icon size={22} className="text-gray-300 mb-2" />
+        <p className="text-sm font-medium text-gray-500">{title}</p>
+        {description && <p className="text-xs text-gray-400 mt-0.5 max-w-xs">{description}</p>}
+        {(action || secondaryAction) && (
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-sm">
+            {action && renderAction(action, false)}
+            {secondaryAction && renderAction(secondaryAction, false)}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={`flex flex-col items-center justify-center text-center py-16 px-6 ${className}`}>

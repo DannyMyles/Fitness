@@ -189,6 +189,18 @@ export default function RegisterClient() {
               </div>
             </div>
 
+            <p className="text-xs text-gray-500 text-center">
+              By creating an account, you agree to our{' '}
+              <Link href="/terms-and-conditions" className="text-fitness-primary hover:underline">
+                Terms & Conditions
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy-policy" className="text-fitness-primary hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+
             <button
               type="submit"
               disabled={isLoading}
