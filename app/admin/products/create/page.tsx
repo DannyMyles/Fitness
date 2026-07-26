@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import ProductForm, { ProductFormValues } from '@/components/admin/ProductForm'
 import { productService } from '@/app/api_services/productService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function CreateProductPage() {
+  useDocumentTitle('Create Product')
   const router = useRouter()
 
   const handleSubmit = async (values: ProductFormValues) => {

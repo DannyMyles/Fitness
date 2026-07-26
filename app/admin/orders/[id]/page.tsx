@@ -7,11 +7,13 @@ import { ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { orderService } from '@/app/api_services/orderService'
 import { Order, OrderStatus, PaymentStatus } from '@/types/commerce'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 const ORDER_STATUSES: OrderStatus[] = ['pending', 'paid', 'shipped', 'delivered', 'cancelled']
 const PAYMENT_STATUSES: PaymentStatus[] = ['pending', 'paid', 'failed']
 
 export default function OrderDetailPage() {
+  useDocumentTitle('Order Details')
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const [order, setOrder] = useState<Order | null>(null)

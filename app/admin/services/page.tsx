@@ -18,8 +18,14 @@ import {
 import toast from 'react-hot-toast'
 import { Training, trainingService } from '@/app/api_services/trainingService'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function ServicesManagementPage() {
+  useDocumentTitle('Services')
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [trainings, setTrainings] = useState<Training[]>([])
@@ -120,6 +126,29 @@ export default function ServicesManagementPage() {
       return matchesSearch && matchesFilter
     })
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+
+  const bulk = useBulkSelection(filteredTrainings, (t) => t.id)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, (id) => trainingService.deleteTraining(id))
+    if (succeededIds.length > 0) {
+      setTrainings((prev) => prev.filter((t) => !succeededIds.includes(t.id)))
+    }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} service${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} service${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
+  }
 
   const stats = {
     total: trainings.length,
@@ -333,6 +362,22 @@ export default function ServicesManagementPage() {
         </div>
       </div>
 
+      <BulkActionBar
+        selectedCount={bulk.selectedCount}
+        itemLabel="service"
+        onClear={bulk.clear}
+        onDeleteClick={() => setShowBulkDeleteModal(true)}
+      />
+
+      <BulkDeleteModal
+        open={showBulkDeleteModal}
+        count={bulk.selectedCount}
+        itemLabel="service"
+        deleting={bulkDeleting}
+        onCancel={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
+
       {/* Services Table */}
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {refreshing ? (
@@ -365,6 +410,14 @@ export default function ServicesManagementPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-4 w-12">
+                    <input
+                      type="checkbox"
+                      checked={bulk.isAllSelected}
+                      onChange={bulk.toggleAll}
+                      className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 min-w-[280px]">Service</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Price</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Order</th>
@@ -375,6 +428,14 @@ export default function ServicesManagementPage() {
               <tbody className="divide-y divide-gray-200">
                 {filteredTrainings.map((training) => (
                   <tr key={training.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={bulk.isSelected(training.id)}
+                        onChange={() => bulk.toggle(training.id)}
+                        className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3 min-w-0">
                         <div

@@ -6,8 +6,10 @@ import toast from 'react-hot-toast'
 import ProductForm, { ProductFormValues } from '@/components/admin/ProductForm'
 import { productService } from '@/app/api_services/productService'
 import { Product } from '@/types/commerce'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function EditProductPage() {
+  useDocumentTitle('Edit Product')
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const [product, setProduct] = useState<Product | null>(null)

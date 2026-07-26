@@ -18,8 +18,10 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { blogService, UpdateBlogRequest } from "@/app/api_services/blogService";
+import { useDocumentTitle } from "@/app/lib/useDocumentTitle";
 
 export default function EditBlogPage() {
+  useDocumentTitle('Edit Blog Post')
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
@@ -598,7 +600,7 @@ export default function EditBlogPage() {
               disabled={saving}
             />
             <p className="mt-2 text-sm text-gray-500">
-              Use relevant tags like: Fire Safety, safety, training, etc.
+              Use relevant tags like: weight loss, nutrition, HIIT, strength training, etc.
             </p>
           </div>
 

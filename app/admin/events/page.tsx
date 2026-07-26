@@ -18,8 +18,14 @@ import {
 import toast from 'react-hot-toast'
 import { EventItem, eventService } from '@/app/api_services/eventService'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function EventsManagementPage() {
+  useDocumentTitle('Events')
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [events, setEvents] = useState<EventItem[]>([])
@@ -114,6 +120,29 @@ export default function EventsManagementPage() {
       return matchesSearch && matchesFilter
     })
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+  const bulk = useBulkSelection(filteredEvents, (e) => e.id)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, (id) => eventService.deleteEvent(id))
+    if (succeededIds.length > 0) {
+      setEvents((prev) => prev.filter((e) => !succeededIds.includes(e.id)))
+    }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} event${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} event${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
+  }
 
   const stats = {
     total: events.length,
@@ -311,6 +340,23 @@ export default function EventsManagementPage() {
         </div>
       </div>
 
+      <BulkActionBar
+        selectedCount={bulk.selectedCount}
+        itemLabel="event"
+        onClear={bulk.clear}
+        onDeleteClick={() => setShowBulkDeleteModal(true)}
+      />
+
+      <BulkDeleteModal
+        open={showBulkDeleteModal}
+        count={bulk.selectedCount}
+        itemLabel="event"
+        warningText="All registrations for the selected events will also be deleted. This cannot be undone."
+        deleting={bulkDeleting}
+        onCancel={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
+
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {refreshing ? (
           <div className="p-8 text-center">
@@ -342,6 +388,14 @@ export default function EventsManagementPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-4 w-12">
+                    <input
+                      type="checkbox"
+                      checked={bulk.isAllSelected}
+                      onChange={bulk.toggleAll}
+                      className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 min-w-[250px]">Event</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Date</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Price</th>
@@ -353,6 +407,14 @@ export default function EventsManagementPage() {
               <tbody className="divide-y divide-gray-200">
                 {filteredEvents.map((event) => (
                   <tr key={event.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={bulk.isSelected(event.id)}
+                        onChange={() => bulk.toggle(event.id)}
+                        className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3 min-w-0">
                         <div

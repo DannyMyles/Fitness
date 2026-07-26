@@ -6,8 +6,10 @@ import { ArrowLeft, Loader2, Mail, Phone, Ticket, CheckCircle, XCircle, Clock } 
 import toast from 'react-hot-toast'
 import { EventRegistration, eventService } from '@/app/api_services/eventService'
 import EmptyState from '@/components/ui/EmptyState'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function EventRegistrationsPage() {
+  useDocumentTitle('Event Registrations')
   const router = useRouter()
   const params = useParams()
   const eventId = params.id as string

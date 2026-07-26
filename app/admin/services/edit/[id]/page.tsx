@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateTrainingRequest, trainingService } from '@/app/api_services/trainingService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 const iconOptions = ['Dumbbell', 'Heart', 'Zap', 'Clock', 'Users', 'Award', 'Star', 'CheckCircle']
 const colorOptions = [
@@ -29,6 +30,7 @@ const colorOptions = [
 ]
 
 export default function EditServicePage() {
+  useDocumentTitle('Edit Service')
   const router = useRouter()
   const params = useParams()
   const trainingId = params.id as string

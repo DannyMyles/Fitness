@@ -17,8 +17,10 @@ import {
   RefreshCw
 } from 'lucide-react'
 import { userService } from '../../../api_services/userService'
+import { useDocumentTitle } from '../../../lib/useDocumentTitle'
 
 export default function CreateUserPage() {
+  useDocumentTitle('Create User')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

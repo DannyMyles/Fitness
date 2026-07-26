@@ -6,8 +6,10 @@ import toast from 'react-hot-toast'
 import { productService } from '@/app/api_services/productService'
 import { Category } from '@/types/commerce'
 import EmptyState from '@/components/ui/EmptyState'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function CategoriesManagementPage() {
+  useDocumentTitle('Categories')
   const [categories, setCategories] = useState<Category[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)

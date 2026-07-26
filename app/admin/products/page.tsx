@@ -7,8 +7,14 @@ import toast from 'react-hot-toast'
 import { productService } from '@/app/api_services/productService'
 import { Product } from '@/types/commerce'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function ProductsManagementPage() {
+  useDocumentTitle('Products')
   const [products, setProducts] = useState<Product[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
@@ -76,6 +82,29 @@ export default function ProductsManagementPage() {
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.category?.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  const bulk = useBulkSelection(filtered, (p) => String(p.id))
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, (id) => productService.admin.deleteProduct(Number(id)))
+    if (succeededIds.length > 0) {
+      setProducts((prev) => prev.filter((p) => !succeededIds.includes(String(p.id))))
+    }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} product${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} product${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
+  }
 
   if (loading) {
     return (
@@ -196,6 +225,22 @@ export default function ProductsManagementPage() {
         />
       </div>
 
+      <BulkActionBar
+        selectedCount={bulk.selectedCount}
+        itemLabel="product"
+        onClear={bulk.clear}
+        onDeleteClick={() => setShowBulkDeleteModal(true)}
+      />
+
+      <BulkDeleteModal
+        open={showBulkDeleteModal}
+        count={bulk.selectedCount}
+        itemLabel="product"
+        deleting={bulkDeleting}
+        onCancel={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
+
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {filtered.length === 0 ? (
           products.length === 0 ? (
@@ -218,6 +263,14 @@ export default function ProductsManagementPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-4 w-12">
+                    <input
+                      type="checkbox"
+                      checked={bulk.isAllSelected}
+                      onChange={bulk.toggleAll}
+                      className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 min-w-[250px]">Product</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Category</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Price</th>
@@ -228,6 +281,14 @@ export default function ProductsManagementPage() {
               <tbody className="divide-y divide-gray-200">
                 {filtered.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={bulk.isSelected(String(product.id))}
+                        onChange={() => bulk.toggle(String(product.id))}
+                        className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <img src={product.images[0]} alt="" className="h-10 w-10 rounded-lg object-contain flex-shrink-0 bg-gray-100 p-0.5" />

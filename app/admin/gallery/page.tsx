@@ -8,6 +8,11 @@ import {
 import toast from 'react-hot-toast'
 import { galleryService, GalleryCategory, GalleryImage } from '@/app/api_services/galleryService'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 interface FilePreview {
   file: File
@@ -15,6 +20,7 @@ interface FilePreview {
 }
 
 export default function GalleryManagementPage() {
+  useDocumentTitle('Gallery')
   const [categories, setCategories] = useState<GalleryCategory[]>([])
   const [images, setImages] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(true)
@@ -52,6 +58,18 @@ export default function GalleryManagementPage() {
     fetchAll()
   }, [])
 
+  // Keep the upload category valid: default to the first category once any
+  // exist, and fall back if the previously-selected one gets deleted.
+  useEffect(() => {
+    if (categories.length === 0) {
+      setUploadCategoryId('')
+      return
+    }
+    if (!categories.some((c) => c.id === uploadCategoryId)) {
+      setUploadCategoryId(categories[0].id)
+    }
+  }, [categories, uploadCategoryId])
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (showFormModal && formModalRef.current && !formModalRef.current.contains(event.target as Node)) {
@@ -84,7 +102,6 @@ export default function GalleryManagementPage() {
       const [cats, imgs] = await Promise.all([galleryService.getCategories(), galleryService.getImages()])
       setCategories(cats)
       setImages(imgs)
-      if (!uploadCategoryId && cats[0]) setUploadCategoryId(cats[0].id)
     } catch (error: any) {
       toast.error(error.message || 'Failed to load gallery')
     } finally {
@@ -249,8 +266,19 @@ export default function GalleryManagementPage() {
     if (!imageToDelete) return
     setDeletingImage(true)
     try {
-      await galleryService.admin.deleteImage(imageToDelete.id)
-      toast.success('Photo deleted')
+      try {
+        await galleryService.admin.deleteImage(imageToDelete.id)
+        toast.success('Photo deleted')
+      } catch (error: any) {
+        // Already gone server-side (stale grid, double-click, etc.) — the
+        // end state the user wants is the same either way, so don't scare
+        // them with an error for something that isn't one.
+        if (error?.status === 404) {
+          toast.success('Photo already removed')
+        } else {
+          throw error
+        }
+      }
       setImages((prev) => prev.filter((img) => img.id !== imageToDelete.id))
       setCategories((prev) =>
         prev.map((c) =>
@@ -276,6 +304,44 @@ export default function GalleryManagementPage() {
       (categoryById(img.categoryId)?.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
     return matchesFilter && matchesSearch
   })
+
+  const bulk = useBulkSelection(filteredImages, (img) => img.id)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, async (id) => {
+      try {
+        await galleryService.admin.deleteImage(id)
+      } catch (error: any) {
+        // Already gone server-side counts as a successful outcome here too.
+        if (error?.status === 404) return
+        throw error
+      }
+    })
+    if (succeededIds.length > 0) {
+      const removedImages = images.filter((img) => succeededIds.includes(img.id))
+      setImages((prev) => prev.filter((img) => !succeededIds.includes(img.id)))
+      setCategories((prev) =>
+        prev.map((c) => {
+          const removedCount = removedImages.filter((img) => img.categoryId === c.id).length
+          return removedCount > 0 ? { ...c, imageCount: Math.max(0, c.imageCount - removedCount) } : c
+        })
+      )
+    }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} photo${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} photo${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
+  }
 
   if (loading) {
     return (
@@ -564,22 +630,29 @@ export default function GalleryManagementPage() {
           <p className="text-sm text-gray-500">Create a category first before uploading photos.</p>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                <select
-                  value={uploadCategoryId}
-                  onChange={(e) => setUploadCategoryId(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
-                >
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                1. Choose a category *
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setUploadCategoryId(c.id)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+                      uploadCategoryId === c.id
+                        ? 'bg-accent-500 border-accent-500 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-accent-400 hover:bg-accent-50'
+                    }`}
+                  >
+                    {c.name}
+                  </button>
+                ))}
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {selectedFiles.length === 1 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Title (optional)</label>
@@ -596,6 +669,7 @@ export default function GalleryManagementPage() {
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">2. Add photos</label>
               <label className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 rounded-xl py-8 cursor-pointer hover:border-accent-400 hover:bg-accent-50/30 transition-colors">
                 <input type="file" accept="image/*" multiple onChange={handleFileSelect} className="hidden" disabled={uploading} />
                 <Upload className="h-5 w-5 text-gray-400" />
@@ -603,7 +677,13 @@ export default function GalleryManagementPage() {
                   Click to select one photo, or select multiple for a bulk upload
                 </span>
               </label>
-              <p className="text-xs text-gray-500 mt-2">Each file up to 5MB — JPG, PNG, GIF, or WebP.</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Each file up to 5MB — JPG, PNG, GIF, or WebP. Uploading to{' '}
+                <span className="font-medium text-gray-700">
+                  {categories.find((c) => c.id === uploadCategoryId)?.name ?? '…'}
+                </span>
+                .
+              </p>
             </div>
 
             {selectedFiles.length > 0 && (
@@ -678,17 +758,46 @@ export default function GalleryManagementPage() {
               </button>
             ))}
           </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search photos..."
-              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 text-sm"
-            />
+          <div className="flex items-center gap-3">
+            {filteredImages.length > 0 && (
+              <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={bulk.isAllSelected}
+                  onChange={bulk.toggleAll}
+                  className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                />
+                Select all
+              </label>
+            )}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search photos..."
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 text-sm"
+              />
+            </div>
           </div>
         </div>
+
+        <BulkActionBar
+          selectedCount={bulk.selectedCount}
+          itemLabel="photo"
+          onClear={bulk.clear}
+          onDeleteClick={() => setShowBulkDeleteModal(true)}
+        />
+
+        <BulkDeleteModal
+          open={showBulkDeleteModal}
+          count={bulk.selectedCount}
+          itemLabel="photo"
+          deleting={bulkDeleting}
+          onCancel={() => setShowBulkDeleteModal(false)}
+          onConfirm={handleBulkDeleteConfirm}
+        />
 
         {filteredImages.length === 0 ? (
           <div className="bg-white rounded-xl shadow-adventure border border-gray-200">
@@ -716,10 +825,27 @@ export default function GalleryManagementPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredImages.map((image) => (
-              <div key={image.id} className="group relative rounded-xl overflow-hidden border border-gray-200 bg-white">
+              <div
+                key={image.id}
+                className={`group relative rounded-xl overflow-hidden border bg-white ${
+                  bulk.isSelected(image.id) ? 'border-accent-500 ring-2 ring-accent-200' : 'border-gray-200'
+                }`}
+              >
                 <div className="aspect-square">
                   <img src={galleryService.getImageUrl(image)} alt={image.title ?? ''} className="w-full h-full object-cover" />
                 </div>
+                <label
+                  className={`absolute top-2 left-2 p-0.5 bg-white/90 rounded-md cursor-pointer transition-opacity ${
+                    bulk.isSelected(image.id) || bulk.selectedCount > 0 ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={bulk.isSelected(image.id)}
+                    onChange={() => bulk.toggle(image.id)}
+                    className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                  />
+                </label>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
                   <button
                     onClick={() => handleDeleteImageClick(image)}

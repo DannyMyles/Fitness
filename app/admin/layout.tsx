@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { Toaster } from 'react-hot-toast';
 import {
   LayoutDashboard, Users, ShoppingBag, FileText,
-  LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar, Image as ImageIcon
+  LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar, Image as ImageIcon, Home
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -104,11 +104,18 @@ export default function AdminLayout({
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10">
-          <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors">
-            <LogOut size={20} />
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-1">
+          <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1">
+            <Home size={20} />
             <span>Back to Website</span>
           </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1"
+          >
+            <LogOut size={20} />
+            <span>Log Out</span>
+          </button>
         </div>
       </aside>
 
@@ -125,9 +132,17 @@ export default function AdminLayout({
             </button>
             
             <div className="flex items-center gap-4 ml-auto">
+              <span className="hidden sm:block text-sm text-gray-600">{session?.user?.name || session?.user?.email}</span>
               <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#E55A2B] rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
-                A
+                {(session?.user?.name || 'A').charAt(0).toUpperCase()}
               </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-red-600"
+                title="Log Out"
+              >
+                <LogOut size={20} />
+              </button>
             </div>
           </div>
         </header>

@@ -15,7 +15,21 @@
   --color-fitness-error: #EF5350;
   --color-fitness-light: #F8F9FA;
   --color-fitness-dark: #1A1A2E;
-  
+
+  /* Accent scale — used throughout the admin panel (buttons, badges, focus
+     rings, pills). Same brand orange as fitness-primary, just exposed as a
+     numeric Tailwind scale since admin components reference accent-50…900. */
+  --color-accent-50: #FFF4EE;
+  --color-accent-100: #FFE4D6;
+  --color-accent-200: #FFC7AD;
+  --color-accent-300: #FFA179;
+  --color-accent-400: #FF8C5A;
+  --color-accent-500: #FF6B35;
+  --color-accent-600: #E55A2B;
+  --color-accent-700: #C94A22;
+  --color-accent-800: #A63D1C;
+  --color-accent-900: #7A2D15;
+
   /* Brand colors */
   --color-brand-orange: #FF6B35;
   --color-brand-green: #0BA154;

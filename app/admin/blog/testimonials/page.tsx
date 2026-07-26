@@ -26,8 +26,10 @@ import {
 import toast from 'react-hot-toast'
 import { Testimonial, testimonialService } from '@/app/api_services/testimonialService'
 import EmptyState from '@/components/ui/EmptyState'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function TestimonialsManagementPage() {
+  useDocumentTitle('Testimonials')
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [ratingFilter, setRatingFilter] = useState('all')

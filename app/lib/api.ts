@@ -213,25 +213,34 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = data as ApiError;
-      
+
+      // Attach the HTTP status so callers can branch on it (e.g. treat a 404
+      // on a delete as "already gone" instead of a hard failure) without
+      // having to parse the message string.
+      const makeError = (message: string) => {
+        const err = new Error(message) as Error & { status?: number }
+        err.status = response.status
+        return err
+      }
+
       // Handle specific HTTP errors
       if (response.status === 403) {
-        throw new Error('You do not have permission to perform this action.')
+        throw makeError('You do not have permission to perform this action.')
       }
-      
+
       if (response.status === 429) {
-        throw new Error('Too many requests. Please try again later.')
+        throw makeError('Too many requests. Please try again later.')
       }
-      
+
       if (response.status === 404) {
-        throw new Error('The requested resource was not found.')
+        throw makeError('The requested resource was not found.')
       }
-      
+
       if (response.status >= 500) {
-        throw new Error('Server error. Please try again later.')
+        throw makeError('Server error. Please try again later.')
       }
-      
-      throw new Error(errorData.error || errorData.message || `Request failed with status ${response.status}`)
+
+      throw makeError(errorData.error || errorData.message || `Request failed with status ${response.status}`)
     }
 
     return data as T;

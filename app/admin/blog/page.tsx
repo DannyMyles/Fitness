@@ -7,6 +7,11 @@ import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Eye, Calendar, X, Ref
 import toast from 'react-hot-toast'
 import { Blog, blogService } from '@/app/api_services/blogService'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 interface BlogStats {
   totalBlogs: number
@@ -17,6 +22,7 @@ interface BlogStats {
 }
 
 export default function BlogManagementPage() {
+  useDocumentTitle('Blog')
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [blogs, setBlogs] = useState<Blog[]>([])
@@ -132,6 +138,30 @@ export default function BlogManagementPage() {
     
     return matchesSearch && matchesFilter
   })
+
+  const bulk = useBulkSelection(filteredBlogs, (b) => b.id)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, (id) => blogService.deleteBlog(id))
+    if (succeededIds.length > 0) {
+      setBlogs((prev) => prev.filter((b) => !succeededIds.includes(b.id)))
+      fetchStats()
+    }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} post${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} post${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
+  }
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes'
@@ -348,6 +378,24 @@ export default function BlogManagementPage() {
         </div>
       </div>
 
+      <BulkActionBar
+        selectedCount={bulk.selectedCount}
+        itemLabel="post"
+        itemLabelPlural="posts"
+        onClear={bulk.clear}
+        onDeleteClick={() => setShowBulkDeleteModal(true)}
+      />
+
+      <BulkDeleteModal
+        open={showBulkDeleteModal}
+        count={bulk.selectedCount}
+        itemLabel="post"
+        itemLabelPlural="posts"
+        deleting={bulkDeleting}
+        onCancel={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
+
       {/* Blog Posts Table */}
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {refreshing ? (
@@ -380,6 +428,14 @@ export default function BlogManagementPage() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
+                  <th className="px-6 py-4 w-12">
+                    <input
+                      type="checkbox"
+                      checked={bulk.isAllSelected}
+                      onChange={bulk.toggleAll}
+                      className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 min-w-[250px]">Title</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Category</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Image</th>
@@ -392,6 +448,14 @@ export default function BlogManagementPage() {
               <tbody className="divide-y divide-gray-200">
                 {filteredBlogs.map((blog) => (
                   <tr key={blog.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <input
+                        type="checkbox"
+                        checked={bulk.isSelected(blog.id)}
+                        onChange={() => bulk.toggle(blog.id)}
+                        className="h-4 w-4 text-accent-500 focus:ring-accent-500 rounded"
+                      />
+                    </td>
                     <td className="px-6 py-4">
                       <div className="min-w-0">
                         <p className="font-medium text-gray-900 truncate">{blog.title}</p>

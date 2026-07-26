@@ -264,7 +264,7 @@ export default function ContactClient() {
             {/* Additional Info */}
             <div className="space-y-8">
               {/* Quick Contact Options */}
-              <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-fitness-primary via-fitness-primary to-fitness-primary-dark p-8 shadow-fitness-lg ring-1 ring-white/10">
+              <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-fitness-primary via-fitness-primary to-fitness-primary-dark p-8 shadow-fitness-lg ring-1 ring-white/10 text-white">
                 {/* Spotlight + texture layers */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.18),transparent_45%)]" />
                 <div className="absolute inset-0 opacity-[0.15] bg-pattern-dots" />

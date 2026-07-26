@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { orderService } from '@/app/api_services/orderService'
 import { Order, OrderStatus } from '@/types/commerce'
 import EmptyState from '@/components/ui/EmptyState'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -17,6 +18,7 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
 }
 
 export default function OrdersManagementPage() {
+  useDocumentTitle('Orders')
   const [orders, setOrders] = useState<Order[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)

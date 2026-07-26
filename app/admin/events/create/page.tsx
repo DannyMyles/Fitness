@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateEventRequest, eventService } from '@/app/api_services/eventService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 function toLines(value: string): string[] {
   return value
@@ -26,6 +27,7 @@ function toLines(value: string): string[] {
 }
 
 export default function CreateEventPage() {
+  useDocumentTitle('Create Event')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

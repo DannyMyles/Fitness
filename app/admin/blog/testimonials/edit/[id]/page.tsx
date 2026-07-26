@@ -19,8 +19,10 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateTestimonialRequest, testimonialService, Testimonial } from '@/app/api_services/testimonialService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function EditTestimonialPage() {
+  useDocumentTitle('Edit Testimonial')
   const router = useRouter()
   const params = useParams()
   const testimonialId = params.id as string

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { userService, User, UpdateUserRequest } from '@/app/api_services/userService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 interface UserFormData {
   name: string
@@ -30,6 +31,7 @@ interface UserFormData {
 }
 
 export default function EditUserPage() {
+  useDocumentTitle('Edit User')
   const router = useRouter()
   const params = useParams()
   const userId = params.id as string

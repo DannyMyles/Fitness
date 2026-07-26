@@ -22,8 +22,15 @@ import {
 } from 'lucide-react'
 import { User, userService } from '@/app/api_services/userService'
 import EmptyState from '@/components/ui/EmptyState'
+import BulkActionBar from '@/components/ui/BulkActionBar'
+import BulkDeleteModal from '@/components/ui/BulkDeleteModal'
+import { useBulkSelection } from '@/app/lib/useBulkSelection'
+import { runBulkDelete } from '@/app/lib/bulkDelete'
+import toast from 'react-hot-toast'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function UsersManagementPage() {
+  useDocumentTitle('Users')
   const router = useRouter()
   const { data: session, status: authStatus } = useSession()
   const [searchQuery, setSearchQuery] = useState('')
@@ -36,7 +43,6 @@ export default function UsersManagementPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [isAuthLoading, setIsAuthLoading] = useState(true)
 
   // Check authentication status
@@ -132,45 +138,41 @@ export default function UsersManagementPage() {
       return sortOrder === 'asc' ? comparison : -comparison
     })
 
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedUsers(filteredUsers.map(user => user._id))
-    } else {
-      setSelectedUsers([])
-    }
-  }
-
-  const handleSelectUser = (id: string, checked: boolean) => {
-    if (checked) {
-      setSelectedUsers([...selectedUsers, id])
-    } else {
-      setSelectedUsers(selectedUsers.filter(userId => userId !== id))
-    }
-  }
+  // Own account is never selectable for bulk actions — toggleAll/isAllSelected
+  // are computed only over other users, so there's no way to bulk-delete self.
+  const selectableUsers = filteredUsers.filter((u) => u._id !== session?.user?.id)
+  const bulk = useBulkSelection(selectableUsers, (u) => u._id)
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
+  const [bulkDeleting, setBulkDeleting] = useState(false)
 
   const handleDeleteUser = async (id: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return
-    
+
     try {
       await userService.deleteUser(id)
       setUsers(users.filter(u => u._id !== id))
-      setSelectedUsers(selectedUsers.filter(userId => userId !== id))
     } catch (err: any) {
-      alert(err.message || 'Failed to delete user')
+      toast.error(err.message || 'Failed to delete user')
     }
   }
 
-  const handleDeleteSelected = async () => {
-    if (selectedUsers.length === 0) return
-    if (!confirm(`Are you sure you want to delete ${selectedUsers.length} selected users?`)) return
-    
-    try {
-      await Promise.all(selectedUsers.map(id => userService.deleteUser(id)))
-      setUsers(users.filter(u => !selectedUsers.includes(u._id)))
-      setSelectedUsers([])
-    } catch (err: any) {
-      alert(err.message || 'Failed to delete users')
+  const handleBulkDeleteConfirm = async () => {
+    setBulkDeleting(true)
+    const ids = Array.from(bulk.selectedIds)
+    const { succeededIds, failedIds } = await runBulkDelete(ids, (id) => userService.deleteUser(id))
+    if (succeededIds.length > 0) {
+      setUsers((prev) => prev.filter((u) => !succeededIds.includes(u._id)))
     }
+    if (failedIds.length === 0) {
+      toast.success(`${succeededIds.length} user${succeededIds.length === 1 ? '' : 's'} deleted`)
+    } else if (succeededIds.length === 0) {
+      toast.error(`Failed to delete ${failedIds.length} user${failedIds.length === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`${succeededIds.length} deleted, ${failedIds.length} failed`)
+    }
+    bulk.clear()
+    setBulkDeleting(false)
+    setShowBulkDeleteModal(false)
   }
 
   const handleToggleStatus = async (id: string) => {
@@ -371,39 +373,32 @@ export default function UsersManagementPage() {
         </div>
       </div>
 
-      {/* Bulk Actions */}
-      {selectedUsers.length > 0 && (
-        <div className="adventure-card bg-accent-50 border-accent-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-accent-100 rounded-lg flex items-center justify-center">
-                <span className="text-accent-700 font-medium">{selectedUsers.length}</span>
-              </div>
-              <p className="text-accent-700 font-medium">
-                {selectedUsers.length} user{selectedUsers.length > 1 ? 's' : ''} selected
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  const userId = selectedUsers[0]
-                  const user = users.find(u => u._id === userId)
-                  if (user) handleToggleStatus(userId)
-                }}
-                className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
-              >
-                Toggle Status
-              </button>
-              <button
-                onClick={handleDeleteSelected}
-                className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors"
-              >
-                Delete Selected
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BulkActionBar
+        selectedCount={bulk.selectedCount}
+        itemLabel="user"
+        onClear={bulk.clear}
+        onDeleteClick={() => setShowBulkDeleteModal(true)}
+        extraActions={
+          <button
+            onClick={() => {
+              const userId = Array.from(bulk.selectedIds)[0]
+              if (userId) handleToggleStatus(userId)
+            }}
+            className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
+          >
+            Toggle Status
+          </button>
+        }
+      />
+
+      <BulkDeleteModal
+        open={showBulkDeleteModal}
+        count={bulk.selectedCount}
+        itemLabel="user"
+        deleting={bulkDeleting}
+        onCancel={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteConfirm}
+      />
 
       {/* Filters and Search */}
       <div className="flex flex-col lg:flex-row gap-4">
@@ -481,8 +476,8 @@ export default function UsersManagementPage() {
                       <th className="px-6 py-4 w-12">
                         <input
                           type="checkbox"
-                          checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
-                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          checked={bulk.isAllSelected}
+                          onChange={bulk.toggleAll}
                           className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] rounded"
                         />
                       </th>
@@ -498,12 +493,22 @@ export default function UsersManagementPage() {
                     {filteredUsers.map((user) => (
                       <tr key={user._id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedUsers.includes(user._id)}
-                            onChange={(e) => handleSelectUser(user._id, e.target.checked)}
-                            className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] rounded"
-                          />
+                          {user._id === session?.user?.id ? (
+                            <input
+                              type="checkbox"
+                              checked={false}
+                              disabled
+                              title="You can't select your own account"
+                              className="h-4 w-4 rounded opacity-40 cursor-not-allowed"
+                            />
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={bulk.isSelected(user._id)}
+                              onChange={() => bulk.toggle(user._id)}
+                              className="h-4 w-4 text-[#FF6B35] focus:ring-[#FF6B35] rounded"
+                            />
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">

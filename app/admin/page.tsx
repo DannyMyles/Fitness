@@ -12,6 +12,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import { orderService } from '@/app/api_services/orderService';
 import { productService } from '@/app/api_services/productService';
 import { Order, Product } from '@/types/commerce';
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -25,6 +26,7 @@ const getStatusColor = (status: string) => {
 };
 
 export default function AdminDashboard() {
+  useDocumentTitle('Dashboard');
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);

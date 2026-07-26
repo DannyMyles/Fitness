@@ -18,8 +18,10 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateTestimonialRequest, testimonialService } from '@/app/api_services/testimonialService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function CreateTestimonialPage() {
+  useDocumentTitle('Create Testimonial')
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

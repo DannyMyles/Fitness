@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save, Eye, Upload, X, Image as ImageIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { blogService, CreateBlogRequest } from '@/app/api_services/blogService'
+import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 export default function CreateBlogPage() {
+  useDocumentTitle('Create Blog Post')
   const router = useRouter()
   const [formData, setFormData] = useState<CreateBlogRequest>({
     title: '',
@@ -432,7 +434,7 @@ export default function CreateBlogPage() {
               disabled={loading}
             />
             <p className="mt-2 text-sm text-gray-500">
-              Use relevant tags like: Fire Safety, safety, training, etc.
+              Use relevant tags like: weight loss, nutrition, HIIT, strength training, etc.
             </p>
           </div>
 
