@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Testimonial, testimonialService } from '@/app/api_services/testimonialService'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function TestimonialsManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -682,34 +683,28 @@ export default function TestimonialsManagementPage() {
       {/* Empty State */}
       {filteredTestimonials.length === 0 && (
         <div className="adventure-card">
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <MessageSquare className="h-12 w-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No testimonials found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your search or filter criteria</p>
-            {testimonials.length > 0 && (
-              <button
-                onClick={() => {
+          {testimonials.length === 0 ? (
+            <EmptyState
+              icon={MessageSquare}
+              title="No testimonials yet"
+              description="Add your first testimonial to start showcasing client results."
+              action={{ label: 'Add Testimonial', icon: Plus, href: '/admin/blog/testimonials/create' }}
+            />
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="No testimonials match your filters"
+              description="Try adjusting your search or filter criteria."
+              action={{
+                label: 'Clear All Filters',
+                onClick: () => {
                   setSearchQuery('')
                   setFilter('all')
                   setRatingFilter('all')
-                }}
-                className="mt-4 text-accent-600 hover:text-accent-700 font-medium"
-              >
-                Clear all filters
-              </button>
-            )}
-            {testimonials.length === 0 && (
-              <Link
-                href="/admin/blog/testimonials/create"
-                className="btn-adventure inline-flex items-center gap-2"
-              >
-                <Plus className="h-4 w-4" />
-                Add First Testimonial
-              </Link>
-            )}
-          </div>
+                },
+              }}
+            />
+          )}
         </div>
       )}
     </div>

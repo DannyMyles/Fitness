@@ -5,16 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   Calendar, Clock, MapPin, Users,
-  Zap, ArrowRight, Heart, Loader2, AlertCircle, CheckCircle, X
+  Zap, ArrowRight, Heart, Loader2, AlertCircle, CheckCircle, X, RefreshCw
 } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
+import EmptyState from '@/components/ui/EmptyState';
 import { eventService, EventItem } from '@/app/api_services/eventService';
-
-const upcomingHighlights = [
-  { month: 'This Month', count: 4 },
-  { month: 'Next Month', count: 6 },
-];
 
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
 
@@ -54,6 +50,21 @@ export default function EventsClient() {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  const now = new Date();
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const eventsThisMonth = events.filter((e) => {
+    const d = new Date(e.date);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }).length;
+  const eventsNextMonth = events.filter((e) => {
+    const d = new Date(e.date);
+    return d.getFullYear() === nextMonth.getFullYear() && d.getMonth() === nextMonth.getMonth();
+  }).length;
+  const upcomingHighlights = [
+    { month: 'This Month', count: eventsThisMonth },
+    { month: 'Next Month', count: eventsNextMonth },
+  ];
 
   const handleRegisterClick = (event: EventItem) => {
     if (status !== 'authenticated') {
@@ -223,7 +234,7 @@ export default function EventsClient() {
                   <Calendar size={28} className="text-fitness-primary" />
                 </div>
                 <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                  {item.count}+
+                  {item.count}
                 </div>
                 <div className="text-gray-600">Events {item.month}</div>
               </div>
@@ -294,9 +305,19 @@ export default function EventsClient() {
               <p>Loading events...</p>
             </div>
           ) : error ? (
-            <div className="text-center py-16 text-gray-500">{error}</div>
+            <EmptyState
+              icon={AlertCircle}
+              title="Couldn't load events"
+              description={error}
+              action={{ label: 'Try Again', icon: RefreshCw, onClick: fetchEvents }}
+            />
           ) : events.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">No upcoming events right now. Check back soon.</div>
+            <EmptyState
+              icon={Calendar}
+              title="No upcoming events right now"
+              description="Check back soon — new sessions and workshops are added regularly."
+              action={{ label: 'Get in Touch', href: '/contact' }}
+            />
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {events.map((event, index) => (

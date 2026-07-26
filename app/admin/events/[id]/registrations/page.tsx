@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Loader2, Mail, Phone, Ticket, CheckCircle, XCircle, Clock } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { EventRegistration, eventService } from '@/app/api_services/eventService'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function EventRegistrationsPage() {
   const router = useRouter()
@@ -92,10 +93,11 @@ export default function EventRegistrationsPage() {
 
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {registrations.length === 0 ? (
-          <div className="p-8 text-center">
-            <Ticket className="h-10 w-10 mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500">No registrations yet</p>
-          </div>
+          <EmptyState
+            icon={Ticket}
+            title="No registrations yet"
+            description="Registrations for this event will show up here as people sign up."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

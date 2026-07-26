@@ -52,8 +52,8 @@ const Footer = () => {
   ];
 
   const features = [
-    { icon: Target, text: 'Certified Trainer', count: '5+' },
-    { icon: Award, text: 'Happy Clients', count: '200+' },
+    { icon: Target, text: 'Certified Trainer', count: '2' },
+    { icon: Award, text: 'Happy Clients', count: '100+' },
     { icon: Calendar, text: 'Classes/Month', count: '50+' },
     { icon: Shield, text: 'Success Rate', count: '98%' },
   ];

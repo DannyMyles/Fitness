@@ -1,32 +1,40 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import { X, Instagram, Facebook, Twitter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Instagram, Facebook, Twitter, Loader2, AlertCircle, Image as ImageIcon, RefreshCw } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
-
-const galleryImages = [
-  { id: 1, src: '/images/004.JPG', category: 'Training', title: 'Personal Training Session' },
-  { id: 2, src: '/images/005.JPG', category: 'Workout', title: 'HIIT Class' },
-  { id: 3, src: '/images/006.JPG', category: 'Gym', title: 'Strength Training' },
-  { id: 4, src: '/images/007.JPG', category: 'Training', title: 'Cardio Session' },
-  { id: 5, src: '/images/008.JPG', category: 'Workout', title: 'Circuit Training' },
-  { id: 6, src: '/images/018.JPG', category: 'Workout', title: 'Group Fitness' },
-  { id: 7, src: '/images/022.JPG', category: 'Events', title: 'Community Workout' },
-  { id: 8, src: '/images/023.JPG', category: 'Events', title: 'Fitness Workshop' },
-  { id: 9, src: '/images/024.JPG', category: 'Gym', title: 'Training Session' },
-  { id: 10, src: '/images/027.JPG', category: 'Gym', title: 'Equipment Training' },
-];
-
-const categories = ['All', 'Training', 'Workout', 'Gym', 'Events'];
+import EmptyState from '@/components/ui/EmptyState';
+import { galleryService, GalleryCategory, GalleryImage } from '@/app/api_services/galleryService';
 
 export default function GalleryClient() {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedImage, setSelectedImage] = useState<typeof galleryImages[0] | null>(null);
+  const [categories, setCategories] = useState<GalleryCategory[]>([]);
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
 
-  const filteredImages = activeCategory === 'All' 
-    ? galleryImages 
-    : galleryImages.filter(img => img.category === activeCategory);
+  const fetchGallery = () => {
+    setIsLoading(true);
+    setError('');
+    Promise.all([galleryService.getCategories(), galleryService.getImages()])
+      .then(([cats, imgs]) => {
+        setCategories(cats);
+        setImages(imgs);
+      })
+      .catch(() => setError('Could not load the gallery. Please try again shortly.'))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchGallery();
+  }, []);
+
+  const categoryName = (categoryId: string) =>
+    categories.find((c) => c.id === categoryId)?.name ?? '';
+
+  const filteredImages =
+    activeCategory === 'all' ? images : images.filter((img) => img.categoryId === activeCategory);
 
   return (
     <div className="pt-0">
@@ -39,45 +47,85 @@ export default function GalleryClient() {
       {/* Gallery Grid */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-6 py-2 rounded-full font-medium transition-all ${
-                  activeCategory === category
-                    ? 'bg-fitness-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-fitness-primary/10 hover:text-fitness-primary'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-
-          {/* Images Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredImages.map((image) => (
-              <div 
-                key={image.id}
-                className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer"
-                onClick={() => setSelectedImage(image)}
-              >
-                <img
-                  src={image.src}
-                  alt={image.title}
-                  className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-fitness-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <p className="text-white text-sm font-medium mb-1">{image.category}</p>
-                    <h3 className="text-white font-semibold">{image.title}</h3>
-                  </div>
-                </div>
+          {isLoading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 size={32} className="animate-spin text-gray-300" />
+            </div>
+          ) : error ? (
+            <EmptyState
+              icon={AlertCircle}
+              title="Couldn't load the gallery"
+              description={error}
+              action={{ label: 'Try Again', icon: RefreshCw, onClick: fetchGallery }}
+            />
+          ) : images.length === 0 ? (
+            <EmptyState
+              icon={ImageIcon}
+              title="No photos yet"
+              description="Check back soon — new photos from training sessions and events are added regularly."
+            />
+          ) : (
+            <>
+              {/* Category Filter */}
+              <div className="flex flex-wrap justify-center gap-4 mb-12">
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`px-6 py-2 rounded-full font-medium transition-all ${
+                    activeCategory === 'all'
+                      ? 'bg-fitness-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-fitness-primary/10 hover:text-fitness-primary'
+                  }`}
+                >
+                  All
+                </button>
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setActiveCategory(category.id)}
+                    className={`px-6 py-2 rounded-full font-medium transition-all ${
+                      activeCategory === category.id
+                        ? 'bg-fitness-primary text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-fitness-primary/10 hover:text-fitness-primary'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
+
+              {/* Images Grid */}
+              {filteredImages.length === 0 ? (
+                <EmptyState
+                  icon={ImageIcon}
+                  title="No photos in this category yet"
+                  description="Try a different category, or check back soon."
+                  action={{ label: 'Show All Photos', onClick: () => setActiveCategory('all') }}
+                />
+              ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredImages.map((image) => (
+                  <div
+                    key={image.id}
+                    className="group relative aspect-[4/3] rounded-xl overflow-hidden cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <img
+                      src={galleryService.getImageUrl(image)}
+                      alt={image.title || categoryName(image.categoryId)}
+                      className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-fitness-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <p className="text-white text-sm font-medium mb-1">{categoryName(image.categoryId)}</p>
+                        {image.title && <h3 className="text-white font-semibold">{image.title}</h3>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 
@@ -106,11 +154,11 @@ export default function GalleryClient() {
 
       {/* Lightbox Modal */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <button 
+          <button
             className="absolute top-4 right-4 p-2 text-white hover:text-fitness-accent transition-colors"
             onClick={() => setSelectedImage(null)}
           >
@@ -118,13 +166,13 @@ export default function GalleryClient() {
           </button>
           <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
             <img
-              src={selectedImage.src}
-              alt={selectedImage.title}
+              src={galleryService.getImageUrl(selectedImage)}
+              alt={selectedImage.title || categoryName(selectedImage.categoryId)}
               className="w-full h-auto rounded-xl"
             />
             <div className="mt-4 text-white text-center">
-              <p className="text-sm text-fitness-accent">{selectedImage.category}</p>
-              <h3 className="text-xl font-semibold">{selectedImage.title}</h3>
+              <p className="text-sm text-fitness-accent">{categoryName(selectedImage.categoryId)}</p>
+              {selectedImage.title && <h3 className="text-xl font-semibold">{selectedImage.title}</h3>}
             </div>
           </div>
         </div>
@@ -132,4 +180,3 @@ export default function GalleryClient() {
     </div>
   );
 }
-

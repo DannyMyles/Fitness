@@ -8,6 +8,7 @@ import {
   Dumbbell, Menu, X
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useCartStore } from '@/app/lib/cartStore';
 
 type NavItem = {
   name: string;
@@ -18,6 +19,8 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const cartCount = useCartStore((s) => s.count());
+  const hasHydrated = useCartStore((s) => s.hasHydrated);
 
   const navigation = {
     main: [
@@ -154,7 +157,11 @@ const Navigation = () => {
                   <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
                   <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
                 </svg>
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white text-xs rounded-full flex items-center justify-center font-bold shadow-fitness">0</span>
+                {hasHydrated && cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white text-xs rounded-full flex items-center justify-center font-bold shadow-fitness">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
               <Link
                 href="/contact"

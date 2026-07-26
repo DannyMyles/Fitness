@@ -46,9 +46,9 @@ export default function AboutClient() {
 
     const interval = setInterval(() => {
       setAnimatedStats(prev => ({
-        clients: Math.min(prev.clients + 9, 500),
+        clients: Math.min(prev.clients + 2, 100),
         years: Math.min(prev.years + 0.2, 10),
-        certifications: Math.min(prev.certifications + 1, 50),
+        certifications: Math.min(prev.certifications + 0.1, 2),
         success: Math.min(prev.success + 2, 98)
       }));
     }, stepDuration);
@@ -58,8 +58,8 @@ export default function AboutClient() {
 
   const stats = [
     { icon: Users, key: 'clients' as const, label: 'Clients Transformed', suffix: '+' },
-    { icon: Clock, key: 'years' as const, label: 'Years Experience', suffix: '+' },
-    { icon: Award, key: 'certifications' as const, label: 'Certifications', suffix: '+' },
+    { icon: Clock, key: 'years' as const, label: 'Years Experience', suffix: '' },
+    { icon: Award, key: 'certifications' as const, label: 'Certifications', suffix: '' },
     { icon: Target, key: 'success' as const, label: 'Success Rate', suffix: '%' }
   ];
 
@@ -142,7 +142,7 @@ export default function AboutClient() {
                     <Award size={28} />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">10+</div>
+                    <div className="text-3xl font-bold">10</div>
                     <div className="text-sm text-white/90">Years Experience</div>
                   </div>
                 </div>

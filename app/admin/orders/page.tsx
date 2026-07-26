@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { RefreshCw, Search, Eye } from 'lucide-react'
+import { RefreshCw, Search, Eye, ShoppingCart } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { orderService } from '@/app/api_services/orderService'
 import { Order, OrderStatus } from '@/types/commerce'
+import EmptyState from '@/components/ui/EmptyState'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -111,9 +112,20 @@ export default function OrdersManagementPage() {
 
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No orders found</p>
-          </div>
+          orders.length === 0 ? (
+            <EmptyState
+              icon={ShoppingCart}
+              title="No orders yet"
+              description="Orders placed through the shop will show up here."
+            />
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="No orders match your search"
+              description="Try a different search term."
+              action={{ label: 'Clear Search', onClick: () => setSearchQuery('') }}
+            />
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

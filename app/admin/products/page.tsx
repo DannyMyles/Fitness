@@ -2,10 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Edit, Trash2, RefreshCw, X, Trash2 as TrashIcon } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, RefreshCw, X, Trash2 as TrashIcon, ShoppingBag } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { productService } from '@/app/api_services/productService'
 import { Product } from '@/types/commerce'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function ProductsManagementPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -197,9 +198,21 @@ export default function ProductsManagementPage() {
 
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No products found</p>
-          </div>
+          products.length === 0 ? (
+            <EmptyState
+              icon={ShoppingBag}
+              title="No products yet"
+              description="Add your first product to start building the shop catalog."
+              action={{ label: 'Add Product', icon: Plus, href: '/admin/products/create' }}
+            />
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="No products match your search"
+              description="Try a different search term."
+              action={{ label: 'Clear Search', onClick: () => setSearchQuery('') }}
+            />
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

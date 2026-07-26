@@ -5,6 +5,7 @@ import { Plus, Search, Edit, Trash2, RefreshCw, X, Tags, Package } from 'lucide-
 import toast from 'react-hot-toast'
 import { productService } from '@/app/api_services/productService'
 import { Category } from '@/types/commerce'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function CategoriesManagementPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -321,17 +322,21 @@ export default function CategoriesManagementPage() {
       {/* Table */}
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">
-              {categories.length === 0 ? 'No categories yet' : 'No categories match your search'}
-            </p>
-            {categories.length === 0 && (
-              <button onClick={openCreateModal} className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700">
-                <Plus className="h-4 w-4" />
-                Create your first category
-              </button>
-            )}
-          </div>
+          categories.length === 0 ? (
+            <EmptyState
+              icon={Tags}
+              title="No categories yet"
+              description="Create your first category to start organizing the shop catalog."
+              action={{ label: 'Create Category', icon: Plus, onClick: openCreateModal }}
+            />
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="No categories match your search"
+              description="Try a different search term."
+              action={{ label: 'Clear Search', onClick: () => setSearchQuery('') }}
+            />
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

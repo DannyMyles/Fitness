@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Training, trainingService } from '@/app/api_services/trainingService'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function ServicesManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -340,29 +341,25 @@ export default function ServicesManagementPage() {
             <p className="mt-4 text-gray-600">Refreshing services...</p>
           </div>
         ) : filteredTrainings.length === 0 && trainings.length > 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No services match your search criteria</p>
-            <button
-              onClick={() => {
+          <EmptyState
+            icon={Search}
+            title="No services match your search"
+            description="Try a different search term or filter."
+            action={{
+              label: 'Clear Filters',
+              onClick: () => {
                 setSearchQuery('')
                 setFilter('all')
-              }}
-              className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-            >
-              Clear filters
-            </button>
-          </div>
+              },
+            }}
+          />
         ) : filteredTrainings.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No services found</p>
-            <Link
-              href="/admin/services/create"
-              className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-            >
-              <Plus className="h-4 w-4" />
-              Create your first service
-            </Link>
-          </div>
+          <EmptyState
+            icon={Dumbbell}
+            title="No services yet"
+            description="Create your first service to start building your offerings."
+            action={{ label: 'Create Service', icon: Plus, href: '/admin/services/create' }}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

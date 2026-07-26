@@ -413,6 +413,16 @@ class ApiClient {
       getBySlug: (slug: string) =>
         this.request(`/api/v1/events/${slug}`, { requiresAuth: false }),
     },
+
+    gallery: {
+      getCategories: () =>
+        this.request('/api/v1/gallery/categories', { requiresAuth: false }),
+
+      getImages: (categoryId?: string) => {
+        const query = categoryId ? `?categoryId=${categoryId}` : '';
+        return this.request(`/api/v1/gallery/images${query}`, { requiresAuth: false });
+      },
+    },
   }
 
   // Protected endpoints (requires auth)
@@ -601,6 +611,44 @@ class ApiClient {
         this.request(`/api/v1/testimonials/${id}/status`, {
           method: 'PATCH',
           body: JSON.stringify(data),
+        }),
+    },
+
+    gallery: {
+      createCategory: (data: { name: string; description?: string }) =>
+        this.request('/api/v1/gallery/categories', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+
+      updateCategory: (id: string, data: { name?: string; description?: string }) =>
+        this.request(`/api/v1/gallery/categories/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(data),
+        }),
+
+      deleteCategory: (id: string) =>
+        this.request(`/api/v1/gallery/categories/${id}`, {
+          method: 'DELETE',
+        }),
+
+      uploadSingle: (data: FormData) =>
+        this.request('/api/v1/gallery/images/single', {
+          method: 'POST',
+          body: data,
+          headers: {},
+        }),
+
+      uploadBulk: (data: FormData) =>
+        this.request('/api/v1/gallery/images/bulk', {
+          method: 'POST',
+          body: data,
+          headers: {},
+        }),
+
+      deleteImage: (id: string) =>
+        this.request(`/api/v1/gallery/images/${id}`, {
+          method: 'DELETE',
         }),
     },
 

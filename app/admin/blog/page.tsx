@@ -3,9 +3,10 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Eye, Calendar, X, RefreshCw } from 'lucide-react'
+import { Plus, Search, Filter, MoreVertical, Edit, Trash2, Eye, Calendar, X, RefreshCw, FileText } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Blog, blogService } from '@/app/api_services/blogService'
+import EmptyState from '@/components/ui/EmptyState'
 
 interface BlogStats {
   totalBlogs: number
@@ -355,29 +356,25 @@ export default function BlogManagementPage() {
             <p className="mt-4 text-gray-600">Refreshing blog posts...</p>
           </div>
         ) : filteredBlogs.length === 0 && blogs.length > 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No blog posts match your search criteria</p>
-            <button
-              onClick={() => {
+          <EmptyState
+            icon={Search}
+            title="No blog posts match your search"
+            description="Try a different search term or filter."
+            action={{
+              label: 'Clear Filters',
+              onClick: () => {
                 setSearchQuery('')
                 setFilter('all')
-              }}
-              className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-            >
-              Clear filters
-            </button>
-          </div>
+              },
+            }}
+          />
         ) : filteredBlogs.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No blog posts found</p>
-            <Link
-              href="/admin/blog/create"
-              className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-            >
-              <Plus className="h-4 w-4" />
-              Create your first blog post
-            </Link>
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="No blog posts yet"
+            description="Write your first post to start sharing fitness tips and updates."
+            action={{ label: 'Create Post', icon: Plus, href: '/admin/blog/create' }}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

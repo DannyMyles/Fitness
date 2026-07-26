@@ -6,11 +6,12 @@ import Image from 'next/image';
 import {
   ShoppingCart, Heart, Plus, Minus,
   Truck, Shield, RefreshCw,
-  Dumbbell, Loader2, ArrowUpRight, Search
+  Dumbbell, Loader2, ArrowUpRight, Search, AlertCircle
 } from 'lucide-react';
 import { productService } from '@/app/api_services/productService';
 import { useCartStore } from '@/app/lib/cartStore';
 import { Category, Product } from '@/types/commerce';
+import EmptyState from '@/components/ui/EmptyState';
 
 const heroTiles = [
   { src: '/images/mark254/tshirts/tshirts_01.png', rotate: '-rotate-3', z: 'z-20' },
@@ -40,17 +41,22 @@ export default function ShopClient() {
       .catch(() => setError('Could not load categories.'));
   }, []);
 
+  const fetchProducts = () => {
+    setIsLoading(true);
+    setError('');
+    productService
+      .getProducts({ category: activeCategory, search: searchQuery })
+      .then(setProducts)
+      .catch(() => setError('Could not load products. Is the commerce API running?'))
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
     setIsLoading(true);
     setError('');
-    const timeout = setTimeout(() => {
-      productService
-        .getProducts({ category: activeCategory, search: searchQuery })
-        .then(setProducts)
-        .catch(() => setError('Could not load products. Is the commerce API running?'))
-        .finally(() => setIsLoading(false));
-    }, 250); // debounce search typing
+    const timeout = setTimeout(fetchProducts, 250); // debounce search typing
     return () => clearTimeout(timeout);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, searchQuery]);
 
   const quantityInCart = useMemo(() => {
@@ -230,18 +236,38 @@ export default function ShopClient() {
                 </p>
               </div>
 
-              {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-                  {error}
-                </div>
-              )}
-
-              {isLoading ? (
+              {error ? (
+                <EmptyState
+                  icon={AlertCircle}
+                  title="Couldn't load products"
+                  description={error}
+                  action={{ label: 'Try Again', icon: RefreshCw, onClick: fetchProducts }}
+                />
+              ) : isLoading ? (
                 <div className="flex items-center justify-center py-24 text-gray-400">
                   <Loader2 className="animate-spin" size={32} />
                 </div>
               ) : products.length === 0 ? (
-                <div className="text-center py-24 text-gray-500">No products found.</div>
+                searchQuery || activeCategory !== 'All' ? (
+                  <EmptyState
+                    icon={Search}
+                    title="No products match your search"
+                    description="Try a different search term or category."
+                    action={{
+                      label: 'Clear Filters',
+                      onClick: () => {
+                        setSearchQuery('');
+                        setActiveCategory('All');
+                      },
+                    }}
+                  />
+                ) : (
+                  <EmptyState
+                    icon={Dumbbell}
+                    title="No products yet"
+                    description="New Mark 254 gear is on the way — check back soon."
+                  />
+                )
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {products.map((product) => {
@@ -326,7 +352,7 @@ export default function ShopClient() {
       {hasHydrated && cartCount > 0 && (
         <Link
           href="/cart"
-          className="fixed bottom-6 right-6 z-40 bg-fitness-primary text-white px-6 py-3 rounded-full shadow-fitness-lg flex items-center gap-2 hover:bg-fitness-primary-dark transition-colors"
+          className="fixed bottom-24 right-6 z-40 bg-fitness-primary text-white px-6 py-3 rounded-full shadow-fitness-lg flex items-center gap-2 hover:bg-fitness-primary-dark transition-colors"
         >
           <ShoppingCart size={20} />
           <span className="font-semibold">{cartCount} items</span>

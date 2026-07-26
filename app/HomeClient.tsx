@@ -140,7 +140,7 @@ export default function HomeClient() {
               
               {/* Experience Badge */}
               <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white rounded-2xl p-6 shadow-fitness-lg animate-bounce-slow">
-                <div className="text-3xl font-bold">10+</div>
+                <div className="text-3xl font-bold">10</div>
                 <div className="text-sm">Years Experience</div>
               </div>
               
@@ -151,7 +151,7 @@ export default function HomeClient() {
                     <Users size={28} className="text-fitness-primary" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-gray-900">500+</div>
+                    <div className="text-2xl font-bold text-gray-900">100+</div>
                     <div className="text-sm text-gray-600">Clients</div>
                   </div>
                 </div>

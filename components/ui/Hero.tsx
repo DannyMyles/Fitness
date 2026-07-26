@@ -156,7 +156,7 @@ const Hero = () => {
               {/* Annotation callout */}
               <div className="absolute top-[38%] left-6 hidden sm:flex items-center gap-2">
                 <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold text-fitness-dark shadow-lg border border-white/50">
-                  10+ Years Experience
+                  10 Years Experience
                 </div>
                 <div className="w-16 h-px bg-white/60" />
                 <div className="w-2 h-2 rounded-full bg-white shadow" />
@@ -178,7 +178,7 @@ const Hero = () => {
 
               {/* Bottom stat card */}
               <div className="absolute bottom-5 left-5 right-5 bg-white rounded-2xl p-5 shadow-xl">
-                <p className="text-2xl font-bold text-fitness-dark">500+</p>
+                <p className="text-2xl font-bold text-fitness-dark">100+</p>
                 <p className="text-sm text-gray-500 mb-3">Clients Trained</p>
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-3">
@@ -191,7 +191,7 @@ const Hero = () => {
                       </div>
                     ))}
                   </div>
-                  <span className="text-xs font-semibold text-gray-500">+1k happy clients</span>
+                  <span className="text-xs font-semibold text-gray-500">100+ happy clients</span>
                 </div>
               </div>
             </div>

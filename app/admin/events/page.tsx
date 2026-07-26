@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { EventItem, eventService } from '@/app/api_services/eventService'
+import EmptyState from '@/components/ui/EmptyState'
 
 export default function EventsManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -317,26 +318,25 @@ export default function EventsManagementPage() {
             <p className="mt-4 text-gray-600">Refreshing events...</p>
           </div>
         ) : filteredEvents.length === 0 && events.length > 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No events match your search criteria</p>
-            <button
-              onClick={() => {
+          <EmptyState
+            icon={Search}
+            title="No events match your search"
+            description="Try a different search term or filter."
+            action={{
+              label: 'Clear Filters',
+              onClick: () => {
                 setSearchQuery('')
                 setFilter('all')
-              }}
-              className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700"
-            >
-              Clear filters
-            </button>
-          </div>
+              },
+            }}
+          />
         ) : filteredEvents.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-gray-500">No events found</p>
-            <Link href="/admin/events/create" className="mt-4 inline-flex items-center gap-2 text-accent-600 hover:text-accent-700">
-              <Plus className="h-4 w-4" />
-              Create your first event
-            </Link>
-          </div>
+          <EmptyState
+            icon={Calendar}
+            title="No events yet"
+            description="Create your first event to start filling up the calendar."
+            action={{ label: 'Create Event', icon: Plus, href: '/admin/events/create' }}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">

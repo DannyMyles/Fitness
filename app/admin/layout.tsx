@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import { Toaster } from 'react-hot-toast';
 import {
   LayoutDashboard, Users, ShoppingBag, FileText,
-  LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar
+  LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar, Image as ImageIcon
 } from 'lucide-react';
 
 const sidebarLinks = [
@@ -19,6 +19,7 @@ const sidebarLinks = [
   { icon: Dumbbell, label: 'Services', href: '/admin/services' },
   { icon: Calendar, label: 'Events', href: '/admin/events' },
   { icon: FileText, label: 'Blog', href: '/admin/blog' },
+  { icon: ImageIcon, label: 'Gallery', href: '/admin/gallery' },
 ];
 
 export default function AdminLayout({

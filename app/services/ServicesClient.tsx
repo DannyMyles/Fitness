@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Dumbbell, Heart, Zap, Clock, Users, Award,
-  CheckCircle, Star, ArrowRight, Loader2, type LucideIcon
+  CheckCircle, Star, ArrowRight, Loader2, RefreshCw, AlertCircle, type LucideIcon
 } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
+import EmptyState from '@/components/ui/EmptyState';
 import { Training, trainingService } from '@/app/api_services/trainingService';
 
 const iconMap: Record<string, LucideIcon> = { Dumbbell, Heart, Zap, Clock, Users, Award, Star, CheckCircle };
@@ -47,12 +48,18 @@ export default function ServicesClient() {
     setIsLoaded(true);
   }, []);
 
-  useEffect(() => {
+  const fetchTrainings = () => {
+    setIsLoadingTrainings(true);
+    setTrainingsError('');
     trainingService
       .getAllTrainings()
       .then((response) => setTrainings(trainingService.sortForDisplay(response.trainings)))
       .catch(() => setTrainingsError('Could not load services. Please check back shortly.'))
       .finally(() => setIsLoadingTrainings(false));
+  };
+
+  useEffect(() => {
+    fetchTrainings();
   }, []);
 
   return (
@@ -87,13 +94,19 @@ export default function ServicesClient() {
               <p>Loading services...</p>
             </div>
           ) : trainingsError ? (
-            <div className="text-center py-16 text-gray-500">
-              <p>{trainingsError}</p>
-            </div>
+            <EmptyState
+              icon={AlertCircle}
+              title="Couldn't load services"
+              description={trainingsError}
+              action={{ label: 'Try Again', icon: RefreshCw, onClick: fetchTrainings }}
+            />
           ) : trainings.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">
-              <p>No services available right now. Please check back soon.</p>
-            </div>
+            <EmptyState
+              icon={Dumbbell}
+              title="No services available right now"
+              description="Please check back soon, or get in touch to ask about training options directly."
+              action={{ label: 'Contact Me', href: '/contact' }}
+            />
           ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {trainings.map((training, index) => {
