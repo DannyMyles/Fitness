@@ -2,6 +2,13 @@
 
 import { api } from "../lib/api"
 
+// getBlogBySlug is called both client-side and server-side (Next.js
+// generateMetadata on the public post page) — the shared ApiClient's
+// relative-path requests only resolve in a browser, so this one call goes
+// through a direct absolute-URL fetch instead, same fix productService.ts
+// already applies to getProduct() for the identical reason.
+const COMMERCE_API_URL = process.env.NEXT_PUBLIC_COMMERCE_API_URL || 'http://localhost:4000'
+
 export interface Blog {
   id: string
   title: string
@@ -90,9 +97,20 @@ export const blogService = {
     sort?: string
   }): Promise<BlogResponse> => {
     try {
-      const response = await api.public.blog.getAll(params)
-      console.log('Get all blogs response:', response)
-      
+      const query = new URLSearchParams()
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) query.append(key, String(value))
+        })
+      }
+      const qs = query.toString()
+      const res = await fetch(`${COMMERCE_API_URL}/api/v1/blogs${qs ? `?${qs}` : ''}`, { cache: 'no-store' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || `Request failed with status ${res.status}`)
+      }
+      const response = await res.json()
+
       // Handle both wrapped ({ blogs: [...] }) and direct responses
       const blogsData = (response as any).blogs || response
       
@@ -120,8 +138,13 @@ export const blogService = {
   // Get blog by slug
   getBlogBySlug: async (slug: string): Promise<Blog> => {
     try {
-      const response = await api.public.blog.getBySlug(slug)
-      return response.blog
+      const res = await fetch(`${COMMERCE_API_URL}/api/v1/blogs/slug/${slug}`, { cache: 'no-store' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error || `Request failed with status ${res.status}`)
+      }
+      const data = await res.json()
+      return data.blog
     } catch (error) {
       console.error(`Error fetching blog by slug ${slug}:`, error)
       throw error

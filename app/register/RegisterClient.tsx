@@ -3,15 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { api } from '@/app/lib/api';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 export default function RegisterClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
 
@@ -22,6 +20,7 @@ export default function RegisterClient() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,20 +40,9 @@ export default function RegisterClient() {
     try {
       const username = email.split('@')[0];
       await api.public.auth.register({ name, username, email, password });
-
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        // Registered successfully but auto sign-in failed — send them to log in manually.
-        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-        return;
-      }
-
-      router.push(callbackUrl);
+      // New accounts start unverified — auto sign-in would fail until the
+      // verification link is clicked, so send them there instead.
+      setRegistered(true);
     } catch (err: any) {
       setError(err?.message || 'Failed to create account');
     } finally {
@@ -86,6 +74,24 @@ export default function RegisterClient() {
 
         {/* Register Form */}
         <div className="bg-white rounded-2xl shadow-fitness-lg p-8">
+          {registered ? (
+            <div className="text-center py-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle size={32} className="text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-fitness-dark mb-2">Check Your Email</h1>
+              <p className="text-gray-600 mb-6">
+                We've sent a verification link to <strong>{email}</strong>. Verify your email, then sign in.
+              </p>
+              <Link
+                href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                className="btn-primary inline-flex items-center justify-center py-3 px-6"
+              >
+                Go to Sign In
+              </Link>
+            </div>
+          ) : (
+            <>
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-fitness-dark mb-2">Create Your Account</h1>
             <p className="text-gray-600">Sign up to start your fitness journey</p>
@@ -228,6 +234,8 @@ export default function RegisterClient() {
               </Link>
             </p>
           </div>
+            </>
+          )}
         </div>
 
         {/* Back to Home */}

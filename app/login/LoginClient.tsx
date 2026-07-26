@@ -5,7 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { api } from '@/app/lib/api';
 
 export default function LoginClient() {
   const router = useRouter();
@@ -16,10 +17,15 @@ export default function LoginClient() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
+
+  const needsVerification = /verify your email/i.test(error);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setResendMessage('');
     setIsLoading(true);
 
     const result = await signIn('credentials', {
@@ -29,7 +35,7 @@ export default function LoginClient() {
     });
 
     if (result?.error) {
-      setError('Invalid email or password');
+      setError(result.error || 'Invalid email or password');
       setIsLoading(false);
       return;
     }
@@ -44,6 +50,19 @@ export default function LoginClient() {
     }
 
     setIsLoading(false);
+  };
+
+  const handleResendVerification = async () => {
+    setIsResending(true);
+    setResendMessage('');
+    try {
+      const res: any = await api.public.auth.resendVerification(email);
+      setResendMessage(res?.message || 'If an account exists for that email, a new link has been sent.');
+    } catch (err: any) {
+      setResendMessage(err?.message || 'Could not resend the verification email. Please try again.');
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -76,9 +95,29 @@ export default function LoginClient() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-              <AlertCircle size={20} className="text-red-500" />
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <AlertCircle size={20} className="text-red-500 shrink-0" />
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+              {needsVerification && !resendMessage && (
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={isResending}
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-fitness-primary hover:underline disabled:opacity-60"
+                >
+                  {isResending ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Sending…
+                    </>
+                  ) : (
+                    'Resend verification email'
+                  )}
+                </button>
+              )}
+              {resendMessage && <p className="mt-3 text-sm text-fitness-dark">{resendMessage}</p>}
             </div>
           )}
 

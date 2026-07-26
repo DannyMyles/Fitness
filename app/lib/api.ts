@@ -336,6 +336,20 @@ class ApiClient {
         this.request(`/api/v1/auth/verify-reset-token/${token}`, {
           requiresAuth: false,
         }),
+
+      verifyEmail: (token: string) =>
+        this.request('/api/v1/auth/verify-email', {
+          method: 'POST',
+          body: JSON.stringify({ token }),
+          requiresAuth: false,
+        }),
+
+      resendVerification: (email: string) =>
+        this.request('/api/v1/auth/resend-verification', {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+          requiresAuth: false,
+        }),
     },
     
     contact: {
