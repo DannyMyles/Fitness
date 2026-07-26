@@ -259,10 +259,10 @@ const Footer = () => {
 
             <div className="space-y-4">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-primary/50 shadow-sm transition-all duration-300">
-                <div className="p-2 bg-fitness-primary/10 rounded-lg">
+                <div className="p-2 bg-fitness-primary/10 rounded-lg shrink-0">
                   <Phone size={18} className="text-fitness-primary" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-gray-500">Call Us</p>
                   <a href="tel:+254700000000" className="font-medium text-fitness-dark hover:text-fitness-primary transition-colors">
                     +254 701 437 959
@@ -271,12 +271,12 @@ const Footer = () => {
               </div>
 
               <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-accent/50 shadow-sm transition-all duration-300">
-                <div className="p-2 bg-fitness-accent/10 rounded-lg">
+                <div className="p-2 bg-fitness-accent/10 rounded-lg shrink-0">
                   <Mail size={18} className="text-fitness-accent" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-gray-500">Email Us</p>
-                  <a href="mailto:markotundo777@gmail.com" className="font-medium text-fitness-dark hover:text-fitness-accent transition-colors">
+                  <a href="mailto:markotundo777@gmail.com" className="font-medium text-fitness-dark hover:text-fitness-accent transition-colors break-all">
                     markotundo777@gmail.com
                   </a>
                 </div>
