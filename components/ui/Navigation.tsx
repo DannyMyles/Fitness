@@ -8,6 +8,7 @@ import {
   Dumbbell, Menu, X
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { useCartStore } from '@/app/lib/cartStore';
 
 type NavItem = {
@@ -19,6 +20,7 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { status: authStatus } = useSession();
   const cartCount = useCartStore((s) => s.count());
   const hasHydrated = useCartStore((s) => s.hasHydrated);
 
@@ -96,13 +98,13 @@ const Navigation = () => {
 
             <div className="flex items-center gap-4">
               <Link
-                href="/login"
+                href={authStatus === 'authenticated' ? '/account' : '/login'}
                 className="flex items-center gap-2 text-sm hover:text-fitness-primary transition-all duration-300 hover:scale-105"
               >
                 <div className="p-1.5 bg-gray-100 rounded-lg">
                   <User size={14} />
                 </div>
-                <span>Login</span>
+                <span>{authStatus === 'authenticated' ? 'My Account' : 'Login'}</span>
               </Link>
             </div>
           </div>

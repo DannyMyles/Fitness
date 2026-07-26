@@ -432,6 +432,15 @@ class ApiClient {
         return this.request(`/api/v1/gallery/images${query}`, { requiresAuth: false });
       },
     },
+
+    newsletter: {
+      subscribe: (email: string) =>
+        this.request('/api/v1/newsletter/subscribe', {
+          method: 'POST',
+          body: JSON.stringify({ email }),
+          requiresAuth: false,
+        }),
+    },
   }
 
   // Protected endpoints (requires auth)
@@ -483,6 +492,20 @@ class ApiClient {
           method: 'POST',
           body: JSON.stringify(data),
         }),
+
+      registrationsMine: () =>
+        this.request('/api/v1/events/registrations/mine'),
+    },
+
+    orders: {
+      create: (data: unknown) =>
+        this.request('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        }),
+
+      mine: () =>
+        this.request('/api/orders/mine'),
     },
   }
 
@@ -681,6 +704,16 @@ class ApiClient {
       
       delete: (id: string) =>
         this.request(`/api/v1/contacts/${id}`, {
+          method: 'DELETE',
+        }),
+    },
+
+    newsletter: {
+      getAll: () =>
+        this.request('/api/v1/newsletter'),
+
+      delete: (id: string) =>
+        this.request(`/api/v1/newsletter/${id}`, {
           method: 'DELETE',
         }),
     },

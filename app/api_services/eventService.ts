@@ -46,6 +46,26 @@ export interface RegistrationResponse {
   payment: { status: string; reference: string; message: string } | null
 }
 
+export interface MyRegistration {
+  id: number
+  ticketNumber: string
+  attendeeName: string
+  attendeePhone: string
+  status: 'pending_payment' | 'confirmed' | 'cancelled'
+  paymentRef?: string
+  createdAt: string
+  event: {
+    id: number
+    title: string
+    slug: string
+    date: string
+    time: string
+    location: string
+    price: number
+    image: string
+  }
+}
+
 export interface CreateEventRequest {
   title: string
   description: string
@@ -90,6 +110,17 @@ export const eventService = {
       return await api.protected.events.register(slug, data)
     } catch (error) {
       console.error(`Error registering for event ${slug}:`, error)
+      throw error
+    }
+  },
+
+  getMyRegistrations: async (): Promise<MyRegistration[]> => {
+    try {
+      const response = await api.protected.events.registrationsMine()
+      const data = (response as any).registrations || response
+      return Array.isArray(data) ? data : []
+    } catch (error) {
+      console.error('Error fetching my event registrations:', error)
       throw error
     }
   },

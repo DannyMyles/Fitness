@@ -1,11 +1,13 @@
 // orderService.ts — talks to the mark254-commerce-api backend.
-// Checkout (createOrder) is a public, unauthenticated endpoint (guest
-// checkout). Listing/updating orders is admin-only and goes through the
-// same-origin proxy — see app/api/commerce/admin/[...path]/route.ts.
+// Checkout (createOrder) requires the customer to be logged in on the
+// frontend (see CartClient's checkout gate) — it goes through the same-origin
+// authenticated api.ts client so the order gets associated with their
+// account. The backend route itself still supports guest checkout via
+// optionalAuth. Listing/updating orders (admin) goes through the separate
+// admin-key proxy — see app/api/commerce/admin/[...path]/route.ts.
 
 import { CreateOrderInput, CreateOrderResponse, Order, OrderStatus, PaymentStatus } from '@/types/commerce';
-
-const COMMERCE_API_URL = process.env.NEXT_PUBLIC_COMMERCE_API_URL || 'http://localhost:4000';
+import { api } from '../lib/api';
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -17,12 +19,11 @@ async function handle<T>(res: Response): Promise<T> {
 
 export const orderService = {
   createOrder: async (input: CreateOrderInput): Promise<CreateOrderResponse> => {
-    const res = await fetch(`${COMMERCE_API_URL}/api/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
-    });
-    return handle<CreateOrderResponse>(res);
+    return api.protected.orders.create(input) as Promise<CreateOrderResponse>;
+  },
+
+  getMine: async (): Promise<Order[]> => {
+    return api.protected.orders.mine() as Promise<Order[]>;
   },
 
   admin: {

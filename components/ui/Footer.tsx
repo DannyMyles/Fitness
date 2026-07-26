@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { newsletterService } from '@/app/api_services/newsletterService';
 
 const legalLinks = [
   { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -23,14 +24,24 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribing, setSubscribing] = useState(false);
+  const [subscribeError, setSubscribeError] = useState('');
   const [isHovered, setIsHovered] = useState(-1);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email || subscribing) return;
+    setSubscribing(true);
+    setSubscribeError('');
+    try {
+      await newsletterService.subscribe(email);
       setSubscribed(true);
       setEmail('');
       setTimeout(() => setSubscribed(false), 3000);
+    } catch (err: any) {
+      setSubscribeError(err?.message || 'Could not subscribe right now. Please try again.');
+    } finally {
+      setSubscribing(false);
     }
   };
 
@@ -101,37 +112,49 @@ const Footer = () => {
               </p>
             </div>
 
-            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full sm:w-80 px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-fitness-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition-all duration-300"
-                />
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="submit"
-                className="btn-primary group relative overflow-hidden"
-              >
-                <span className="relative flex items-center gap-2">
-                  {subscribed ? (
-                    <>
-                      <CheckCircle size={20} />
-                      <span>Subscribed!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send size={18} />
-                      <span>Subscribe Now</span>
-                    </>
-                  )}
-                </span>
-              </motion.button>
-            </form>
+            <div className="w-full lg:w-auto">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    disabled={subscribing}
+                    className="w-full sm:w-80 px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-fitness-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition-all duration-300 disabled:opacity-60"
+                  />
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="submit"
+                  disabled={subscribing}
+                  className="btn-primary group relative overflow-hidden disabled:opacity-70"
+                >
+                  <span className="relative flex items-center gap-2">
+                    {subscribed ? (
+                      <>
+                        <CheckCircle size={20} />
+                        <span>Subscribed!</span>
+                      </>
+                    ) : subscribing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Subscribing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={18} />
+                        <span>Subscribe Now</span>
+                      </>
+                    )}
+                  </span>
+                </motion.button>
+              </form>
+              {subscribeError && (
+                <p className="text-sm text-red-500 mt-2">{subscribeError}</p>
+              )}
+            </div>
           </div>
         </motion.div>
 

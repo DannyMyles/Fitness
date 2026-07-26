@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  ShoppingCart, Heart, Plus, Minus,
+  ShoppingCart, Plus, Minus,
   Truck, Shield, RefreshCw,
   Dumbbell, Loader2, ArrowUpRight, Search, AlertCircle
 } from 'lucide-react';
@@ -290,12 +290,6 @@ export default function ShopClient() {
                               <span className="text-white font-semibold">Out of Stock</span>
                             </div>
                           )}
-                          <button
-                            onClick={(e) => e.preventDefault()}
-                            className="absolute top-3 right-3 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
-                          >
-                            <Heart size={18} className="text-gray-600" />
-                          </button>
                         </Link>
 
                         <div className="p-5">
