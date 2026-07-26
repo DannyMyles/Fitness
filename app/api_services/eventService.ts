@@ -125,6 +125,14 @@ export const eventService = {
     }
   },
 
+  getRegistrationStatus: async (id: number): Promise<{ status: EventRegistration['status'] }> => {
+    return api.protected.events.registrationStatus(id) as Promise<{ status: EventRegistration['status'] }>
+  },
+
+  retryPayment: async (id: number): Promise<RegistrationResponse> => {
+    return api.protected.events.retryRegistration(id) as Promise<RegistrationResponse>
+  },
+
   createEvent: async (data: CreateEventRequest): Promise<EventItem> => {
     try {
       const formData = new FormData()

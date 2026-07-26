@@ -6,7 +6,7 @@
 // optionalAuth. Listing/updating orders (admin) goes through the separate
 // admin-key proxy — see app/api/commerce/admin/[...path]/route.ts.
 
-import { CreateOrderInput, CreateOrderResponse, Order, OrderStatus, PaymentStatus } from '@/types/commerce';
+import { CreateOrderInput, CreateOrderResponse, Order, OrderPaymentStatus, OrderStatus, PaymentStatus } from '@/types/commerce';
 import { api } from '../lib/api';
 
 async function handle<T>(res: Response): Promise<T> {
@@ -24,6 +24,14 @@ export const orderService = {
 
   getMine: async (): Promise<Order[]> => {
     return api.protected.orders.mine() as Promise<Order[]>;
+  },
+
+  getPaymentStatus: async (id: number): Promise<OrderPaymentStatus> => {
+    return api.protected.orders.status(id) as Promise<OrderPaymentStatus>;
+  },
+
+  retryPayment: async (id: number): Promise<CreateOrderResponse> => {
+    return api.protected.orders.retry(id) as Promise<CreateOrderResponse>;
   },
 
   admin: {

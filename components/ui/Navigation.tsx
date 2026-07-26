@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
+import {
   Phone, Mail, Clock, Zap, User,
-  Dumbbell, Menu, X
+  Dumbbell, Menu, X, LogOut
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useCartStore } from '@/app/lib/cartStore';
 
 type NavItem = {
@@ -106,6 +106,18 @@ const Navigation = () => {
                 </div>
                 <span>{authStatus === 'authenticated' ? 'My Account' : 'Login'}</span>
               </Link>
+              {authStatus === 'authenticated' && (
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="flex items-center gap-2 text-sm hover:text-fitness-primary transition-all duration-300 hover:scale-105"
+                  title="Log Out"
+                >
+                  <div className="p-1.5 bg-gray-100 rounded-lg">
+                    <LogOut size={14} />
+                  </div>
+                  <span className="hidden sm:inline">Log Out</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

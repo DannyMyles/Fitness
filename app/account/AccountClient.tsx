@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { Package, Ticket, Loader2, MapPin, Calendar, RefreshCw, AlertCircle } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
+import { Package, Ticket, Loader2, MapPin, Calendar, RefreshCw, AlertCircle, LogOut } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import EmptyState from '@/components/ui/EmptyState';
 import { orderService } from '@/app/api_services/orderService';
@@ -87,7 +87,19 @@ export default function AccountClient() {
         subtitle={`Welcome back${session?.user?.name ? `, ${session.user.name}` : ''} — here's your order and ticket history.`}
       />
 
-      <section className="py-16 bg-white">
+      <section className="pt-10 bg-white">
+        <div className="container mx-auto px-4 max-w-4xl flex justify-end">
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-fitness-primary hover:text-fitness-primary transition-colors"
+          >
+            <LogOut size={16} />
+            Log Out
+          </button>
+        </div>
+      </section>
+
+      <section className="py-10 bg-white">
         <div className="container mx-auto px-4 max-w-4xl space-y-16">
           {loading ? (
             <div className="flex justify-center py-20">

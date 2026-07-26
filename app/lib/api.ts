@@ -495,6 +495,14 @@ class ApiClient {
 
       registrationsMine: () =>
         this.request('/api/v1/events/registrations/mine'),
+
+      registrationStatus: (id: number | string) =>
+        this.request(`/api/v1/events/registrations/${id}/status`),
+
+      retryRegistration: (id: number | string) =>
+        this.request(`/api/v1/events/registrations/${id}/retry-payment`, {
+          method: 'POST',
+        }),
     },
 
     orders: {
@@ -506,6 +514,14 @@ class ApiClient {
 
       mine: () =>
         this.request('/api/orders/mine'),
+
+      status: (id: number | string) =>
+        this.request(`/api/orders/${id}/status`),
+
+      retry: (id: number | string) =>
+        this.request(`/api/orders/${id}/retry-payment`, {
+          method: 'POST',
+        }),
     },
   }
 

@@ -1,17 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
   ShoppingCart, Trash2, Plus, Minus,
   Truck, Shield, CreditCard, ArrowLeft,
-  ChevronRight, CheckCircle, Loader2, AlertCircle
+  ChevronRight, CheckCircle, Loader2, AlertCircle, XCircle, RefreshCw
 } from 'lucide-react';
 import { useCartStore } from '@/app/lib/cartStore';
 import { orderService } from '@/app/api_services/orderService';
-import { CreateOrderResponse } from '@/types/commerce';
+import { usePaymentPolling } from '@/app/lib/usePaymentPolling';
+import { CreateOrderResponse, OrderPaymentStatus } from '@/types/commerce';
 
 const steps = ['Cart', 'Shipping', 'Payment', 'Confirm'];
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
@@ -32,6 +33,14 @@ export default function CartClient() {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState('');
   const [confirmedOrder, setConfirmedOrder] = useState<CreateOrderResponse | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const orderIdRef = useRef<number | null>(null);
+
+  const pollPayment = usePaymentPolling<OrderPaymentStatus>({
+    checkFn: () => orderService.getPaymentStatus(orderIdRef.current!),
+    isSuccess: (r) => r.paymentStatus === 'paid',
+    isFailed: (r) => r.paymentStatus === 'failed',
+  });
 
   const lines = useCartStore((s) => s.lines);
   const removeItem = useCartStore((s) => s.removeItem);
@@ -68,12 +77,29 @@ export default function CartClient() {
         })),
       });
       setConfirmedOrder(result);
+      orderIdRef.current = result.order.id;
       clearCart();
       setCurrentStep(3);
+      pollPayment.start();
     } catch (err) {
       setOrderError(err instanceof Error ? err.message : 'Could not place order. Please try again.');
     } finally {
       setIsPlacingOrder(false);
+    }
+  };
+
+  const retryPayment = async () => {
+    if (!confirmedOrder) return;
+    setIsRetrying(true);
+    setOrderError('');
+    try {
+      const result = await orderService.retryPayment(confirmedOrder.order.id);
+      setConfirmedOrder(result);
+      pollPayment.start();
+    } catch (err) {
+      setOrderError(err instanceof Error ? err.message : 'Could not retry payment. Please try again.');
+    } finally {
+      setIsRetrying(false);
     }
   };
 
@@ -322,7 +348,7 @@ export default function CartClient() {
                         <div>
                           <p className="font-semibold text-gray-900">M-Pesa</p>
                           <p className="text-sm text-gray-600">
-                            An STK push prompt will be simulated to {shippingInfo.phone || 'your phone'}
+                            An STK push prompt will be sent to {shippingInfo.phone || 'your phone'}
                           </p>
                         </div>
                       </div>
@@ -361,21 +387,78 @@ export default function CartClient() {
                     </button>
                   </div>
                 </div>
-              ) : (
+              ) : pollPayment.phase === 'success' ? (
                 <div className="bg-white rounded-xl shadow-card p-8 text-center">
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle size={40} className="text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-fitness-dark mb-4">Order Received!</h2>
-                  <p className="text-gray-600 mb-2">
-                    {confirmedOrder?.payment.message ?? 'Thank you for your order.'}
-                  </p>
+                  <h2 className="text-2xl font-bold text-fitness-dark mb-4">Payment Received!</h2>
+                  <p className="text-gray-600 mb-2">Thank you for your order — we're getting it ready.</p>
                   <p className="text-sm text-gray-500 mb-8">
                     Order #: {confirmedOrder?.order.orderNumber}
                   </p>
                   <Link href="/shop" className="btn-fitness">
                     Continue Shopping
                   </Link>
+                </div>
+              ) : pollPayment.phase === 'failed' || pollPayment.phase === 'timeout' ? (
+                <div className="bg-white rounded-xl shadow-card p-8 text-center">
+                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <XCircle size={40} className="text-red-500" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-fitness-dark mb-4">
+                    {pollPayment.phase === 'timeout' ? 'Payment Not Confirmed' : 'Payment Failed'}
+                  </h2>
+                  <p className="text-gray-600 mb-2">
+                    {pollPayment.phase === 'timeout'
+                      ? "We didn't receive a confirmation in time. If you already paid, it may still go through — otherwise, try again."
+                      : 'The M-Pesa payment was cancelled or declined. Your order is saved — you can retry payment below.'}
+                  </p>
+                  <p className="text-sm text-gray-500 mb-8">
+                    Order #: {confirmedOrder?.order.orderNumber}
+                  </p>
+                  {orderError && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 mb-6 text-left">
+                      <AlertCircle size={20} className="text-red-500 shrink-0" />
+                      <p className="text-sm text-red-600">{orderError}</p>
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={retryPayment}
+                      disabled={isRetrying}
+                      className="btn-fitness flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      {isRetrying ? (
+                        <>
+                          <Loader2 className="animate-spin" size={18} />
+                          Sending M-Pesa STK push…
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw size={18} />
+                          Retry Payment
+                        </>
+                      )}
+                    </button>
+                    <Link href="/shop" className="text-gray-600 hover:text-fitness-primary transition-colors">
+                      Continue Shopping
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-card p-8 text-center">
+                  <div className="w-20 h-20 bg-fitness-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Loader2 size={40} className="text-fitness-primary animate-spin" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-fitness-dark mb-4">Check Your Phone</h2>
+                  <p className="text-gray-600 mb-2">
+                    {confirmedOrder?.payment.message ?? 'Enter your M-Pesa PIN to complete payment.'}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Order #: {confirmedOrder?.order.orderNumber}
+                  </p>
                 </div>
               )}
             </div>

@@ -70,9 +70,15 @@ export interface Order {
   paymentStatus: PaymentStatus;
   paymentRef: string | null;
   subtotal: number;
+  shipping: number;
   total: number;
   createdAt: string;
   items: OrderItem[];
+}
+
+export interface OrderPaymentStatus {
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
 }
 
 export interface PaymentInitiation {
