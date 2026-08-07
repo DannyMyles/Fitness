@@ -108,14 +108,14 @@ export default function ServicesClient() {
               action={{ label: 'Contact Me', href: '/contact' }}
             />
           ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {trainings.map((training, index) => {
               const Icon = (training.icon && iconMap[training.icon]) || Dumbbell;
               const color = training.color || colorPalette[index % colorPalette.length];
               return (
               <div
                 key={training.id}
-                className={`service-card group ${hoveredCard === index ? 'ring-2 ring-fitness-primary' : ''}`}
+                className={`service-card group flex flex-col sm:flex-row ${hoveredCard === index ? 'ring-2 ring-fitness-primary' : ''}`}
                 onMouseEnter={() => setHoveredCard(index)}
                 onMouseLeave={() => setHoveredCard(null)}
                 style={{ animationDelay: `${index * 0.1}s` }}
@@ -129,19 +129,19 @@ export default function ServicesClient() {
                   </div>
                 )}
 
-                <div className="relative h-52 overflow-hidden service-card-image">
+                <div className="relative h-52 sm:h-auto sm:w-2/5 shrink-0 overflow-hidden service-card-image">
                   <img
                     src={training.image}
                     alt={training.title}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent`}></div>
+                  <div className={`absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-gray-900/80 via-gray-900/20 to-transparent`}></div>
                   <div className={`absolute bottom-4 left-4 w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>
                     <Icon size={28} className="text-white" />
                   </div>
                 </div>
 
-                <div className="p-6">
+                <div className="p-6 flex flex-col flex-1">
                   <h3 className="text-xl font-bold text-gray-900 mb-2">{training.title}</h3>
                   <p className="text-gray-700 mb-4">{training.description}</p>
 
@@ -163,7 +163,7 @@ export default function ServicesClient() {
                     ))}
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between pt-4 mt-auto border-t border-gray-100">
                     <span className="text-gradient-primary font-bold">{training.price}</span>
                     <Link
                       href="/contact"

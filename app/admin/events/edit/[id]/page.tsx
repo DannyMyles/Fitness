@@ -14,18 +14,11 @@ import {
   Loader2,
   Upload,
   X,
-  Users,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateEventRequest, eventService } from '@/app/api_services/eventService'
 import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
-
-function toLines(value: string): string[] {
-  return value
-    .split(/\r?\n|,/)
-    .map((v) => v.trim())
-    .filter(Boolean)
-}
+import TrainersInput from '@/components/ui/TrainersInput'
 
 export default function EditEventPage() {
   useDocumentTitle('Edit Event')
@@ -36,7 +29,6 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [trainersInput, setTrainersInput] = useState('')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<CreateEventRequest & { date: string }>({
@@ -61,9 +53,7 @@ export default function EditEventPage() {
   const fetchEvent = async () => {
     try {
       setLoading(true)
-      const events = await eventService.getAllEvents()
-      const event = events.events.find((e) => e.id === eventId)
-      if (!event) throw new Error('Event not found')
+      const event = await eventService.getEventById(eventId)
 
       setFormData({
         title: event.title,
@@ -79,7 +69,6 @@ export default function EditEventPage() {
         popular: event.popular,
         published: event.published !== false,
       })
-      setTrainersInput(event.trainers.join(', '))
       if (event.imageInfo?.hasImage) setImagePreview(event.image)
     } catch (err: any) {
       console.error('Error fetching event:', err)
@@ -125,7 +114,7 @@ export default function EditEventPage() {
     if (!formData.date) throw new Error('Date is required')
     if (!formData.time.trim()) throw new Error('Time is required')
     if (!formData.location.trim()) throw new Error('Location is required')
-    if (toLines(trainersInput).length === 0) throw new Error('At least one trainer is required')
+    if (formData.trainers.filter((t) => t.trim()).length === 0) throw new Error('At least one trainer is required')
     if (!formData.imageFile && !formData.imageUrl?.trim() && !imagePreview) {
       throw new Error('An image (upload or URL) is required')
     }
@@ -143,7 +132,7 @@ export default function EditEventPage() {
       validateForm()
       await eventService.updateEvent(eventId, {
         ...formData,
-        trainers: toLines(trainersInput),
+        trainers: formData.trainers.map((t) => t.trim()).filter(Boolean),
         date: new Date(formData.date).toISOString(),
       })
       toast.success('Event updated successfully!')
@@ -270,21 +259,10 @@ export default function EditEventPage() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5" />
-                    Trainer(s) *
-                  </label>
-                  <input
-                    type="text"
-                    value={trainersInput}
-                    onChange={(e) => setTrainersInput(e.target.value)}
-                    placeholder="Marksila254, Victor Olumaasai"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-                    required
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Separate multiple trainers with commas</p>
-                </div>
+                <TrainersInput
+                  value={formData.trainers}
+                  onChange={(trainers) => setFormData({ ...formData, trainers })}
+                />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -403,7 +381,9 @@ export default function EditEventPage() {
               <p className="text-sm text-gray-600 mt-1 line-clamp-3">
                 {formData.description || 'Event description will appear here...'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">{trainersInput || 'Trainer(s)'}</p>
+              <p className="text-xs text-gray-500 mt-2">
+                {formData.trainers.filter(Boolean).join(', ') || 'Trainer(s)'}
+              </p>
               <p className="text-sm font-bold text-fitness-primary mt-3">
                 {formData.price > 0 ? `KES ${formData.price.toLocaleString()}` : 'Free'}
               </p>

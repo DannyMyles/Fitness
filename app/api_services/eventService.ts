@@ -113,6 +113,19 @@ export const eventService = {
     }
   },
 
+  // Admin-only: fetches by numeric id regardless of published status (the
+  // public getAllEvents/getEventBySlug only ever return published events,
+  // so the edit form needs this to be able to load a draft event too).
+  getEventById: async (id: string): Promise<EventItem> => {
+    try {
+      const response = await api.admin.events.getById(id)
+      return ((response as any).event || response) as EventItem
+    } catch (error) {
+      console.error(`Error fetching event ${id}:`, error)
+      throw error
+    }
+  },
+
   register: async (slug: string, data: { attendeeName: string; attendeePhone: string }): Promise<RegistrationResponse> => {
     try {
       return await api.protected.events.register(slug, data)

@@ -643,6 +643,9 @@ class ApiClient {
     },
 
     events: {
+      getById: (id: string) =>
+        this.request(`/api/v1/events/${id}/edit`),
+
       create: (data: FormData) =>
         this.request('/api/v1/events', {
           method: 'POST',

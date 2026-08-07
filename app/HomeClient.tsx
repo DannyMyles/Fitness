@@ -541,7 +541,7 @@ export default function HomeClient() {
             <div className="flex gap-3 shrink-0">
               {galleryImages.slice(0, 3).map((image, index) => (
                 <div key={index} className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden">
-                  <img src={image.src} alt={image.alt} className="w-full h-full object-cover object-top" />
+                  <img src={image.src} alt={image.alt} className="w-full h-full object-cover object-center" />
                 </div>
               ))}
             </div>
