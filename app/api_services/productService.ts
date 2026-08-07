@@ -16,17 +16,50 @@ async function handle<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export interface ProductImageInput {
+  type: 'upload' | 'existing' | 'url';
+  file?: File; // present when type === 'upload'
+  url?: string; // present when type === 'existing' | 'url'
+  color: string | null;
+}
+
 export interface ProductInput {
   name: string;
   description: string;
   price: number;
   categoryId: number;
-  images: string[];
+  images: ProductImageInput[];
   sizes?: string[];
   colors?: string[];
   inStock?: boolean;
   featured?: boolean;
   isNew?: boolean;
+}
+
+function buildProductFormData(data: Partial<ProductInput>): FormData {
+  const fd = new FormData();
+  if (data.name !== undefined) fd.append('name', data.name);
+  if (data.description !== undefined) fd.append('description', data.description);
+  if (data.price !== undefined) fd.append('price', String(data.price));
+  if (data.categoryId !== undefined) fd.append('categoryId', String(data.categoryId));
+  if (data.sizes !== undefined) fd.append('sizes', JSON.stringify(data.sizes));
+  if (data.colors !== undefined) fd.append('colors', JSON.stringify(data.colors));
+  if (data.inStock !== undefined) fd.append('inStock', String(data.inStock));
+  if (data.featured !== undefined) fd.append('featured', String(data.featured));
+  if (data.isNew !== undefined) fd.append('isNew', String(data.isNew));
+
+  if (data.images !== undefined) {
+    const imageMeta = data.images.map((img) => {
+      if (img.type === 'upload' && img.file) {
+        fd.append('images', img.file);
+        return { type: 'upload', color: img.color };
+      }
+      return { type: img.type, url: img.url, color: img.color };
+    });
+    fd.append('imageMeta', JSON.stringify(imageMeta));
+  }
+
+  return fd;
 }
 
 export interface ProductFilters {
@@ -63,8 +96,7 @@ export const productService = {
     createProduct: async (data: ProductInput): Promise<Product> => {
       const res = await fetch('/api/commerce/admin/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: buildProductFormData(data),
       });
       return handle<Product>(res);
     },
@@ -72,8 +104,7 @@ export const productService = {
     updateProduct: async (id: number, data: Partial<ProductInput>): Promise<Product> => {
       const res = await fetch(`/api/commerce/admin/products/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: buildProductFormData(data),
       });
       return handle<Product>(res);
     },

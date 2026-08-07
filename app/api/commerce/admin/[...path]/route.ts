@@ -18,14 +18,18 @@ async function proxy(req: NextRequest, path: string[]) {
 
   const targetUrl = `${COMMERCE_API_URL}/api/${path.join('/')}${req.nextUrl.search}`;
   const hasBody = !['GET', 'HEAD', 'DELETE'].includes(req.method);
+  // Multipart bodies (product image uploads) must be forwarded as FormData
+  // with no explicit Content-Type — fetch sets the correct multipart
+  // boundary itself. Everything else keeps going through as JSON, unchanged.
+  const isMultipart = (req.headers.get('content-type') || '').startsWith('multipart/form-data');
 
   const response = await fetch(targetUrl, {
     method: req.method,
     headers: {
-      'Content-Type': 'application/json',
       'x-admin-key': COMMERCE_ADMIN_KEY,
+      ...(isMultipart ? {} : { 'Content-Type': 'application/json' }),
     },
-    body: hasBody ? await req.text() : undefined,
+    body: !hasBody ? undefined : isMultipart ? await req.formData() : await req.text(),
   });
 
   if (response.status === 204) {

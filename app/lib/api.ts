@@ -189,6 +189,9 @@ class ApiClient {
           })
           
           if (retryResponse.ok) {
+            if (retryResponse.status === 204) {
+              return undefined as T
+            }
             const data = await retryResponse.json()
             return data as T
           }
@@ -202,6 +205,13 @@ class ApiClient {
       // If we got here, refresh didn't work or wasn't attempted
       signOut({ callbackUrl: '/login' })
       throw new Error('Session expired. Please sign in again.')
+    }
+
+    // 204 No Content — every DELETE route in this app returns this with no
+    // body at all, so response.json() would always throw below even though
+    // the request actually succeeded.
+    if (response.status === 204) {
+      return undefined as T;
     }
 
     let data: T | ApiError;
@@ -425,6 +435,13 @@ class ApiClient {
 
       getOne: (id: string) =>
         this.request(`/api/v1/testimonials/${id}`, { requiresAuth: false }),
+
+      submit: (data: FormData) =>
+        this.request('/api/v1/testimonials/submit', {
+          method: 'POST',
+          body: data,
+          requiresAuth: false,
+        }),
     },
 
     events: {

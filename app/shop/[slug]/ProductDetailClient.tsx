@@ -28,6 +28,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const [validationError, setValidationError] = useState('');
   const [justAdded, setJustAdded] = useState(false);
 
+  // Only filter the gallery down to the selected color's images when that
+  // color actually has tagged images — otherwise (untagged product, or a
+  // color nobody assigned an image to) fall back to showing everything, so
+  // this is purely additive and never breaks products with no per-image colors.
+  const colorTaggedImages = selectedColor && product
+    ? product.imageDetails.filter((img) => img.color === selectedColor).map((img) => img.url)
+    : [];
+  const displayImages = colorTaggedImages.length > 0 ? colorTaggedImages : (product?.images ?? []);
+
   useEffect(() => {
     setIsLoading(true);
     setError('');
@@ -122,16 +131,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           >
             <X size={24} />
           </button>
-          {product.images.length > 1 && (
+          {displayImages.length > 1 && (
             <>
               <button
-                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i - 1 + product.images.length) % product.images.length); }}
+                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i - 1 + displayImages.length) % displayImages.length); }}
                 className="absolute left-4 md:left-8 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
               >
                 <ChevronLeft size={28} />
               </button>
               <button
-                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i + 1) % product.images.length); }}
+                onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => (i + 1) % displayImages.length); }}
                 className="absolute right-4 md:right-8 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
               >
                 <ChevronRight size={28} />
@@ -139,7 +148,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             </>
           )}
           <img
-            src={product.images[selectedImage]}
+            src={displayImages[selectedImage] ?? displayImages[0]}
             alt={product.name}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
@@ -169,7 +178,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               onClick={() => setIsLightboxOpen(true)}
             >
               <img
-                src={product.images[selectedImage]}
+                src={displayImages[selectedImage] ?? displayImages[0]}
                 alt={product.name}
                 className="w-full h-full object-contain p-6"
               />
@@ -183,9 +192,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
               )}
             </div>
 
-            {product.images.length > 1 && (
+            {displayImages.length > 1 && (
               <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-                {product.images.map((img, index) => (
+                {displayImages.map((img, index) => (
                   <button
                     key={img + index}
                     onClick={() => setSelectedImage(index)}
@@ -221,7 +230,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
                   {product.colors.map((color) => (
                     <button
                       key={color}
-                      onClick={() => { setSelectedColor(color); setValidationError(''); }}
+                      onClick={() => { setSelectedColor(color); setValidationError(''); setSelectedImage(0); }}
                       title={color}
                       className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
                         selectedColor === color ? 'border-fitness-primary scale-110' : 'border-gray-200 hover:border-gray-300'

@@ -8,7 +8,8 @@ import Link from "next/link";
 import {
   Dumbbell, Heart, Zap, Clock, Users, Award,
   ChevronRight, ArrowRight, Star, Play, Quote,
-  ArrowLeft, ArrowRight as ArrowRightIcon, Loader2
+  ArrowLeft, ArrowRight as ArrowRightIcon, Loader2,
+  AlertCircle, CheckCircle, Upload
 } from 'lucide-react';
 import { testimonialService, Testimonial } from '@/app/api_services/testimonialService';
 
@@ -53,6 +54,58 @@ export default function HomeClient() {
   const [isLoadingTestimonials, setIsLoadingTestimonials] = useState(true);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  const [tName, setTName] = useState('');
+  const [tRole, setTRole] = useState('');
+  const [tCompany, setTCompany] = useState('');
+  const [tContent, setTContent] = useState('');
+  const [tRating, setTRating] = useState(5);
+  const [tPhoto, setTPhoto] = useState<File | null>(null);
+  const [tPhotoPreview, setTPhotoPreview] = useState('');
+  const [isSubmittingTestimonial, setIsSubmittingTestimonial] = useState(false);
+  const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
+  const [testimonialError, setTestimonialError] = useState('');
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setTestimonialError('Please choose an image file.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setTestimonialError('Photo must be under 5MB.');
+      return;
+    }
+    setTestimonialError('');
+    setTPhoto(file);
+    setTPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handleSubmitTestimonial = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTestimonialError('');
+    if (!tName.trim() || !tRole.trim() || tContent.trim().length < 20) {
+      setTestimonialError('Please fill in your name, role, and at least 20 characters about your experience.');
+      return;
+    }
+    setIsSubmittingTestimonial(true);
+    try {
+      await testimonialService.submitTestimonial({
+        name: tName,
+        role: tRole,
+        company: tCompany || undefined,
+        content: tContent,
+        rating: tRating,
+        photoFile: tPhoto,
+      });
+      setTestimonialSubmitted(true);
+    } catch (err: any) {
+      setTestimonialError(err?.message || 'Could not submit your testimonial. Please try again.');
+    } finally {
+      setIsSubmittingTestimonial(false);
+    }
+  };
 
   useEffect(() => {
     testimonialService
@@ -348,6 +401,138 @@ export default function HomeClient() {
         </div>
       </section>
       )}
+
+      {/* Share Your Experience — public testimonial submission, pending admin approval */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 badge mb-4">
+                <Quote size={16} className="text-fitness-primary" />
+                <span>Share Your Story</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Trained With <span className="text-gradient-primary">Marksila254?</span>
+              </h2>
+              <p className="text-lg text-gray-600">
+                Tell us about your experience — approved stories get featured above.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-3xl p-8 md:p-10 border border-gray-100">
+              {testimonialSubmitted ? (
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle size={32} className="text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Thank You!</h3>
+                  <p className="text-gray-600">Your testimonial has been submitted and is pending review.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitTestimonial} className="space-y-5">
+                  {testimonialError && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                      <AlertCircle size={20} className="text-red-500 shrink-0" />
+                      <p className="text-sm text-red-600">{testimonialError}</p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={100}
+                        value={tName}
+                        onChange={(e) => setTName(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Role / Occupation</label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={100}
+                        value={tRole}
+                        onChange={(e) => setTRole(e.target.value)}
+                        placeholder="e.g. Client, Software Engineer"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Company (optional)</label>
+                    <input
+                      type="text"
+                      maxLength={100}
+                      value={tCompany}
+                      onChange={(e) => setTCompany(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setTRating(i + 1)}
+                          className="p-1 hover:scale-110 transition-transform"
+                        >
+                          <Star className={`h-7 w-7 ${i < tRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Experience</label>
+                    <textarea
+                      required
+                      minLength={20}
+                      maxLength={500}
+                      rows={4}
+                      value={tContent}
+                      onChange={(e) => setTContent(e.target.value)}
+                      placeholder="Tell us how training with Marksila254 has helped you..."
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-fitness-primary"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">{tContent.length}/500 (min 20 characters)</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Photo (optional)</label>
+                    <div className="flex items-center gap-4">
+                      {tPhotoPreview && (
+                        <img src={tPhotoPreview} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-fitness-primary" />
+                      )}
+                      <label className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium text-gray-600 hover:border-fitness-primary hover:text-fitness-primary transition-colors cursor-pointer">
+                        <Upload size={16} />
+                        {tPhoto ? 'Change Photo' : 'Upload Photo'}
+                        <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                      </label>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingTestimonial}
+                    className="w-full btn-fitness py-4 flex items-center justify-center gap-2 disabled:opacity-60"
+                  >
+                    {isSubmittingTestimonial ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Testimonial'
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Gallery Preview Section — compact teaser, full grid lives on /gallery */}
       <section className="py-16 bg-white">

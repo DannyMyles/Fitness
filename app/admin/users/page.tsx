@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
@@ -18,7 +18,8 @@ import {
   AlertCircle,
   RefreshCw,
   User as UserIcon,
-  Loader2
+  Loader2,
+  X
 } from 'lucide-react'
 import { User, userService } from '@/app/api_services/userService'
 import EmptyState from '@/components/ui/EmptyState'
@@ -145,14 +146,39 @@ export default function UsersManagementPage() {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false)
   const [bulkDeleting, setBulkDeleting] = useState(false)
 
-  const handleDeleteUser = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setShowDeleteModal(false)
+      }
+    }
+    if (showDeleteModal) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showDeleteModal])
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user)
+    setShowDeleteModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return
+    setDeleting(true)
     try {
-      await userService.deleteUser(id)
-      setUsers(users.filter(u => u._id !== id))
+      await userService.deleteUser(userToDelete._id)
+      setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id))
+      toast.success('User deleted')
     } catch (err: any) {
       toast.error(err.message || 'Failed to delete user')
+    } finally {
+      setDeleting(false)
+      setShowDeleteModal(false)
+      setUserToDelete(null)
     }
   }
 
@@ -400,6 +426,58 @@ export default function UsersManagementPage() {
         onConfirm={handleBulkDeleteConfirm}
       />
 
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div ref={modalRef} className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Confirm Deletion</h3>
+              <button onClick={() => setShowDeleteModal(false)} className="p-2 hover:bg-gray-100 rounded-lg" disabled={deleting}>
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              {userToDelete && (
+                <div className="p-4 bg-gray-50 rounded-lg flex items-center gap-3">
+                  <img
+                    src={userService.getAvatarUrl(userToDelete)}
+                    alt={userToDelete.name}
+                    className="h-12 w-12 rounded-full bg-gray-200 flex-shrink-0"
+                  />
+                  <div>
+                    <h4 className="font-medium text-gray-900">{userToDelete.name}</h4>
+                    <p className="text-sm text-gray-500">{userToDelete.email}</p>
+                  </div>
+                </div>
+              )}
+              <div className="p-4 bg-red-50 border border-red-100 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <Trash2 className="h-5 w-5 text-red-600" />
+                  </div>
+                  <p className="text-sm text-red-700">This user will be permanently deleted.</p>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-lg font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters and Search */}
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
@@ -577,7 +655,7 @@ export default function UsersManagementPage() {
                             </Link>
                             
                             <button
-                              onClick={() => handleDeleteUser(user._id)}
+                              onClick={() => handleDeleteClick(user)}
                               className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
                               title="Delete"
                             >

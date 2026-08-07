@@ -10,6 +10,11 @@ export interface Category {
   productCount: number;
 }
 
+export interface ProductImageItem {
+  url: string;
+  color: string | null;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -17,6 +22,7 @@ export interface Product {
   description: string;
   price: number; // KES
   images: string[];
+  imageDetails: ProductImageItem[]; // parallel to images, carries an optional per-image color tag
   sizes: string[];
   colors: string[];
   inStock: boolean;

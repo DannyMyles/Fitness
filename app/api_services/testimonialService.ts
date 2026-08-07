@@ -47,6 +47,15 @@ export interface CreateTestimonialRequest {
   photoFile?: File | null
 }
 
+export interface SubmitTestimonialRequest {
+  name: string
+  role: string
+  company?: string
+  content: string
+  rating: number
+  photoFile?: File | null
+}
+
 export const testimonialService = {
   // Get all testimonials (public - no auth required)
   getAllTestimonials: async (): Promise<TestimonialResponse> => {
@@ -89,6 +98,26 @@ export const testimonialService = {
       return testimonialData as Testimonial
     } catch (error) {
       console.error(`Error fetching testimonial ${id}:`, error)
+      throw error
+    }
+  },
+
+  // Publicly submit a testimonial (no auth) — goes live only once an admin
+  // approves it via toggleTestimonialStatus.
+  submitTestimonial: async (data: SubmitTestimonialRequest): Promise<{ message: string }> => {
+    try {
+      const formData = new FormData()
+      formData.append('name', data.name)
+      formData.append('role', data.role)
+      formData.append('content', data.content)
+      formData.append('rating', data.rating.toString())
+      if (data.company) formData.append('company', data.company)
+      if (data.photoFile) formData.append('photo', data.photoFile)
+
+      const response = await api.public.testimonials.submit(formData)
+      return response as { message: string }
+    } catch (error) {
+      console.error('Error submitting testimonial:', error)
       throw error
     }
   },
