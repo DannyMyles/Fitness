@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { RefreshCw, Search, Eye, ShoppingCart } from 'lucide-react'
+import { RefreshCw, Search, Eye, ShoppingCart, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { orderService } from '@/app/api_services/orderService'
 import { Order, OrderStatus } from '@/types/commerce'
@@ -23,6 +23,7 @@ export default function OrdersManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [exporting, setExporting] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -44,6 +45,25 @@ export default function OrdersManagementPage() {
   const handleRefresh = () => {
     setRefreshing(true)
     fetchOrders()
+  }
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const blob = await orderService.admin.exportCsv()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `orders-report-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to export report')
+    } finally {
+      setExporting(false)
+    }
   }
 
   const filtered = orders.filter(
@@ -70,14 +90,25 @@ export default function OrdersManagementPage() {
           <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
           <p className="mt-1 text-gray-600">Manage Mark 254 shop orders</p>
         </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 w-fit"
-          title="Refresh"
-        >
-          <RefreshCw className={`h-5 w-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExport}
+            disabled={exporting || orders.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-sm font-medium text-gray-700 w-fit"
+            title="Download CSV report"
+          >
+            <Download className={`h-4 w-4 ${exporting ? 'animate-pulse' : ''}`} />
+            {exporting ? 'Exporting...' : 'Export CSV'}
+          </button>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 w-fit"
+            title="Refresh"
+          >
+            <RefreshCw className={`h-5 w-5 text-gray-600 ${refreshing ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

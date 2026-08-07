@@ -36,6 +36,19 @@ async function proxy(req: NextRequest, path: string[]) {
     return new NextResponse(null, { status: 204 });
   }
 
+  // CSV export (and any other non-JSON admin response) — stream it through
+  // as-is with its original headers (Content-Type, Content-Disposition)
+  // rather than forcing it through response.json(), which would throw.
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    const body = await response.arrayBuffer();
+    const headers = new Headers();
+    headers.set('Content-Type', contentType || 'application/octet-stream');
+    const disposition = response.headers.get('content-disposition');
+    if (disposition) headers.set('Content-Disposition', disposition);
+    return new NextResponse(body, { status: response.status, headers });
+  }
+
   const data = await response.json().catch(() => ({}));
   return NextResponse.json(data, { status: response.status });
 }

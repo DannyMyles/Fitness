@@ -79,6 +79,20 @@ export interface Order {
   // payment failed (cancelled, insufficient funds, timed out, etc.).
   paymentResultCode: number | null;
   paymentResultDesc: string | null;
+  // Full M-Pesa transaction detail, populated once a payment has a
+  // paymentRef. phoneNumber/transactionAmount/transactionTime are only
+  // filled in once a real STK callback lands (not via the query-poll
+  // fallback), so they may be null even when paymentStatus is 'paid'.
+  mpesa: {
+    billReferenceNumber: string;
+    phoneNumber: string | null;
+    firstName: string;
+    transactionAmount: number | null;
+    transactionId: string | null;
+    transactionType: string;
+    transactionTime: string | null;
+    businessShortCode: string;
+  } | null;
   subtotal: number;
   shipping: number;
   total: number;

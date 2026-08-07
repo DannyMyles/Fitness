@@ -133,14 +133,46 @@ export default function OrderDetailPage() {
                 </option>
               ))}
             </select>
-            {order.paymentRef && (
-              <p className="text-xs text-gray-500 mt-3">Payment ref: {order.paymentRef}</p>
-            )}
-            {order.paymentStatus === 'failed' && order.paymentResultDesc && (
-              <p className="text-xs text-red-500 mt-1">
-                M-Pesa result: {order.paymentResultDesc}
-                {order.paymentResultCode !== null && ` (code ${order.paymentResultCode})`}
-              </p>
+            {order.mpesa && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  Transaction Details
+                </h3>
+                {order.paymentStatus === 'paid' ? (
+                  <dl className="space-y-2">
+                    {[
+                      ['Bill Reference Number', order.mpesa.billReferenceNumber],
+                      ['Phone Number', order.mpesa.phoneNumber ?? '—'],
+                      ['First Name', order.mpesa.firstName],
+                      ['Transaction Amount', order.mpesa.transactionAmount !== null ? `KES ${order.mpesa.transactionAmount.toLocaleString()}` : '—'],
+                      ['Transaction ID', order.mpesa.transactionId ?? '—'],
+                      ['Transaction Type', order.mpesa.transactionType],
+                      ['Transaction Time', order.mpesa.transactionTime ? new Date(order.mpesa.transactionTime).toLocaleString() : '—'],
+                      ['Business Short Code', order.mpesa.businessShortCode],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex justify-between gap-3 text-xs">
+                        <dt className="text-gray-500">{label}</dt>
+                        <dd className="font-medium text-gray-900 text-right">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : (
+                  <p className="text-xs text-gray-500">
+                    M-Pesa ref: {order.paymentRef}
+                  </p>
+                )}
+                {order.paymentStatus === 'paid' && !order.mpesa.phoneNumber && (
+                  <p className="text-[11px] text-gray-400 mt-3 italic">
+                    Some fields are blank because this payment was confirmed via status check rather than a delivered M-Pesa callback.
+                  </p>
+                )}
+                {order.paymentStatus === 'failed' && order.paymentResultDesc && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {order.paymentResultDesc}
+                    {order.paymentResultCode !== null && ` (code ${order.paymentResultCode})`}
+                  </p>
+                )}
+              </div>
             )}
           </div>
         </div>

@@ -56,5 +56,14 @@ export const orderService = {
       });
       return handle<Order>(res);
     },
+
+    exportCsv: async (): Promise<Blob> => {
+      const res = await fetch('/api/commerce/admin/orders/export', { cache: 'no-store' });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Request failed with status ${res.status}`);
+      }
+      return res.blob();
+    },
   },
 };
