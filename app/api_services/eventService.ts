@@ -38,7 +38,15 @@ export interface EventRegistration {
   attendeeEmail?: string
   status: 'pending_payment' | 'confirmed' | 'cancelled'
   paymentRef?: string
+  checkedInAt: string | null
   createdAt: string
+}
+
+export type CheckinOutcome = 'checked_in' | 'already_checked_in' | 'blocked_unpaid' | 'blocked_cancelled'
+
+export interface CheckinResponse {
+  registration: EventRegistration
+  outcome: CheckinOutcome
 }
 
 export interface RegistrationResponse {
@@ -221,6 +229,10 @@ export const eventService = {
       console.error(`Error updating registration ${id}:`, error)
       throw error
     }
+  },
+
+  checkIn: async (eventId: string, ticketNumber: string): Promise<CheckinResponse> => {
+    return api.admin.events.checkin(eventId, ticketNumber) as Promise<CheckinResponse>
   },
 
   formatDate: (dateString: string): string => {

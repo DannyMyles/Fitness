@@ -471,6 +471,12 @@ class ApiClient {
           body: JSON.stringify({ email }),
           requiresAuth: false,
         }),
+
+      unsubscribe: (email: string, token: string) =>
+        this.request(
+          `/api/v1/newsletter/unsubscribe?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`,
+          { requiresAuth: false }
+        ),
     },
   }
 
@@ -664,6 +670,12 @@ class ApiClient {
           method: 'PATCH',
           body: JSON.stringify({ status }),
         }),
+
+      checkin: (eventId: string, ticketNumber: string) =>
+        this.request(`/api/v1/events/${eventId}/registrations/checkin`, {
+          method: 'POST',
+          body: JSON.stringify({ ticketNumber }),
+        }),
     },
 
     testimonial: {
@@ -762,6 +774,12 @@ class ApiClient {
       delete: (id: string) =>
         this.request(`/api/v1/newsletter/${id}`, {
           method: 'DELETE',
+        }),
+
+      send: (data: { subject: string; message: string }) =>
+        this.request('/api/v1/newsletter/send', {
+          method: 'POST',
+          body: JSON.stringify(data),
         }),
     },
   }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Loader2, Mail, Phone, Ticket, CheckCircle, XCircle, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, Loader2, Mail, Phone, Ticket, CheckCircle, XCircle, Clock, ScanLine, BadgeCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { EventRegistration, eventService } from '@/app/api_services/eventService'
 import EmptyState from '@/components/ui/EmptyState'
@@ -87,10 +88,17 @@ export default function EventRegistrationsPage() {
         <button onClick={() => router.push('/admin/events')} className="p-2 hover:bg-accent-50 rounded-lg transition-colors">
           <ArrowLeft className="h-5 w-5 text-accent-600" />
         </button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900">Registrations</h1>
           <p className="mt-1 text-gray-600">{registrations.length} attendee(s) registered</p>
         </div>
+        <Link
+          href={`/admin/events/${eventId}/checkin`}
+          className="btn-primary flex items-center gap-2 w-fit"
+        >
+          <ScanLine className="h-5 w-5" />
+          Check-in Station
+        </Link>
       </div>
 
       <div className="bg-white rounded-xl shadow-adventure border border-gray-200 overflow-hidden">
@@ -109,6 +117,7 @@ export default function EventRegistrationsPage() {
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ticket</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Checked In</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
                 </tr>
               </thead>
@@ -131,6 +140,15 @@ export default function EventRegistrationsPage() {
                       <span className="font-mono text-sm text-gray-700">{reg.ticketNumber}</span>
                     </td>
                     <td className="px-6 py-4">{statusBadge(reg.status)}</td>
+                    <td className="px-6 py-4">
+                      {reg.checkedInAt ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          <BadgeCheck className="h-3 w-3" /> {new Date(reg.checkedInAt).toLocaleTimeString()}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">Not yet</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {reg.status !== 'confirmed' && (

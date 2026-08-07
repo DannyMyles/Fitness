@@ -11,6 +11,10 @@ export const newsletterService = {
     await api.public.newsletter.subscribe(email)
   },
 
+  unsubscribe: async (email: string, token: string): Promise<void> => {
+    await api.public.newsletter.unsubscribe(email, token)
+  },
+
   admin: {
     getAll: async (): Promise<NewsletterSubscriber[]> => {
       const response = await api.admin.newsletter.getAll()
@@ -20,6 +24,10 @@ export const newsletterService = {
 
     delete: async (id: string): Promise<void> => {
       await api.admin.newsletter.delete(id)
+    },
+
+    sendCampaign: async (data: { subject: string; message: string }): Promise<{ message: string; recipientCount: number }> => {
+      return api.admin.newsletter.send(data) as Promise<{ message: string; recipientCount: number }>
     },
   },
 

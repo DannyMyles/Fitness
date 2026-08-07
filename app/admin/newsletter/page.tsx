@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Search, Trash2, RefreshCw, X, Mail, Download } from 'lucide-react'
+import { Search, Trash2, RefreshCw, X, Mail, Download, Send, ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { newsletterService, NewsletterSubscriber } from '@/app/api_services/newsletterService'
 import EmptyState from '@/components/ui/EmptyState'
@@ -13,6 +13,12 @@ export default function NewsletterManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  const [showSendModal, setShowSendModal] = useState(false)
+  const [sendStep, setSendStep] = useState<'compose' | 'confirm'>('compose')
+  const [campaignSubject, setCampaignSubject] = useState('')
+  const [campaignMessage, setCampaignMessage] = useState('')
+  const [sending, setSending] = useState(false)
+  const sendModalRef = useRef<HTMLDivElement>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [subscriberToDelete, setSubscriberToDelete] = useState<NewsletterSubscriber | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -31,6 +37,16 @@ export default function NewsletterManagementPage() {
     if (showDeleteModal) document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showDeleteModal])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sendModalRef.current && !sendModalRef.current.contains(event.target as Node)) {
+        closeSendModal()
+      }
+    }
+    if (showSendModal) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showSendModal])
 
   const fetchSubscribers = async () => {
     try {
@@ -68,6 +84,33 @@ export default function NewsletterManagementPage() {
       setDeleting(false)
       setShowDeleteModal(false)
       setSubscriberToDelete(null)
+    }
+  }
+
+  const closeSendModal = () => {
+    if (sending) return
+    setShowSendModal(false)
+    setSendStep('compose')
+    setCampaignSubject('')
+    setCampaignMessage('')
+  }
+
+  const handleSendCampaign = async () => {
+    setSending(true)
+    try {
+      const result = await newsletterService.admin.sendCampaign({
+        subject: campaignSubject.trim(),
+        message: campaignMessage.trim(),
+      })
+      toast.success(`Campaign queued for ${result.recipientCount} subscriber(s)`)
+      setShowSendModal(false)
+      setSendStep('compose')
+      setCampaignSubject('')
+      setCampaignMessage('')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to send campaign')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -148,6 +191,92 @@ export default function NewsletterManagementPage() {
         </div>
       )}
 
+      {showSendModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div ref={sendModalRef} className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-gray-900">
+                {sendStep === 'compose' ? 'Send Campaign' : 'Confirm Send'}
+              </h3>
+              <button onClick={closeSendModal} className="p-2 hover:bg-gray-100 rounded-lg" disabled={sending}>
+                <X className="h-5 w-5 text-gray-500" />
+              </button>
+            </div>
+
+            {sendStep === 'compose' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Subject</label>
+                  <input
+                    type="text"
+                    value={campaignSubject}
+                    onChange={(e) => setCampaignSubject(e.target.value)}
+                    placeholder="What's this email about?"
+                    maxLength={150}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Message</label>
+                  <textarea
+                    value={campaignMessage}
+                    onChange={(e) => setCampaignMessage(e.target.value)}
+                    placeholder="Write your message... separate paragraphs with a blank line."
+                    maxLength={5000}
+                    rows={8}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 resize-none"
+                  />
+                </div>
+                <button
+                  onClick={() => setSendStep('confirm')}
+                  disabled={!campaignSubject.trim() || !campaignMessage.trim()}
+                  className="w-full btn-primary py-3 disabled:opacity-50"
+                >
+                  Review &amp; Send
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="p-4 bg-fitness-primary/5 border border-fitness-primary/20 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Subject</p>
+                  <p className="font-medium text-gray-900">{campaignSubject}</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg max-h-40 overflow-y-auto">
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{campaignMessage}</p>
+                </div>
+                <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Send className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <p className="text-sm text-amber-800">
+                      This will email all <strong>{subscribers.length}</strong> subscriber(s). This can't be undone.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setSendStep('compose')}
+                    disabled={sending}
+                    className="flex-1 px-4 py-3 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </button>
+                  <button
+                    onClick={handleSendCampaign}
+                    disabled={sending}
+                    className="flex-1 px-4 py-3 bg-fitness-primary text-white rounded-lg hover:bg-fitness-primary-dark font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {sending ? 'Sending...' : `Send to ${subscribers.length}`}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Newsletter</h1>
@@ -169,6 +298,14 @@ export default function NewsletterManagementPage() {
           >
             <Download className="h-5 w-5" />
             Export CSV
+          </button>
+          <button
+            onClick={() => setShowSendModal(true)}
+            disabled={subscribers.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-fitness-dark text-white rounded-lg hover:bg-fitness-dark/90 disabled:opacity-50 text-sm font-medium"
+          >
+            <Send className="h-4 w-4" />
+            Send Campaign
           </button>
         </div>
       </div>
