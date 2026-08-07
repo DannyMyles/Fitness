@@ -136,6 +136,12 @@ export default function OrderDetailPage() {
             {order.paymentRef && (
               <p className="text-xs text-gray-500 mt-3">Payment ref: {order.paymentRef}</p>
             )}
+            {order.paymentStatus === 'failed' && order.paymentResultDesc && (
+              <p className="text-xs text-red-500 mt-1">
+                M-Pesa result: {order.paymentResultDesc}
+                {order.paymentResultCode !== null && ` (code ${order.paymentResultCode})`}
+              </p>
+            )}
           </div>
         </div>
       </div>

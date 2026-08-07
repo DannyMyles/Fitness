@@ -23,6 +23,7 @@ export function usePaymentPolling<T>({
   timeoutMs = 90000,
 }: UsePaymentPollingOptions<T>) {
   const [phase, setPhase] = useState<PaymentPollingPhase>('idle');
+  const [lastResult, setLastResult] = useState<T | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -40,6 +41,7 @@ export function usePaymentPolling<T>({
     const tick = async () => {
       try {
         const result = await checkFn();
+        setLastResult(result);
         if (isSuccess(result)) {
           stop();
           setPhase('success');
@@ -64,9 +66,10 @@ export function usePaymentPolling<T>({
   const reset = useCallback(() => {
     stop();
     setPhase('idle');
+    setLastResult(null);
   }, [stop]);
 
   useEffect(() => stop, [stop]);
 
-  return { phase, start, reset };
+  return { phase, start, reset, lastResult };
 }

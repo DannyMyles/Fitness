@@ -75,6 +75,10 @@ export interface Order {
   paymentMethod: string;
   paymentStatus: PaymentStatus;
   paymentRef: string | null;
+  // Raw Safaricom STK push result, kept for admin visibility into why a
+  // payment failed (cancelled, insufficient funds, timed out, etc.).
+  paymentResultCode: number | null;
+  paymentResultDesc: string | null;
   subtotal: number;
   shipping: number;
   total: number;
@@ -85,6 +89,7 @@ export interface Order {
 export interface OrderPaymentStatus {
   status: OrderStatus;
   paymentStatus: PaymentStatus;
+  paymentFailureReason?: string;
 }
 
 export interface PaymentInitiation {

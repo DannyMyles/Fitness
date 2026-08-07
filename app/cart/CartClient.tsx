@@ -49,8 +49,7 @@ export default function CartClient() {
   const subtotal = useCartStore((s) => s.subtotal());
   const hasHydrated = useCartStore((s) => s.hasHydrated);
 
-  const shipping = subtotal > 5000 ? 0 : 500;
-  const total = subtotal + shipping;
+  const total = subtotal;
 
   const handleProceedToCheckout = () => {
     if (status !== 'authenticated') {
@@ -412,7 +411,8 @@ export default function CartClient() {
                   <p className="text-gray-600 mb-2">
                     {pollPayment.phase === 'timeout'
                       ? "We didn't receive a confirmation in time. If you already paid, it may still go through — otherwise, try again."
-                      : 'The M-Pesa payment was cancelled or declined. Your order is saved — you can retry payment below.'}
+                      : (pollPayment.lastResult?.paymentFailureReason ??
+                        'The M-Pesa payment was cancelled or declined. Your order is saved — you can retry payment below.')}
                   </p>
                   <p className="text-sm text-gray-500 mb-8">
                     Order #: {confirmedOrder?.order.orderNumber}
@@ -476,33 +476,13 @@ export default function CartClient() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping</span>
-                      <span className="font-medium">
-                        {shipping === 0 ? (
-                          <span className="text-green-600">FREE</span>
-                        ) : (
-                          `KES ${shipping}`
-                        )}
-                      </span>
+                      <span className="font-medium text-green-600">FREE</span>
                     </div>
                     <div className="border-t pt-4 flex justify-between">
                       <span className="text-lg font-bold">Total</span>
                       <span className="text-lg font-bold text-fitness-primary">KES {total.toLocaleString()}</span>
                     </div>
                   </div>
-
-                  {subtotal < 5000 && (
-                    <div className="bg-fitness-primary/10 rounded-lg p-4 mb-6">
-                      <p className="text-sm text-fitness-primary font-medium">
-                        Add KES {(5000 - subtotal).toLocaleString()} more for free delivery!
-                      </p>
-                      <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-fitness-primary rounded-full transition-all"
-                          style={{ width: `${(subtotal / 5000) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  )}
 
                   <button
                     onClick={handleProceedToCheckout}

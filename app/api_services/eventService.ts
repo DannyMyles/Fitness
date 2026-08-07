@@ -125,8 +125,14 @@ export const eventService = {
     }
   },
 
-  getRegistrationStatus: async (id: number): Promise<{ status: EventRegistration['status'] }> => {
-    return api.protected.events.registrationStatus(id) as Promise<{ status: EventRegistration['status'] }>
+  getRegistrationStatus: async (
+    id: number
+  ): Promise<{ status: EventRegistration['status']; paymentFailed?: boolean; paymentFailureReason?: string }> => {
+    return api.protected.events.registrationStatus(id) as Promise<{
+      status: EventRegistration['status']
+      paymentFailed?: boolean
+      paymentFailureReason?: string
+    }>
   },
 
   retryPayment: async (id: number): Promise<RegistrationResponse> => {

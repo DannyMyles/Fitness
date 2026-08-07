@@ -41,10 +41,10 @@ export default function EventsClient() {
   const [isRetrying, setIsRetrying] = useState(false);
   const registrationIdRef = useRef<number | null>(null);
 
-  const pollPayment = usePaymentPolling<{ status: string }>({
+  const pollPayment = usePaymentPolling<{ status: string; paymentFailed?: boolean; paymentFailureReason?: string }>({
     checkFn: () => eventService.getRegistrationStatus(registrationIdRef.current!),
     isSuccess: (r) => r.status === 'confirmed',
-    isFailed: (r) => r.status === 'cancelled',
+    isFailed: (r) => r.paymentFailed === true,
   });
 
   useEffect(() => {
@@ -212,7 +212,8 @@ export default function EventsClient() {
                     <p className="text-gray-700 mb-2">
                       {pollPayment.phase === 'timeout'
                         ? "We didn't receive a confirmation in time. If you already paid, it may still go through — otherwise, try again."
-                        : 'The M-Pesa payment was cancelled or declined. Try again to confirm your spot.'}
+                        : (pollPayment.lastResult?.paymentFailureReason ??
+                          'The M-Pesa payment was cancelled or declined. Try again to confirm your spot.')}
                     </p>
                     {formError && (
                       <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-sm text-red-600 mb-4 text-left">
