@@ -464,6 +464,11 @@ class ApiClient {
       },
     },
 
+    youtube: {
+      getVideos: () =>
+        this.request('/api/v1/youtube/videos', { requiresAuth: false }),
+    },
+
     newsletter: {
       subscribe: (email: string) =>
         this.request('/api/v1/newsletter/subscribe', {

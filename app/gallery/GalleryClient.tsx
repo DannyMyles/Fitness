@@ -1,18 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Instagram, Facebook, Twitter, Loader2, AlertCircle, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { X, Instagram, Facebook, Twitter, Loader2, AlertCircle, Image as ImageIcon, RefreshCw, Play, Youtube } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import EmptyState from '@/components/ui/EmptyState';
 import { galleryService, GalleryCategory, GalleryImage } from '@/app/api_services/galleryService';
+import { youtubeService, YoutubeVideo } from '@/app/api_services/youtubeService';
+
+const VIDEOS_PAGE_SIZE = 9;
 
 export default function GalleryClient() {
+  const [activeTab, setActiveTab] = useState<'photos' | 'videos'>('photos');
+
   const [categories, setCategories] = useState<GalleryCategory[]>([]);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
+  const [videos, setVideos] = useState<YoutubeVideo[]>([]);
+  const [videosLoading, setVideosLoading] = useState(true);
+  const [videosError, setVideosError] = useState('');
+  const [visibleVideoCount, setVisibleVideoCount] = useState(VIDEOS_PAGE_SIZE);
+  const [selectedVideo, setSelectedVideo] = useState<YoutubeVideo | null>(null);
 
   const fetchGallery = () => {
     setIsLoading(true);
@@ -26,8 +37,19 @@ export default function GalleryClient() {
       .finally(() => setIsLoading(false));
   };
 
+  const fetchVideos = () => {
+    setVideosLoading(true);
+    setVideosError('');
+    youtubeService
+      .getVideos()
+      .then(setVideos)
+      .catch(() => setVideosError('Could not load videos. Please try again shortly.'))
+      .finally(() => setVideosLoading(false));
+  };
+
   useEffect(() => {
     fetchGallery();
+    fetchVideos();
   }, []);
 
   const categoryName = (categoryId: string) =>
@@ -36,16 +58,44 @@ export default function GalleryClient() {
   const filteredImages =
     activeCategory === 'all' ? images : images.filter((img) => img.categoryId === activeCategory);
 
+  const visibleVideos = videos.slice(0, visibleVideoCount);
+
   return (
     <div className="pt-0">
       {/* Hero Section */}
       <PageHero
-        title="Photo Gallery"
+        title="Photo & Video Gallery"
         subtitle="Explore moments from training sessions, client transformations, fitness events, and more."
       />
 
+      {/* Photos / Videos toggle */}
+      <div className="pt-16 flex justify-center">
+        <div className="inline-flex bg-gray-100 rounded-full p-1.5">
+          <button
+            onClick={() => setActiveTab('photos')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-medium transition-all ${
+              activeTab === 'photos' ? 'bg-white text-fitness-primary shadow-sm' : 'text-gray-600 hover:text-fitness-primary'
+            }`}
+          >
+            <ImageIcon size={18} />
+            Photos
+          </button>
+          <button
+            onClick={() => setActiveTab('videos')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-medium transition-all ${
+              activeTab === 'videos' ? 'bg-white text-fitness-primary shadow-sm' : 'text-gray-600 hover:text-fitness-primary'
+            }`}
+          >
+            <Youtube size={18} />
+            Videos
+          </button>
+        </div>
+      </div>
+
+      {activeTab === 'photos' ? (
+      <>
       {/* Gallery Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           {isLoading ? (
             <div className="flex justify-center py-20">
@@ -128,6 +178,73 @@ export default function GalleryClient() {
           )}
         </div>
       </section>
+      </>
+      ) : (
+      <>
+      {/* Videos Grid */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          {videosLoading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 size={32} className="animate-spin text-gray-300" />
+            </div>
+          ) : videosError ? (
+            <EmptyState
+              icon={AlertCircle}
+              title="Couldn't load videos"
+              description={videosError}
+              action={{ label: 'Try Again', icon: RefreshCw, onClick: fetchVideos }}
+            />
+          ) : videos.length === 0 ? (
+            <EmptyState
+              icon={Youtube}
+              title="No videos yet"
+              description="Check back soon — videos from the channel will show up here."
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {visibleVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="group relative aspect-video rounded-xl overflow-hidden cursor-pointer bg-gray-100"
+                    onClick={() => setSelectedVideo(video)}
+                  >
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-fitness-dark/80 via-fitness-dark/10 to-transparent" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-white transition-all shadow-lg">
+                        <Play size={22} className="text-fitness-primary ml-1" fill="currentColor" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <h3 className="text-white font-semibold text-sm line-clamp-2">{video.title}</h3>
+                      <p className="text-white/70 text-xs mt-1">{youtubeService.formatDate(video.publishedAt)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {visibleVideoCount < videos.length && (
+                <div className="flex justify-center mt-10">
+                  <button
+                    onClick={() => setVisibleVideoCount((n) => n + VIDEOS_PAGE_SIZE)}
+                    className="px-8 py-3 rounded-full font-medium bg-gray-100 text-gray-700 hover:bg-fitness-primary/10 hover:text-fitness-primary transition-all"
+                  >
+                    Load More Videos
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+      </>
+      )}
 
       {/* Social Media Section */}
       <section className="py-20 bg-gray-50">
@@ -173,6 +290,36 @@ export default function GalleryClient() {
             <div className="mt-4 text-white text-center">
               <p className="text-sm text-fitness-accent">{categoryName(selectedImage.categoryId)}</p>
               {selectedImage.title && <h3 className="text-xl font-semibold">{selectedImage.title}</h3>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Player Modal */}
+      {selectedVideo && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <button
+            className="absolute top-4 right-4 p-2 text-white hover:text-fitness-accent transition-colors"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <X size={32} />
+          </button>
+          <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="aspect-video rounded-xl overflow-hidden bg-black">
+              <iframe
+                src={youtubeService.getEmbedUrl(selectedVideo.id)}
+                title={selectedVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+            <div className="mt-4 text-white text-center">
+              <h3 className="text-xl font-semibold">{selectedVideo.title}</h3>
+              <p className="text-sm text-white/60 mt-1">{youtubeService.formatDate(selectedVideo.publishedAt)}</p>
             </div>
           </div>
         </div>
