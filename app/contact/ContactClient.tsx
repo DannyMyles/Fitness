@@ -4,11 +4,11 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   Phone, Mail, MapPin, Clock, Send,
-  Facebook, Twitter, Instagram, Linkedin,
+  Facebook, Instagram,
   MessageCircle, Calendar,
   CheckCircle, ArrowRight, AlertCircle
 } from 'lucide-react';
-import { FaWhatsapp } from "react-icons/fa6";
+import { FaWhatsapp, FaTiktok } from "react-icons/fa6";
 import PageHero from '@/components/ui/PageHero';
 
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
@@ -317,14 +317,15 @@ export default function ContactClient() {
                 </p>
                 <div className="flex gap-4">
                   {[
-                    { icon: Instagram, color: 'from-pink-500 to-purple-600', href: '#' },
-                    { icon: Facebook, color: 'from-blue-600 to-blue-700', href: '#' },
-                    { icon: Twitter, color: 'from-sky-400 to-sky-500', href: '#' },
-                    { icon: Linkedin, color: 'from-blue-700 to-blue-800', href: '#' },
+                    { icon: FaTiktok, color: 'from-gray-800 to-black', href: 'https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc' },
+                    { icon: Instagram, color: 'from-pink-500 to-purple-600', href: 'https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr' },
+                    { icon: Facebook, color: 'from-blue-600 to-blue-700', href: 'https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr' },
                   ].map((social, index) => (
-                    <a 
+                    <a
                       key={index}
                       href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`w-12 h-12 bg-gradient-to-br ${social.color} rounded-xl flex items-center justify-center text-white hover:shadow-fitness-lg transition-all duration-300 hover:-translate-y-1`}
                     >
                       <social.icon size={22} />

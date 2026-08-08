@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  Phone, Mail, MapPin, 
-  Facebook, Twitter, Linkedin, Instagram, 
+import {
+  Phone, Mail, MapPin,
+  Facebook, Instagram,
   Dumbbell, Heart, Clock, ShoppingBag, Users,
   ArrowRight, Send, Zap, Sparkles, CheckCircle,
   Calendar, Award, Target, Shield
 } from 'lucide-react';
+import { FaTiktok } from 'react-icons/fa6';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { newsletterService } from '@/app/api_services/newsletterService';
@@ -46,10 +47,9 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: Facebook, href: '#', color: 'from-blue-500 to-blue-600', label: 'Facebook' },
-    { icon: Twitter, href: '#', color: 'from-sky-400 to-sky-500', label: 'Twitter' },
-    { icon: Linkedin, href: '#', color: 'from-blue-600 to-blue-700', label: 'LinkedIn' },
-    { icon: Instagram, href: '#', color: 'from-pink-500 to-purple-500', label: 'Instagram' },
+    { icon: FaTiktok, href: 'https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc', color: 'from-gray-800 to-black', label: 'TikTok' },
+    { icon: Instagram, href: 'https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr', color: 'from-pink-500 to-purple-500', label: 'Instagram' },
+    { icon: Facebook, href: 'https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr', color: 'from-blue-500 to-blue-600', label: 'Facebook' },
   ];
 
   const quickLinks = [
@@ -315,6 +315,8 @@ const Footer = () => {
                   <motion.a
                     key={index}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={social.label}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     whileTap={{ scale: 0.95 }}

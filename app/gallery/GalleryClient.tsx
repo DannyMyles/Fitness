@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Instagram, Facebook, Twitter, Loader2, AlertCircle, Image as ImageIcon, RefreshCw, Play, Youtube } from 'lucide-react';
+import { X, Instagram, Facebook, Loader2, AlertCircle, Image as ImageIcon, RefreshCw, Play, Youtube } from 'lucide-react';
+import { FaTiktok } from 'react-icons/fa6';
 import PageHero from '@/components/ui/PageHero';
 import EmptyState from '@/components/ui/EmptyState';
 import { galleryService, GalleryCategory, GalleryImage } from '@/app/api_services/galleryService';
@@ -256,14 +257,29 @@ export default function GalleryClient() {
             Stay updated with daily fitness tips, workout videos, and client transformations on social media.
           </p>
           <div className="flex justify-center gap-6">
-            <a href="#" className="p-4 bg-gradient-to-br from-[#BE2D6B] to-[#771440] text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">
+            <a
+              href="https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 bg-gradient-to-br from-gray-800 to-black text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1"
+            >
+              <FaTiktok size={28} />
+            </a>
+            <a
+              href="https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 bg-gradient-to-br from-[#BE2D6B] to-[#771440] text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1"
+            >
               <Instagram size={28} />
             </a>
-            <a href="#" className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">
+            <a
+              href="https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1"
+            >
               <Facebook size={28} />
-            </a>
-            <a href="#" className="p-4 bg-gradient-to-br from-blue-400 to-blue-500 text-white rounded-xl hover:shadow-fitness-lg transition-all hover:-translate-y-1">
-              <Twitter size={28} />
             </a>
           </div>
         </div>

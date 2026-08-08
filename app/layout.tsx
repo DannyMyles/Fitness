@@ -65,9 +65,9 @@ const localBusinessJsonLd = {
     addressCountry: 'KE',
   },
   sameAs: [
+    process.env.NEXT_PUBLIC_TIKTOK,
     process.env.NEXT_PUBLIC_INSTAGRAM,
     process.env.NEXT_PUBLIC_FACEBOOK,
-    process.env.NEXT_PUBLIC_TWITTER,
   ].filter(Boolean),
 };
 
