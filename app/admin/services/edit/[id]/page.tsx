@@ -14,10 +14,12 @@ import {
   X,
   Sparkles,
   Loader2,
+  Upload,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { CreateTrainingRequest, trainingService } from '@/app/api_services/trainingService'
 import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
+import PriceInput from '@/components/ui/PriceInput'
 
 const iconOptions = ['Dumbbell', 'Heart', 'Zap', 'Clock', 'Users', 'Award', 'Star', 'CheckCircle']
 const colorOptions = [
@@ -38,13 +40,15 @@ export default function EditServicePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
 
   const [formData, setFormData] = useState<CreateTrainingRequest>({
     title: '',
     description: '',
     features: [''],
     price: '',
-    image: '',
+    imageUrl: '',
+    imageFile: null,
     icon: iconOptions[0],
     color: colorOptions[0].value,
     popular: false,
@@ -65,13 +69,15 @@ export default function EditServicePage() {
         description: training.description,
         features: training.features?.length ? training.features : [''],
         price: training.price,
-        image: training.image,
+        imageUrl: training.image,
+        imageFile: null,
         icon: training.icon || iconOptions[0],
         color: training.color || colorOptions[0].value,
         popular: training.popular,
         order: training.order ?? 0,
         published: training.published !== false,
       })
+      if (training.image) setImagePreview(training.image)
     } catch (err: any) {
       console.error('Error fetching service:', err)
       setError(err.message || 'Failed to load service')
@@ -81,11 +87,42 @@ export default function EditServicePage() {
     }
   }
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload a valid image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size must be less than 5MB')
+      return
+    }
+
+    setFormData({ ...formData, imageFile: file, imageUrl: '' })
+    const reader = new FileReader()
+    reader.onload = (e) => setImagePreview(e.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const handleImageUrlChange = (url: string) => {
+    setFormData({ ...formData, imageUrl: url, imageFile: null })
+    setImagePreview(url || null)
+  }
+
+  const removeImage = () => {
+    setFormData({ ...formData, imageFile: null, imageUrl: '' })
+    setImagePreview(null)
+  }
+
   const validateForm = () => {
     if (!formData.title.trim()) throw new Error('Title is required')
     if (!formData.description.trim()) throw new Error('Description is required')
     if (!formData.price.trim()) throw new Error('Price is required')
-    if (!formData.image.trim()) throw new Error('Image URL is required')
+    if (!formData.imageFile && !formData.imageUrl?.trim() && !imagePreview) {
+      throw new Error('An image (upload or URL) is required')
+    }
     if (formData.features.filter((f) => f.trim()).length === 0) {
       throw new Error('At least one feature is required')
     }
@@ -216,16 +253,10 @@ export default function EditServicePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price *</label>
-                  <input
-                    type="text"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-                    required
-                  />
-                </div>
+                <PriceInput
+                  value={formData.price}
+                  onChange={(price) => setFormData({ ...formData, price })}
+                />
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Display Order</label>
                   <input
@@ -287,16 +318,43 @@ export default function EditServicePage() {
               </span>
               Image
             </h3>
+
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    disabled={saving}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 mb-3">Upload an image or enter a URL below</p>
+                  <label className="inline-block cursor-pointer">
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={saving} />
+                    <div className="bg-accent-50 text-accent-700 py-2 px-4 rounded-lg hover:bg-accent-100 transition-colors text-center text-sm font-medium">
+                      Upload File
+                    </div>
+                  </label>
+                </div>
+              )}
+            </div>
+
             <input
               type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              value={formData.imageUrl}
+              onChange={(e) => handleImageUrlChange(e.target.value)}
+              placeholder="/images/025.JPG or https://example.com/image.jpg"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500 focus:border-transparent"
-              required
+              disabled={saving || !!formData.imageFile}
             />
-            {formData.image && (
-              <div className="mt-4 h-40 rounded-lg bg-cover bg-center border border-gray-200" style={{ backgroundImage: `url(${formData.image})` }} />
-            )}
+            <p className="mt-2 text-xs text-gray-500">Upload a new file (max 5MB) or paste an image path/URL to replace the current image</p>
           </div>
         </div>
 

@@ -629,16 +629,18 @@ class ApiClient {
     },
     
     training: {
-      create: (data: any) =>
+      create: (data: FormData) =>
         this.request('/api/v1/trainings', {
           method: 'POST',
-          body: JSON.stringify(data),
+          body: data,
+          headers: {},
         }),
 
-      update: (id: string, data: any) =>
+      update: (id: string, data: FormData) =>
         this.request(`/api/v1/trainings/${id}`, {
           method: 'PUT',
-          body: JSON.stringify(data),
+          body: data,
+          headers: {},
         }),
 
       delete: (id: string) =>

@@ -33,7 +33,8 @@ export interface CreateTrainingRequest {
   description: string
   features: string[]
   price: string
-  image: string
+  imageUrl?: string
+  imageFile?: File | null
   icon?: string
   color?: string
   popular?: boolean
@@ -42,6 +43,25 @@ export interface CreateTrainingRequest {
 }
 
 export interface UpdateTrainingRequest extends Partial<CreateTrainingRequest> {}
+
+function toFormData(data: CreateTrainingRequest | UpdateTrainingRequest): FormData {
+  const formData = new FormData()
+  if (data.title !== undefined) formData.append('title', data.title)
+  if (data.description !== undefined) formData.append('description', data.description)
+  if (data.features !== undefined) formData.append('features', JSON.stringify(data.features))
+  if (data.price !== undefined) formData.append('price', data.price)
+  if (data.icon !== undefined) formData.append('icon', data.icon)
+  if (data.color !== undefined) formData.append('color', data.color)
+  if (data.popular !== undefined) formData.append('popular', data.popular.toString())
+  if (data.order !== undefined) formData.append('order', data.order.toString())
+  if (data.published !== undefined) formData.append('published', data.published.toString())
+  if (data.imageFile) {
+    formData.append('image', data.imageFile)
+  } else if (data.imageUrl) {
+    formData.append('imageUrl', data.imageUrl)
+  }
+  return formData
+}
 
 export const trainingService = {
   // Get all trainings (public - no auth required)
@@ -84,7 +104,8 @@ export const trainingService = {
   // Create training (admin only)
   createTraining: async (data: CreateTrainingRequest): Promise<Training> => {
     try {
-      return await api.admin.training.create(data)
+      const response = await api.admin.training.create(toFormData(data))
+      return ((response as any).training || response) as Training
     } catch (error) {
       console.error('Error creating training:', error)
       throw error
@@ -94,7 +115,8 @@ export const trainingService = {
   // Update training (admin only)
   updateTraining: async (id: string, data: UpdateTrainingRequest): Promise<Training> => {
     try {
-      return await api.admin.training.update(id, data)
+      const response = await api.admin.training.update(id, toFormData(data))
+      return ((response as any).training || response) as Training
     } catch (error) {
       console.error(`Error updating training ${id}:`, error)
       throw error
@@ -114,7 +136,8 @@ export const trainingService = {
   // Toggle published status (admin only)
   togglePublished: async (id: string, published: boolean): Promise<Training> => {
     try {
-      return await api.admin.training.update(id, { published })
+      const response = await api.admin.training.update(id, toFormData({ published }))
+      return ((response as any).training || response) as Training
     } catch (error) {
       console.error(`Error toggling training status ${id}:`, error)
       throw error
