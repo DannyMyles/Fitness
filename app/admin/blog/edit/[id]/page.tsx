@@ -232,16 +232,16 @@ export default function EditBlogPage() {
   };
 
   const categories = [
-    "Safety Updates",
-    "Training",
-    "Environmental",
-    "Equipment",
-    "Regulations",
+    "Workout Tips",
+    "Nutrition",
+    "Training Programs",
+    "Success Stories",
+    "Motivation",
+    "Fitness Gear",
+    "Health & Wellness",
+    "Events & Announcements",
+    "Recovery",
     "News",
-    "Tips & Guides",
-    "Technology",
-    "Health & Safety",
-    "Industry News",
   ];
 
   if (loading && !blogLoaded) {

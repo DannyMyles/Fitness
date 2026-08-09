@@ -152,16 +152,16 @@ export default function CreateBlogPage() {
   }
 
   const categories = [
-    'Safety Updates',
-    'Training',
-    'Environmental',
-    'Equipment',
-    'Regulations',
-    'News',
-    'Tips & Guides',
-    'Technology',
-    'Health & Safety',
-    'Industry News'
+    'Workout Tips',
+    'Nutrition',
+    'Training Programs',
+    'Success Stories',
+    'Motivation',
+    'Fitness Gear',
+    'Health & Wellness',
+    'Events & Announcements',
+    'Recovery',
+    'News'
   ]
 
   return (
