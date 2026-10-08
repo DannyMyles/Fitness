@@ -262,12 +262,8 @@ export const testimonialService = {
   getPhotoUrl: (testimonial: Testimonial): string => {
     if (!testimonial.photoInfo?.hasPhoto) return ''
 
-    if (process.env.NODE_ENV === 'development') {
-      return `/api/v1/testimonials/${testimonial.id}/photo`
-    }
-
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'
-    return `${baseUrl}${testimonial.photoInfo.url}`
+    // Same-origin path — proxy.ts forwards it to the API with this app's key.
+    return `/api/v1/testimonials/${testimonial.id}/photo`
   }
 }
 

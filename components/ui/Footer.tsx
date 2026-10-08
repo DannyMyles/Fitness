@@ -1,369 +1,187 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  Phone, Mail, MapPin,
-  Facebook, Instagram,
-  Dumbbell, Heart, Clock, ShoppingBag, Users,
-  ArrowRight, Send, Zap, Sparkles, CheckCircle,
-  Calendar, Award, Target, Shield
-} from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CheckCircle, Facebook, Instagram, Loader2, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { FaTiktok } from 'react-icons/fa6';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { newsletterService } from '@/app/api_services/newsletterService';
+import { whatsappLink } from '@/app/lib/backend';
 
-const legalLinks = [
-  { name: 'Privacy Policy', href: '/privacy-policy' },
-  { name: 'Terms & Conditions', href: '/terms-and-conditions' },
-  { name: 'Cookie Policy', href: '/cookie-policy' },
-  { name: 'Refund & Returns', href: '/refund-policy' },
+const explore = [
+  { name: 'About', href: '/about' },
+  { name: 'Services', href: '/services' },
+  { name: 'Events', href: '/events' },
+  { name: 'Gallery', href: '/gallery' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'Contact', href: '/contact' },
 ];
 
-const Footer = () => {
-  const currentYear = new Date().getFullYear();
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [subscribing, setSubscribing] = useState(false);
-  const [subscribeError, setSubscribeError] = useState('');
-  const [isHovered, setIsHovered] = useState(-1);
+const train = [
+  { name: 'Personal Training', href: '/services' },
+  { name: 'Group Classes', href: '/services' },
+  { name: 'Online Training', href: '/services' },
+  { name: 'Nutrition Coaching', href: '/services' },
+  { name: 'Mark 254 Shop', href: '/shop' },
+];
 
-  const handleSubscribe = async (e: React.FormEvent) => {
+const legal = [
+  { name: 'Privacy', href: '/privacy-policy' },
+  { name: 'Terms', href: '/terms-and-conditions' },
+  { name: 'Cookies', href: '/cookie-policy' },
+  { name: 'Refunds', href: '/refund-policy' },
+];
+
+const social = [
+  { icon: Instagram, href: 'https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr', label: 'Instagram' },
+  { icon: FaTiktok, href: 'https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc', label: 'TikTok' },
+  { icon: Facebook, href: 'https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr', label: 'Facebook' },
+];
+
+export default function Footer() {
+  const [email, setEmail] = useState('');
+  const [state, setState] = useState<'idle' | 'sending' | 'done'>('idle');
+  const [error, setError] = useState('');
+
+  const subscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || subscribing) return;
-    setSubscribing(true);
-    setSubscribeError('');
+    if (!email || state === 'sending') return;
+    setState('sending');
+    setError('');
     try {
-      await newsletterService.subscribe(email);
-      setSubscribed(true);
+      await newsletterService.subscribe(email.trim());
+      setState('done');
       setEmail('');
-      setTimeout(() => setSubscribed(false), 3000);
-    } catch (err: any) {
-      setSubscribeError(err?.message || 'Could not subscribe right now. Please try again.');
-    } finally {
-      setSubscribing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not subscribe right now.');
+      setState('idle');
     }
   };
 
-  const socialLinks = [
-    { icon: FaTiktok, href: 'https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc', color: 'from-gray-800 to-black', label: 'TikTok' },
-    { icon: Instagram, href: 'https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr', color: 'from-pink-500 to-purple-500', label: 'Instagram' },
-    { icon: Facebook, href: 'https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr', color: 'from-blue-500 to-blue-600', label: 'Facebook' },
-  ];
-
-  const quickLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'About Me', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Gallery', href: '/gallery' },
-    { name: 'Events', href: '/events' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Contact', href: '/contact' },
-  ];
-
-  const services = [
-    { name: 'Personal Training', href: '/services' },
-    { name: 'Group Classes', href: '/services' },
-    { name: 'Online Training', href: '/services' },
-    { name: 'Nutrition Coaching', href: '/services' },
-    { name: 'Fitness Shop', href: '/shop' },
-  ];
-
-  const features = [
-    { icon: Target, text: 'Certified Trainer', count: '2' },
-    { icon: Award, text: 'Happy Clients', count: '100+' },
-    { icon: Calendar, text: 'Classes/Month', count: '50+' },
-    { icon: Shield, text: 'Success Rate', count: '98%' },
-  ];
-
   return (
-    <footer className="relative overflow-hidden bg-gray-50 text-gray-700 border-t border-gray-100">
-      {/* Background accents */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-fitness-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-fitness-primary-dark/5 rounded-full blur-3xl"></div>
-      </div>
+    <footer className="relative overflow-hidden bg-ink text-white">
+      {/* soft brand glow */}
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-fitness-primary/20 blur-3xl" aria-hidden />
 
-      {/* Floating Elements */}
-      <div className="absolute top-10 left-10 w-6 h-6 rounded-full bg-fitness-primary/20 animate-float"></div>
-      <div className="absolute top-20 right-20 w-8 h-8 rounded-full bg-fitness-accent/20 animate-float-delayed"></div>
-
-      <div className="container mx-auto px-4 py-16 relative z-10">
-        {/* Newsletter Banner */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-3xl bg-white border border-gray-200 shadow-card p-8 mb-16"
-        >
-          <div className="absolute top-0 left-0 w-32 h-32 bg-fitness-primary/5 rounded-full -translate-x-16 -translate-y-16"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-fitness-primary/5 rounded-full translate-x-16 translate-y-16"></div>
-
-          <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-fitness-primary/10 text-fitness-primary px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                <Sparkles size={16} />
-                <span>Exclusive Content</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-3 text-fitness-dark">
-                Transform Your Fitness Journey
-              </h3>
-              <p className="text-gray-600 max-w-xl">
-                Join our community of fitness enthusiasts. Get weekly workout plans, nutrition tips, and exclusive discounts delivered to your inbox.
-              </p>
-            </div>
-
-            <div className="w-full lg:w-auto">
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                <div className="relative">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
-                    disabled={subscribing}
-                    className="w-full sm:w-80 px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-fitness-dark placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition-all duration-300 disabled:opacity-60"
-                  />
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="submit"
-                  disabled={subscribing}
-                  className="btn-primary group relative overflow-hidden disabled:opacity-70"
-                >
-                  <span className="relative flex items-center gap-2">
-                    {subscribed ? (
-                      <>
-                        <CheckCircle size={20} />
-                        <span>Subscribed!</span>
-                      </>
-                    ) : subscribing ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Subscribing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send size={18} />
-                        <span>Subscribe Now</span>
-                      </>
-                    )}
-                  </span>
-                </motion.button>
-              </form>
-              {subscribeError && (
-                <p className="text-sm text-red-500 mt-2">{subscribeError}</p>
-              )}
-            </div>
+      <div className="container relative mx-auto px-4">
+        {/* CTA band */}
+        <div className="flex flex-col items-start justify-between gap-6 border-b border-white/10 py-14 md:flex-row md:items-end md:py-20">
+          <div className="reveal max-w-xl">
+            <p className="eyebrow text-fitness-primary-light">Ready when you are</p>
+            <h2 className="mt-3 font-display text-3xl font-bold leading-tight tracking-tight md:text-5xl">
+              Your strongest season <span className="text-fitness-primary">starts now.</span>
+            </h2>
           </div>
-        </motion.div>
-
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
-          
-          {/* Brand Info */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6 lg:col-span-2"
-          >
-            <div className="flex items-center gap-4">
-              <div>
-                <Image
-                  src="/images/logo.svg"
-                  alt="Marksila 254"
-                  width={180}
-                  height={146}
-                  className="h-20 w-auto inline-block"
-                />
-                <p className="text-sm text-gray-500 mt-1">Love Your Body</p>
-              </div>
-            </div>
-            
-            <p className="text-gray-600 leading-relaxed max-w-md">
-              Transforming lives through expert fitness training, nutrition guidance, and personalized workout programs tailored to your goals.
-            </p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.05 }}
-                  className="p-3 rounded-xl bg-white border border-gray-200 shadow-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <feature.icon size={16} className="text-fitness-primary" />
-                    <span className="text-sm text-gray-600">{feature.text}</span>
-                  </div>
-                  <div className="text-xl font-bold mt-1 text-fitness-dark">{feature.count}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Quick Links */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="space-y-6"
-          >
-            <h4 className="text-lg font-semibold relative text-fitness-dark">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary rounded-full"></span>
-              Quick Links
-            </h4>
-            <ul className="space-y-2">
-              {quickLinks.map((link, index) => (
-                <motion.li
-                  key={index}
-                  whileHover={{ x: 5 }}
-                  onMouseEnter={() => setIsHovered(index)}
-                  onMouseLeave={() => setIsHovered(-1)}
-                >
-                  <Link
-                    href={link.href}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition-all duration-300 group"
-                  >
-                    <div className={`w-1.5 h-1.5 rounded-full ${isHovered === index ? 'bg-fitness-primary' : 'bg-gray-300'} transition-all duration-300`}></div>
-                    <span className="text-gray-600 group-hover:text-fitness-dark group-hover:translate-x-1 transition-all duration-300">
-                      {link.name}
-                    </span>
-                  </Link>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Services */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-6"
-          >
-            <h4 className="text-lg font-semibold relative text-fitness-dark">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary-dark rounded-full"></span>
-              Services
-            </h4>
-            <ul className="space-y-2">
-              {services.map((service, index) => (
-                <motion.li
-                  key={index}
-                  whileHover={{ x: 5 }}
-                  onMouseEnter={() => setIsHovered(index + 10)}
-                  onMouseLeave={() => setIsHovered(-1)}
-                >
-                  <Link
-                    href={service.href}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white transition-all duration-300 group"
-                  >
-                    <div className={`w-1.5 h-1.5 rounded-full ${isHovered === index + 10 ? 'bg-fitness-primary' : 'bg-gray-300'} transition-all duration-300`}></div>
-                    <span className="text-gray-600 group-hover:text-fitness-dark group-hover:translate-x-1 transition-all duration-300">
-                      {service.name}
-                    </span>
-                  </Link>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Contact & Social */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-6"
-          >
-            <h4 className="text-lg font-semibold relative text-fitness-dark">
-              <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-8 bg-fitness-primary rounded-full"></span>
-              Connect With Us
-            </h4>
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-primary/50 shadow-sm transition-all duration-300">
-                <div className="p-2 bg-fitness-primary/10 rounded-lg shrink-0">
-                  <Phone size={18} className="text-fitness-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-gray-500">Call Us</p>
-                  <a href="tel:+254700000000" className="font-medium text-fitness-dark hover:text-fitness-primary transition-colors">
-                    +254 701 437 959
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-200 hover:border-fitness-accent/50 shadow-sm transition-all duration-300">
-                <div className="p-2 bg-fitness-accent/10 rounded-lg shrink-0">
-                  <Mail size={18} className="text-fitness-accent" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-gray-500">Email Us</p>
-                  <a href="mailto:markotundo777@gmail.com" className="font-medium text-fitness-dark hover:text-fitness-accent transition-colors break-all">
-                    markotundo777@gmail.com
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Social Links */}
-            <div>
-              <p className="text-sm text-gray-500 mb-3">Follow Our Journey</p>
-              <div className="flex gap-2">
-                {socialLinks.map((social, index) => (
-                  <motion.a
-                    key={index}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={social.label}
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`w-10 h-10 rounded-lg bg-gradient-to-br flex items-center justify-center text-white transition-all duration-300 hover:shadow-lg ${social.color}`}
-                  >
-                    <social.icon size={18} />
-                  </motion.a>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+          <div className="reveal flex flex-wrap gap-3">
+            <a
+              href={whatsappLink("Hi Marksila254! I'd like to start training.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary rounded-full! inline-flex items-center gap-2"
+            >
+              <MessageCircle size={18} /> Chat on WhatsApp
+            </a>
+            <Link href="/services" className="btn-ghost-light inline-flex items-center gap-2">
+              Explore services <ArrowRight size={18} />
+            </Link>
+          </div>
         </div>
 
-        {/* Bottom Bar */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="border-t border-gray-200 pt-8 space-y-6"
-        >
-          <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
-            {legalLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-gray-500 hover:text-fitness-primary transition-colors"
-              >
-                {link.name}
-              </Link>
+        {/* Columns */}
+        <div className="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <Link href="/" className="inline-block">
+              <Image src="/images/logo.svg" alt="Marksila254" width={120} height={98} className="h-16 w-auto brightness-0 invert" />
+            </Link>
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/60">
+              Personal training, group classes, nutrition coaching and Mark 254 active wear — in Nairobi and online.
+            </p>
+            <div className="mt-6 flex gap-2">
+              {social.map(({ icon: Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/70 transition-colors hover:border-fitness-primary hover:bg-fitness-primary hover:text-white"
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <nav aria-label="Explore" className="lg:col-span-2">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/40">Explore</h3>
+            <ul className="space-y-2.5">
+              {explore.map((l) => (
+                <li key={l.name}>
+                  <Link href={l.href} className="text-white/75 transition-colors hover:text-white">{l.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Train" className="lg:col-span-2">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/40">Train</h3>
+            <ul className="space-y-2.5">
+              {train.map((l) => (
+                <li key={l.name}>
+                  <Link href={l.href} className="text-white/75 transition-colors hover:text-white">{l.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="sm:col-span-2 lg:col-span-4">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/40">Weekly tips, no spam</h3>
+            {state === 'done' ? (
+              <p className="flex items-center gap-2 rounded-2xl bg-white/5 p-4 text-green-400">
+                <CheckCircle size={18} /> You’re in — check your inbox soon.
+              </p>
+            ) : (
+              <form onSubmit={subscribe} className="flex rounded-full bg-white/[0.06] p-1.5 ring-1 ring-white/10 focus-within:ring-fitness-primary">
+                <label htmlFor="footer-email" className="sr-only">Email address</label>
+                <input
+                  id="footer-email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@email.com"
+                  autoComplete="email"
+                  className="min-w-0 flex-1 bg-transparent px-4 text-sm text-white placeholder:text-white/40 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={state === 'sending'}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-fitness-primary px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-fitness-primary-dark disabled:opacity-60"
+                >
+                  {state === 'sending' ? <Loader2 size={16} className="animate-spin" /> : <ArrowUpRight size={16} />}
+                  Subscribe
+                </button>
+              </form>
+            )}
+            {error && <p role="alert" className="mt-2 text-sm text-red-400">{error}</p>}
+
+            <ul className="mt-6 space-y-2.5 text-sm text-white/70">
+              <li><a href="tel:+254701437959" className="inline-flex items-center gap-2.5 hover:text-white"><Phone size={16} className="text-fitness-primary" /> +254 701 437 959</a></li>
+              <li><a href="mailto:markotundo777@gmail.com" className="inline-flex items-center gap-2.5 hover:text-white"><Mail size={16} className="text-fitness-primary" /> markotundo777@gmail.com</a></li>
+              <li className="inline-flex items-center gap-2.5"><MapPin size={16} className="text-fitness-primary" /> Nairobi, Kenya</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="flex flex-col-reverse items-start justify-between gap-4 border-t border-white/10 py-6 text-sm text-white/45 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} Marksila254. All rights reserved.</p>
+          <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
+            {legal.map((l) => (
+              <Link key={l.name} href={l.href} className="hover:text-white">{l.name}</Link>
             ))}
-          </div>
-
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-gray-500 text-sm">
-              <p>© {currentYear} <span className="text-fitness-dark font-semibold">Marksila254</span>. All rights reserved.</p>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <span>Made with</span>
-              <Heart size={16} className="text-red-500 animate-pulse" />
-              <span>in Nairobi</span>
-            </div>
-          </div>
-        </motion.div>
+          </nav>
+        </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

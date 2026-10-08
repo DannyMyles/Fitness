@@ -30,11 +30,8 @@ export const galleryService = {
   },
 
   getImageUrl: (image: GalleryImage): string => {
-    if (process.env.NODE_ENV === 'development') {
-      return image.url
-    }
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'
-    return `${baseUrl}${image.url}`
+    // Same-origin path — proxy.ts forwards it to the API with this app's key.
+    return image.url
   },
 
   admin: {

@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { ArrowUpRight, Plus, Dumbbell, Users, Heart, Star, Sun, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,19 +13,13 @@ const bentoCards = [
 const floatingBadges = ['Motivation', 'Nutrition', 'Strength'];
 
 const Hero = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   return (
     <section className="relative bg-gray-50 pt-8 pb-16 md:pt-12 md:pb-24 overflow-hidden">
       <div className="container mx-auto px-4">
         <div
-          className={`grid grid-cols-1 lg:grid-cols-12 gap-5 transition-all duration-1000 ${
-            isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-          }`}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-5 enter-up"
         >
           {/* Left column */}
           <div className="lg:col-span-7 flex flex-col gap-5">

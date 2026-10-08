@@ -50,7 +50,7 @@ export default function RefundPolicyPage() {
 
       <h2>4. Refunds</h2>
       <ul>
-        <li>Approved refunds are issued to the original M-Pesa number used for payment.</li>
+        <li>Approved refunds are returned using the same method you paid with, as agreed with you on WhatsApp.</li>
         <li>Refunds are processed within 5–7 business days of us receiving and inspecting the returned item.</li>
         <li>Shipping fees are non-refundable except where the return is due to our error (damaged or incorrect item).</li>
       </ul>

@@ -7,7 +7,7 @@ import { api } from "../lib/api"
 // relative-path requests only resolve in a browser, so this one call goes
 // through a direct absolute-URL fetch instead, same fix productService.ts
 // already applies to getProduct() for the identical reason.
-const COMMERCE_API_URL = process.env.NEXT_PUBLIC_COMMERCE_API_URL || 'http://localhost:4000'
+import { backendFetch } from '../lib/backend'
 
 export interface Blog {
   id: string
@@ -104,7 +104,7 @@ export const blogService = {
         })
       }
       const qs = query.toString()
-      const res = await fetch(`${COMMERCE_API_URL}/api/v1/blogs${qs ? `?${qs}` : ''}`, { cache: 'no-store' })
+      const res = await backendFetch(`/api/v1/blogs${qs ? `?${qs}` : ''}`, { cache: 'no-store' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error || `Request failed with status ${res.status}`)
@@ -138,7 +138,7 @@ export const blogService = {
   // Get blog by slug
   getBlogBySlug: async (slug: string): Promise<Blog> => {
     try {
-      const res = await fetch(`${COMMERCE_API_URL}/api/v1/blogs/slug/${slug}`, { cache: 'no-store' })
+      const res = await backendFetch(`/api/v1/blogs/slug/${encodeURIComponent(slug)}`, { cache: 'no-store' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error || `Request failed with status ${res.status}`)
@@ -215,15 +215,8 @@ getBlogImageUrl: (blog: Blog): string => {
       return blog.imageInfo.url;
     }
     
-    // For local development, use relative path to avoid CORS
-    if (process.env.NODE_ENV === 'development') {
-      // Use relative path to the API server
-      return `/api/v1/blogs/${blog.id}/image`;
-    }
-    
-    // For production, construct full URL
-    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
-    return `${baseUrl}${blog.imageInfo.url}`;
+    // Same-origin path — proxy.ts forwards it to the API with this app's key.
+    return `/api/v1/blogs/${blog.id}/image`;
   }
   
   // Fallback image

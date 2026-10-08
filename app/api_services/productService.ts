@@ -1,12 +1,12 @@
-// productService.ts — talks to the mark254-commerce-api backend.
-// Public reads hit that API directly (no secrets involved). Admin
-// mutations go through the same-origin /api/commerce/admin proxy so the
-// shared admin key never reaches the browser — see
-// app/api/commerce/admin/[...path]/route.ts.
+// productService.ts — talks to the shared mark254-commerce-api backend.
+// Public reads go through backendFetch (same-origin in the browser, direct
+// with this app's X-App-Key on the server). Admin mutations go through the
+// same-origin /api/commerce/admin proxy so the admin key never reaches the
+// browser — see app/api/commerce/admin/[...path]/route.ts.
 
 import { Category, Product, ProductDetail } from '@/types/commerce';
 
-const COMMERCE_API_URL = process.env.NEXT_PUBLIC_COMMERCE_API_URL || 'http://localhost:4000';
+import { backendFetch } from '../lib/backend';
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -70,7 +70,7 @@ export interface ProductFilters {
 
 export const productService = {
   getCategories: async (): Promise<Category[]> => {
-    const res = await fetch(`${COMMERCE_API_URL}/api/categories`, { cache: 'no-store' });
+    const res = await backendFetch(`/api/categories`, { cache: 'no-store' });
     return handle<Category[]>(res);
   },
 
@@ -80,14 +80,14 @@ export const productService = {
     if (filters.search) params.set('search', filters.search);
     if (filters.featured) params.set('featured', 'true');
     const query = params.toString();
-    const res = await fetch(`${COMMERCE_API_URL}/api/products${query ? `?${query}` : ''}`, {
+    const res = await backendFetch(`/api/products${query ? `?${query}` : ''}`, {
       cache: 'no-store',
     });
     return handle<Product[]>(res);
   },
 
   getProduct: async (slug: string): Promise<ProductDetail> => {
-    const res = await fetch(`${COMMERCE_API_URL}/api/products/${slug}`, { cache: 'no-store' });
+    const res = await backendFetch(`/api/products/${encodeURIComponent(slug)}`, { cache: 'no-store' });
     return handle<ProductDetail>(res);
   },
 

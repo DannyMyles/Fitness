@@ -2,15 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Calendar, Clock, MapPin, Users, ArrowLeft, Loader2, Sparkles } from 'lucide-react';
 import EventRegistrationModal from '@/components/events/EventRegistrationModal';
 import { eventService, EventItem } from '@/app/api_services/eventService';
 
 export default function EventDetailClient({ slug }: { slug: string }) {
-  const router = useRouter();
-  const { status } = useSession();
 
   const [event, setEvent] = useState<EventItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,10 +29,6 @@ export default function EventDetailClient({ slug }: { slug: string }) {
   }, [slug]);
 
   const handleRegisterClick = () => {
-    if (status !== 'authenticated') {
-      router.push(`/login?callbackUrl=/events/${slug}`);
-      return;
-    }
     setRegistering(true);
   };
 
@@ -171,7 +163,7 @@ export default function EventDetailClient({ slug }: { slug: string }) {
                 disabled={event.spotsRemaining <= 0}
                 className="w-full btn-fitness disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {event.spotsRemaining <= 0 ? 'Fully Booked' : 'Register for This Event'}
+                {event.spotsRemaining <= 0 ? 'Fully Booked' : 'Book on WhatsApp'}
               </button>
             </div>
           </div>

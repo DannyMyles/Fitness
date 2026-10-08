@@ -8,24 +8,24 @@ import PageHero from '@/components/ui/PageHero';
 import EmptyState from '@/components/ui/EmptyState';
 import { orderService } from '@/app/api_services/orderService';
 import { eventService, MyRegistration } from '@/app/api_services/eventService';
-import { Order, OrderStatus, PaymentStatus } from '@/types/commerce';
+import { Order, OrderStatus } from '@/types/commerce';
 
 const ORDER_STATUS_STYLES: Record<OrderStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
-  paid: 'bg-blue-100 text-blue-800',
+  confirmed: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
 };
 
 const TICKET_STATUS_STYLES: Record<MyRegistration['status'], string> = {
-  pending_payment: 'bg-yellow-100 text-yellow-800',
+  pending: 'bg-yellow-100 text-yellow-800',
   confirmed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
 };
 
 const TICKET_STATUS_LABELS: Record<MyRegistration['status'], string> = {
-  pending_payment: 'Pending Payment',
+  pending: 'Awaiting confirmation',
   confirmed: 'Confirmed',
   cancelled: 'Cancelled',
 };

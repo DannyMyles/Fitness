@@ -19,7 +19,7 @@ const getStatusColor = (status: string) => {
     case 'delivered': return 'status-badge status-badge-completed';
     case 'pending': return 'status-badge status-badge-pending';
     case 'shipped':
-    case 'paid': return 'status-badge status-badge-processing';
+    case 'confirmed': return 'status-badge status-badge-processing';
     case 'cancelled': return 'status-badge status-badge-cancelled';
     default: return 'status-badge status-badge-inactive';
   }

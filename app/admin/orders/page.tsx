@@ -11,7 +11,7 @@ import { useDocumentTitle } from '@/app/lib/useDocumentTitle'
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
-  paid: 'bg-blue-100 text-blue-800',
+  confirmed: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
@@ -70,7 +70,8 @@ export default function OrdersManagementPage() {
     (o) =>
       o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.customerEmail.toLowerCase().includes(searchQuery.toLowerCase())
+      o.customerPhone.replace(/\s/g, '').includes(searchQuery.replace(/\s/g, '')) ||
+      (o.customerEmail ?? '').toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const revenue = orders.filter((o) => o.paymentStatus === 'paid').reduce((sum, o) => sum + o.total, 0)
@@ -117,9 +118,9 @@ export default function OrdersManagementPage() {
           <p className="text-2xl font-bold text-gray-900 mt-2">{orders.length}</p>
         </div>
         <div className="admin-card">
-          <p className="text-sm text-gray-600">Pending Payment</p>
+          <p className="text-sm text-gray-600">Awaiting confirmation</p>
           <p className="text-2xl font-bold text-gray-900 mt-2">
-            {orders.filter((o) => o.paymentStatus === 'pending').length}
+            {orders.filter((o) => o.status === 'pending').length}
           </p>
         </div>
         <div className="admin-card">
@@ -179,7 +180,7 @@ export default function OrdersManagementPage() {
                     <td className="px-6 py-4 font-medium text-gray-900">{order.orderNumber}</td>
                     <td className="px-6 py-4">
                       <p className="text-gray-900">{order.customerName}</p>
-                      <p className="text-sm text-gray-500">{order.customerEmail}</p>
+                      <p className="text-sm text-gray-500">{order.customerPhone}</p>
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900">KES {order.total.toLocaleString()}</td>
                     <td className="px-6 py-4">
@@ -187,8 +188,6 @@ export default function OrdersManagementPage() {
                         className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${
                           order.paymentStatus === 'paid'
                             ? 'bg-green-100 text-green-800'
-                            : order.paymentStatus === 'failed'
-                            ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >

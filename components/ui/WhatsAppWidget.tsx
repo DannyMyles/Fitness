@@ -1,29 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { FaWhatsapp } from "react-icons/fa6";
 import { X } from 'lucide-react';
+import { whatsappLink } from '@/app/lib/backend';
+
+// Hidden where it would get in the way: the admin area, and checkout (which
+// already ends on WhatsApp and needs the space for its form).
+const HIDDEN_ON = ['/admin', '/cart'];
 
 const WhatsAppWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const pathname = usePathname();
 
-  // Don't show on admin pages
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (window.location.pathname.startsWith('/admin')) {
-        setIsVisible(false);
-      }
-    }
-  }, []);
+  useEffect(() => setIsOpen(false), [pathname]);
 
-  if (!isVisible) return null;
+  if (HIDDEN_ON.some((p) => pathname.startsWith(p))) return null;
 
   return (
     <>
       {/* Quick Chat Popup */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-80 bg-white rounded-2xl shadow-fitness-lg overflow-hidden animate-scale-in">
+        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] max-w-80 bg-white rounded-2xl shadow-fitness-lg overflow-hidden animate-scale-in">
           <div className="bg-gradient-to-br from-[#25D366] to-[#20BD5A] text-white p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-fitness">
@@ -51,7 +50,7 @@ const WhatsAppWidget = () => {
               </p>
             </div>
             <a
-              href="https://wa.me/254701437959"
+              href={whatsappLink("Hi Marksila254! I'd like to know more about training.")}
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full bg-gradient-to-br from-[#25D366] to-[#20BD5A] text-white text-center py-3.5 rounded-xl font-semibold hover:shadow-fitness-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"
@@ -66,17 +65,15 @@ const WhatsAppWidget = () => {
       {/* WhatsApp Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-[#25D366] to-[#20BD5A] text-white rounded-full shadow-fitness-lg flex items-center justify-center hover:shadow-fitness-xl hover:scale-110 transition-all duration-300 group"
-        aria-label="Toggle WhatsApp chat"
+        className="fixed bottom-5 right-4 sm:right-6 z-50 w-14 h-14 bg-[#25D366] text-white rounded-full shadow-lg shadow-green-900/25 flex items-center justify-center hover:scale-105 active:scale-95 transition-transform duration-200"
+        aria-label={isOpen ? 'Close WhatsApp chat' : 'Chat on WhatsApp'}
+        aria-expanded={isOpen}
       >
         {isOpen ? (
-          <X size={24} className="animate-rotate" />
+          <X size={24} />
         ) : (
-          <FaWhatsapp size={26} className="animate-pulse" />
+          <FaWhatsapp size={28} />
         )}
-        
-        {/* Pulse effect */}
-        <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-50 animate-ping"></span>
       </button>
     </>
   );

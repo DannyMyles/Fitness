@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { backendFetch } from "@/app/lib/backend"
 
 // Type for authenticated user
 export interface AuthenticatedUser {
@@ -41,8 +42,6 @@ export async function serverFetch<T = any>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const API_BASE_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'
-  
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),
@@ -57,7 +56,7 @@ export async function serverFetch<T = any>(
     }
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+  const response = await backendFetch(endpoint, {
     ...options,
     headers,
   })

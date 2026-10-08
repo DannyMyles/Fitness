@@ -18,7 +18,7 @@ interface LogEntry {
 const OUTCOME_META: Record<CheckinOutcome, { label: string; icon: typeof CheckCircle2; classes: string }> = {
   checked_in: { label: 'Checked in', icon: CheckCircle2, classes: 'bg-green-50 border-green-200 text-green-800' },
   already_checked_in: { label: 'Already checked in', icon: Clock3, classes: 'bg-amber-50 border-amber-200 text-amber-800' },
-  blocked_unpaid: { label: 'Payment not confirmed', icon: AlertTriangle, classes: 'bg-red-50 border-red-200 text-red-800' },
+  blocked_unconfirmed: { label: 'Booking not confirmed yet', icon: AlertTriangle, classes: 'bg-red-50 border-red-200 text-red-800' },
   blocked_cancelled: { label: 'Ticket cancelled', icon: XCircle, classes: 'bg-red-50 border-red-200 text-red-800' },
 }
 

@@ -67,7 +67,7 @@ export default function EventRegistrationsPage() {
       default:
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-            <Clock className="h-3 w-3" /> Pending Payment
+            <Clock className="h-3 w-3" /> Awaiting confirmation
           </span>
         )
     }
@@ -115,7 +115,7 @@ export default function EventRegistrationsPage() {
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Attendee</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ticket</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Reference</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Checked In</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
@@ -126,15 +126,26 @@ export default function EventRegistrationsPage() {
                   <tr key={reg.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-medium text-gray-900">{reg.attendeeName}</p>
+                      <p className="text-xs text-gray-500">
+                        {reg.participants} {reg.participants === 1 ? 'person' : 'people'}
+                        {reg.total > 0 && ` · KES ${reg.total.toLocaleString()}`}
+                      </p>
                       <p className="text-xs text-gray-400">{eventService.formatDate(reg.createdAt)}</p>
+                      {reg.notes && <p className="text-xs text-gray-500 italic mt-1">“{reg.notes}”</p>}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <Mail className="h-3.5 w-3.5" /> {reg.attendeeEmail || '—'}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                      <a
+                        href={`https://wa.me/${reg.attendeePhone.replace(/\D/g, '').replace(/^0(?=\d{9}$)/, '254')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-green-700 mt-1"
+                        title="Chat on WhatsApp"
+                      >
                         <Phone className="h-3.5 w-3.5" /> {reg.attendeePhone}
-                      </div>
+                      </a>
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-mono text-sm text-gray-700">{reg.ticketNumber}</span>

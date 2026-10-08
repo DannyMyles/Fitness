@@ -1,4 +1,5 @@
 import { api } from "../lib/api"
+import type { WhatsAppHandoff } from "@/types/commerce"
 
 export interface EventItem {
   id: string
@@ -20,6 +21,9 @@ export interface EventItem {
   price: number
   maxSpots: number
   spotsRemaining: number
+  category?: string | null
+  difficulty?: string | null
+  duration?: string | null
   popular: boolean
   published: boolean
   createdAt: string
@@ -30,19 +34,25 @@ export interface EventResponse {
   events: EventItem[]
 }
 
+// Bookings are confirmed with the customer on WhatsApp, then marked
+// confirmed by an admin — there's no online payment step.
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled'
+
 export interface EventRegistration {
   id: string
   ticketNumber: string
   attendeeName: string
   attendeePhone: string
-  attendeeEmail?: string
-  status: 'pending_payment' | 'confirmed' | 'cancelled'
-  paymentRef?: string
+  attendeeEmail?: string | null
+  participants: number
+  total: number
+  notes?: string | null
+  status: BookingStatus
   checkedInAt: string | null
   createdAt: string
 }
 
-export type CheckinOutcome = 'checked_in' | 'already_checked_in' | 'blocked_unpaid' | 'blocked_cancelled'
+export type CheckinOutcome = 'checked_in' | 'already_checked_in' | 'blocked_unconfirmed' | 'blocked_cancelled'
 
 export interface CheckinResponse {
   registration: EventRegistration
@@ -51,7 +61,15 @@ export interface CheckinResponse {
 
 export interface RegistrationResponse {
   registration: EventRegistration
-  payment: { status: string; reference: string; message: string } | null
+  whatsapp: WhatsAppHandoff | null
+}
+
+export interface BookingInput {
+  attendeeName: string
+  attendeePhone: string
+  attendeeEmail?: string
+  participants: number
+  notes?: string
 }
 
 export interface MyRegistration {
@@ -59,8 +77,9 @@ export interface MyRegistration {
   ticketNumber: string
   attendeeName: string
   attendeePhone: string
-  status: 'pending_payment' | 'confirmed' | 'cancelled'
-  paymentRef?: string
+  participants: number
+  total: number
+  status: BookingStatus
   createdAt: string
   event: {
     id: number
@@ -126,9 +145,9 @@ export const eventService = {
     }
   },
 
-  register: async (slug: string, data: { attendeeName: string; attendeePhone: string }): Promise<RegistrationResponse> => {
+  register: async (slug: string, data: BookingInput): Promise<RegistrationResponse> => {
     try {
-      return await api.protected.events.register(slug, data)
+      return await api.public.events.register(slug, data)
     } catch (error) {
       console.error(`Error registering for event ${slug}:`, error)
       throw error
@@ -146,19 +165,6 @@ export const eventService = {
     }
   },
 
-  getRegistrationStatus: async (
-    id: number
-  ): Promise<{ status: EventRegistration['status']; paymentFailed?: boolean; paymentFailureReason?: string }> => {
-    return api.protected.events.registrationStatus(id) as Promise<{
-      status: EventRegistration['status']
-      paymentFailed?: boolean
-      paymentFailureReason?: string
-    }>
-  },
-
-  retryPayment: async (id: number): Promise<RegistrationResponse> => {
-    return api.protected.events.retryRegistration(id) as Promise<RegistrationResponse>
-  },
 
   createEvent: async (data: CreateEventRequest): Promise<EventItem> => {
     try {
@@ -234,7 +240,7 @@ export const eventService = {
     }
   },
 
-  updateRegistrationStatus: async (id: string, status: 'pending_payment' | 'confirmed' | 'cancelled'): Promise<EventRegistration> => {
+  updateRegistrationStatus: async (id: string, status: BookingStatus): Promise<EventRegistration> => {
     try {
       const response = await api.admin.events.updateRegistrationStatus(id, status)
       return ((response as any).registration || response) as EventRegistration
@@ -270,7 +276,7 @@ export const eventService = {
     switch (status) {
       case 'confirmed': return 'Confirmed'
       case 'cancelled': return 'Cancelled'
-      default: return 'Pending Payment'
+      default: return 'Awaiting confirmation'
     }
   },
 }

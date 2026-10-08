@@ -3,11 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ShoppingCart, Plus, Minus,
-  Truck, Shield, RefreshCw,
-  Dumbbell, Loader2, ArrowUpRight, Search, AlertCircle
-} from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Shield, RefreshCw, Dumbbell, Loader2, ArrowUpRight, Search, AlertCircle, MessageCircle, Wallet } from 'lucide-react';
 import { productService } from '@/app/api_services/productService';
 import { useCartStore } from '@/app/lib/cartStore';
 import { Category, Product } from '@/types/commerce';
@@ -102,24 +98,25 @@ export default function ShopClient() {
         />
       )}
       {/* Hero Section — bento panel */}
-      <section className="bg-gray-50 pt-8 pb-4 md:pt-12">
-        <div className="container mx-auto px-4">
-          <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-fitness-primary via-fitness-primary-dark to-fitness-dark px-6 py-14 md:px-16 md:py-20">
-            <div className="absolute inset-0 opacity-10 bg-pattern-dots" />
+      <section className="pt-3 pb-2 md:pb-4">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4">
+          <div className="relative rounded-4xl overflow-hidden bg-ink px-6 py-8 md:px-16 md:py-20">
+            <div className="pointer-events-none absolute -right-20 -top-24 h-96 w-96 rounded-full bg-fitness-primary/40 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-fitness-primary/15 blur-3xl" aria-hidden />
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7">
-                <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold text-white mb-6">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <div className="eyebrow mb-4 md:mb-6 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-fitness-primary-light">
+                  <span className="h-1.5 w-1.5 rounded-full bg-fitness-primary" />
                   New Collection
                 </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-5">
-                  Mark 254<br />Active Wear
+                <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.02] mb-3 md:mb-5">
+                  Mark 254<br /><span className="text-fitness-primary">Active Wear</span>
                 </h1>
-                <p className="text-lg text-white/80 max-w-lg leading-relaxed">
+                <p className="text-base md:text-lg text-white/70 max-w-lg leading-relaxed">
                   Apparel, drinkware, and training gear built for the way you train. Your body, your rules.
                 </p>
               </div>
-              <div className="lg:col-span-5 relative h-72 md:h-80">
+              <div className="hidden md:block lg:col-span-5 relative h-80" aria-hidden>
                 {heroTiles.map((tile, i) => (
                   <div
                     key={tile.src}
@@ -136,19 +133,19 @@ export default function ShopClient() {
       </section>
 
       {/* Features Bar */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-4 md:py-8 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-3 bg-white rounded-2xl p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <div className="flex items-center gap-3 bg-white rounded-2xl p-3 md:p-4">
               <div className="w-11 h-11 bg-fitness-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Truck size={22} className="text-fitness-primary" />
+                <MessageCircle size={22} className="text-fitness-primary" />
               </div>
               <div>
-                <p className="font-semibold text-gray-800 text-sm">Free Delivery</p>
-                <p className="text-xs text-gray-500">Orders over KES 5,000</p>
+                <p className="font-semibold text-gray-800 text-sm">Order on WhatsApp</p>
+                <p className="text-xs text-gray-500">No account needed</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-white rounded-2xl p-4">
+            <div className="flex items-center gap-3 bg-white rounded-2xl p-3 md:p-4">
               <div className="w-11 h-11 bg-fitness-accent/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Shield size={22} className="text-fitness-accent" />
               </div>
@@ -157,16 +154,16 @@ export default function ShopClient() {
                 <p className="text-xs text-gray-500">Premium products</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-white rounded-2xl p-4">
+            <div className="flex items-center gap-3 bg-white rounded-2xl p-3 md:p-4">
               <div className="w-11 h-11 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <RefreshCw size={22} className="text-green-600" />
+                <Wallet size={22} className="text-green-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-800 text-sm">Easy Returns</p>
-                <p className="text-xs text-gray-500">30-day policy</p>
+                <p className="font-semibold text-gray-800 text-sm">No Upfront Payment</p>
+                <p className="text-xs text-gray-500">Pay once confirmed</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-white rounded-2xl p-4">
+            <div className="flex items-center gap-3 bg-white rounded-2xl p-3 md:p-4">
               <div className="w-11 h-11 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Dumbbell size={22} className="text-purple-600" />
               </div>
@@ -180,13 +177,13 @@ export default function ShopClient() {
       </section>
 
       {/* Shop Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="pt-4 pb-16 md:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-5 lg:gap-8">
             {/* Sidebar */}
             <div className="lg:w-1/4">
-              <div className="bg-white rounded-3xl p-6 shadow-card sticky top-24">
-                <div className="mb-6 relative">
+              <div className="bg-white rounded-3xl p-4 md:p-6 shadow-card lg:sticky lg:top-24">
+                <div className="mb-4 md:mb-6 relative">
                   <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
@@ -198,11 +195,11 @@ export default function ShopClient() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-800 mb-4">Categories</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="hidden lg:block font-semibold text-gray-800 mb-4">Categories</h3>
+                  <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1 lg:mx-0 lg:px-0 lg:flex-wrap lg:overflow-visible [scrollbar-width:none]">
                     <button
                       onClick={() => setActiveCategory('All')}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         activeCategory === 'All'
                           ? 'bg-fitness-primary text-white shadow-sm'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -214,7 +211,7 @@ export default function ShopClient() {
                       <button
                         key={category.slug}
                         onClick={() => setActiveCategory(category.slug)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                        className={`shrink-0 whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                           activeCategory === category.slug
                             ? 'bg-fitness-primary text-white shadow-sm'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'

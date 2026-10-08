@@ -3,6 +3,7 @@ import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "@/components/ui/SiteChrome";
 import AuthProvider from "./providers/AuthProvider";
+import RevealObserver from "@/components/ui/RevealObserver";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -77,10 +78,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${montserrat.variable}`}>
+    <html lang="en" className={`${inter.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/images/logo.svg" type="image/svg+xml" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        {/* Lets CSS hide .reveal content only when JS is running to reveal it. */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
       </head>
       <body className="min-h-screen bg-fitness-light font-sans">
         <script
@@ -89,6 +92,7 @@ export default function RootLayout({
         />
         <AuthProvider>
           <SiteChrome>{children}</SiteChrome>
+          <RevealObserver />
         </AuthProvider>
       </body>
     </html>

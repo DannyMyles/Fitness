@@ -52,7 +52,7 @@ export default function TermsAndConditionsPage() {
       <h2>3. Event & Session Bookings</h2>
       <ul>
         <li>Registering for an event or session reserves your spot subject to availability and, where applicable, payment confirmation.</li>
-        <li>Paid events are confirmed once payment is successfully processed via M-Pesa.</li>
+        <li>Event bookings are confirmed by us on WhatsApp; for paid events we agree payment with you there.</li>
         <li>We may reschedule or cancel an event due to unforeseen circumstances; where this happens, we'll notify registered attendees and offer a refund or alternative session.</li>
         <li>Please arrive on time — late arrival may affect your ability to participate in that session.</li>
       </ul>
@@ -61,7 +61,7 @@ export default function TermsAndConditionsPage() {
       <ul>
         <li>Product descriptions, images, and prices on the Mark 254 Active Wear shop are provided in good faith but may occasionally contain errors; we reserve the right to correct pricing or availability issues before an order is confirmed.</li>
         <li>All prices are listed in Kenyan Shillings (KES) and are inclusive of applicable taxes unless stated otherwise.</li>
-        <li>Orders are confirmed once payment via M-Pesa is successfully processed.</li>
+        <li>Orders are placed online and confirmed with you on WhatsApp, where we agree delivery and payment. No payment is taken on this website.</li>
         <li>See our <a href="/refund-policy">Refund & Returns Policy</a> for details on exchanges, returns, and cancellations.</li>
       </ul>
 

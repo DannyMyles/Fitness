@@ -1,5 +1,41 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { backendFetch } from "@/app/lib/backend"
+
+/** Renew the backend token this long before it expires. */
+const REFRESH_WHEN_LEFT_MS = 2 * 60 * 60 * 1000
+
+/**
+ * Reads (without verifying — the backend does that) the backend JWT's
+ * expiry and app claim. Tokens issued before the shared-backend change have
+ * no `app` claim and are rejected by the API.
+ */
+function readBackendToken(accessToken: unknown): { valid: boolean; expiresInMs: number } {
+  if (typeof accessToken !== 'string') return { valid: false, expiresInMs: 0 }
+  try {
+    const payload = JSON.parse(Buffer.from(accessToken.split('.')[1], 'base64url').toString('utf8'))
+    const expiresInMs = typeof payload.exp === 'number' ? payload.exp * 1000 - Date.now() : 0
+    return { valid: typeof payload.app === 'number' && expiresInMs > 0, expiresInMs }
+  } catch {
+    return { valid: false, expiresInMs: 0 }
+  }
+}
+
+async function refreshBackendToken(accessToken: string): Promise<string | null> {
+  try {
+    const res = await backendFetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: accessToken }),
+      cache: 'no-store',
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return typeof data.accessToken === 'string' ? data.accessToken : null
+  } catch {
+    return null
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,136 +48,41 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error("Email and password are required")
-          }
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required")
+        }
 
-          const backendBaseUrl = process.env.BACKEND_URL || 'http://localhost:4000'
-          const backendUrl = `${backendBaseUrl}/api/v1/auth/login`
-          
-          console.log('[NextAuth] Attempting login to:', backendUrl)
-          
-          const response = await fetch(backendUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
-          })
+        // Logs in against the shared API as the `fitness` app — accounts are
+        // per app, so a Source of Adventure account can't sign in here.
+        const response = await backendFetch('/api/v1/auth/login', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: credentials.email, password: credentials.password }),
+          cache: 'no-store',
+        })
+        const data = await response.json().catch(() => ({}))
 
-          console.log('[NextAuth] Login response status:', response.status)
-          
-          // Read raw response first
-          const responseText = await response.text()
-          console.log('[NextAuth] Login response raw:', responseText)
+        if (!response.ok) {
+          throw new Error(data.error || data.message || "Authentication failed")
+        }
 
-          if (!response.ok) {
-            let errorData
-            try {
-              errorData = JSON.parse(responseText)
-            } catch {
-              throw new Error(`Login failed with status: ${response.status}`)
-            }
-            throw new Error(errorData.message || errorData.error || "Authentication failed")
-          }
+        // Backend shape: { message, user: { id, name, username, email, role, token } }
+        const user = data.user
+        if (!user?.token) {
+          throw new Error("No token received from server")
+        }
 
-          // Parse successful response
-          let data
-          try {
-            data = JSON.parse(responseText)
-          } catch {
-            throw new Error("Invalid JSON response from server")
-          }
-
-          console.log('[NextAuth] Parsed response data:', JSON.stringify(data, null, 2))
-
-          // Handle different response formats
-          let userData: any = null
-          let token: string | null = null
-
-          // Format 1: { message: "...", user: { id, name, email, token: "..." } } - token INSIDE user
-          if (data.user && typeof data.user === 'object' && data.user.token) {
-            userData = data.user
-            token = data.user.token
-            console.log('[NextAuth] Format: token inside user object')
-          }
-          // Format 2: { message: "...", user: {...}, token: "..." } - token at root with user
-          else if (data.user && typeof data.user === 'object' && data.token) {
-            userData = data.user
-            token = data.token
-            console.log('[NextAuth] Format: token at root with user object')
-          }
-          // Format 3: { user: {...}, token: "..." }
-          else if (data.user && data.token) {
-            userData = data.user
-            token = data.token
-            console.log('[NextAuth] Format: user and token at root')
-          }
-          // Format 4: { user: {...}, accessToken: "..." }
-          else if (data.user && data.accessToken) {
-            userData = data.user
-            token = data.accessToken
-            console.log('[NextAuth] Format: user and accessToken at root')
-          }
-          // Format 5: { data: {...}, token: "..." }
-          else if (data.data && data.token) {
-            userData = data.data
-            token = data.token
-            console.log('[NextAuth] Format: data and token at root')
-          }
-          // Format 6: { data: {...}, accessToken: "..." }
-          else if (data.data && data.accessToken) {
-            userData = data.data
-            token = data.accessToken
-            console.log('[NextAuth] Format: data and accessToken at root')
-          }
-          // Format 7: Direct response with token at root
-          else if (data.token) {
-            userData = data
-            token = data.token
-            console.log('[NextAuth] Format: token only at root')
-          }
-          // Format 8: Direct response with accessToken at root
-          else if (data.accessToken) {
-            userData = data
-            token = data.accessToken
-            console.log('[NextAuth] Format: accessToken only at root')
-          }
-          // Format 9: user directly at root with id
-          else if (data._id || data.id) {
-            userData = data
-            token = data.token || data.accessToken || null
-            console.log('[NextAuth] Format: user directly at root')
-          }
-          else {
-            console.error('[NextAuth] Unknown response format:', data)
-            throw new Error("Unable to parse user data from server response")
-          }
-
-          if (!token) {
-            console.error('[NextAuth] No token found in response. userData:', JSON.stringify(userData))
-            throw new Error("No token received from server")
-          }
-
-          console.log('[NextAuth] Successfully authenticated user:', userData?.email)
-
-          return {
-            id: userData._id || userData.id || userData.userId || '',
-            email: userData.email || credentials.email,
-            name: userData.name || userData.username || userData.fullName || "User",
-            role: userData.role || userData.roleName || "user",
-            accessToken: token,
-          }
-        } catch (error: any) {
-          console.error("[NextAuth] Authorization error:", error.message)
-          throw new Error(error.message || "Authentication failed")
+        return {
+          id: String(user.id),
+          email: user.email || credentials.email,
+          name: user.name || user.username || "User",
+          role: user.role || "user",
+          accessToken: user.token,
         }
       },
     }),
   ],
-  
+
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       // Initial sign in
@@ -151,7 +92,6 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name
         token.role = user.role
         token.accessToken = user.accessToken
-        console.log('[NextAuth] JWT callback - initial sign in, token:', token.accessToken?.substring(0, 20) + '...')
       }
       
       // Handle session update (e.g., after token refresh)
@@ -163,7 +103,24 @@ export const authOptions: NextAuthOptions = {
           token.name = session.name
         }
       }
-      
+
+      // Keep the backend token in step with this session. A token from
+      // before apps existed, or one that has expired, can't be used any
+      // more: throwing here makes NextAuth clear the cookie, so the visitor
+      // is simply signed out instead of being bounced to /login by a 401
+      // on whatever page they open next.
+      const backend = readBackendToken(token.accessToken)
+      if (!backend.valid) {
+        throw new Error('Backend session is no longer valid')
+      }
+      // Sliding session: renew the backend token when it gets close to
+      // expiry, so an active visitor never hits an expired token.
+      if (backend.expiresInMs < REFRESH_WHEN_LEFT_MS) {
+        const refreshed = await refreshBackendToken(token.accessToken)
+        if (!refreshed) throw new Error('Backend session could not be renewed')
+        token.accessToken = refreshed
+      }
+
       return token
     },
 
@@ -174,7 +131,6 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name as string
         session.user.role = token.role as string
         session.user.accessToken = token.accessToken as string
-        console.log('[NextAuth] Session callback - accessToken set:', session.user.accessToken?.substring(0, 20) + '...')
       }
       return session
     },
@@ -193,7 +149,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development",
 }
 
 const handler = NextAuth(authOptions)

@@ -11,21 +11,6 @@ interface ApiOptions extends RequestInit {
   requiresAuth?: boolean
 }
 
-interface ContactFormData {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-  phone?: string;
-  category?: 'general' | 'support' | 'feedback' | 'complaint' | 'partnership' | 'other';
-  company?: string;
-}
-
-interface ContactResponse {
-  message: string;
-  contactId: string;
-}
-
 interface ApiError {
   error: string;
   message?: string;
@@ -108,10 +93,20 @@ async function getAuthToken(): Promise<string | null> {
   }
 }
 
+/**
+ * Ends the session and goes to /login, returning to the current page after
+ * signing in. `expired` shows a "session expired" note on the login page.
+ */
+function redirectToLogin(expired = false) {
+  if (typeof window === 'undefined') return
+  const here = window.location.pathname + window.location.search
+  const params = new URLSearchParams({ callbackUrl: here })
+  if (expired) params.set('expired', '1')
+  signOut({ callbackUrl: `/login?${params.toString()}` })
+}
+
 // API client for client-side components
 class ApiClient {
-  private refreshTokenPromise: Promise<string> | null = null
-
   private async getAuthHeaders(options?: ApiOptions): Promise<Record<string, string>> {
     const headers: Record<string, string> = {
       'Accept': 'application/json',
@@ -150,61 +145,46 @@ class ApiClient {
       ...(fetchOptions.headers as Record<string, string> || {}),
     }
 
-    // For authenticated requests, verify we have a token
-    if (requiresAuth) {
-      const authHeader = allHeaders['Authorization']
-      
-      if (!authHeader) {
-        // Try one more time to get session
-        const token = await getAuthToken()
-        
-        if (!token) {
-          // No token available - redirect to login
-          signOut({ callbackUrl: '/login' })
-          throw new Error('No authentication token found. Please log in again.')
-        }
-        
-        allHeaders['Authorization'] = `Bearer ${token}`
+    // A protected call with no session: send the visitor to sign in and
+    // bring them back to the page they were on.
+    if (requiresAuth && !allHeaders['Authorization']) {
+      const token = await getAuthToken()
+      if (!token) {
+        redirectToLogin()
+        throw new Error('Please sign in to continue.')
       }
+      allHeaders['Authorization'] = `Bearer ${token}`
     }
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    let response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...fetchOptions,
       headers: allHeaders,
       credentials: 'include',
     })
 
-    // Handle 401 Unauthorized
     if (response.status === 401) {
-      // Try to refresh token
-      try {
-        const newToken = await this.refreshAccessToken()
-        if (newToken) {
-          // Retry the request with new token
-          allHeaders['Authorization'] = `Bearer ${newToken}`
-          const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
-            ...fetchOptions,
-            headers: allHeaders,
-            credentials: 'include',
-          })
-          
-          if (retryResponse.ok) {
-            if (retryResponse.status === 204) {
-              return undefined as T
-            }
-            const data = await retryResponse.json()
-            return data as T
-          }
-        }
-      } catch (refreshError) {
-        // Refresh failed, redirect to login
-        signOut({ callbackUrl: '/login' })
-        throw new Error('Session expired. Please sign in again.')
+      // Public endpoints never need a session — a stale token there is just
+      // ignored by the API, so a 401 is a real error, not a reason to log out.
+      if (!requiresAuth) {
+        const body = await response.json().catch(() => ({}))
+        throw new Error(body.error || 'Request was not authorised.')
       }
-      
-      // If we got here, refresh didn't work or wasn't attempted
-      signOut({ callbackUrl: '/login' })
-      throw new Error('Session expired. Please sign in again.')
+      // Re-read the session: NextAuth renews the backend token server-side
+      // (see app/api/auth/[...nextauth]/route.ts). Retry once if it changed.
+      const sentToken = allHeaders['Authorization']?.slice('Bearer '.length)
+      const freshToken = await getAuthToken()
+      if (freshToken && freshToken !== sentToken) {
+        allHeaders['Authorization'] = `Bearer ${freshToken}`
+        response = await fetch(`${API_BASE_URL}${endpoint}`, {
+          ...fetchOptions,
+          headers: allHeaders,
+          credentials: 'include',
+        })
+      }
+      if (response.status === 401) {
+        redirectToLogin(true)
+        throw new Error('Your session has expired. Please sign in again.')
+      }
     }
 
     // 204 No Content — every DELETE route in this app returns this with no
@@ -254,51 +234,6 @@ class ApiClient {
     }
 
     return data as T;
-  }
-
-  // Token refresh mechanism
-  private async refreshAccessToken(): Promise<string | null> {
-    // Prevent multiple simultaneous refresh requests
-    if (this.refreshTokenPromise) {
-      return this.refreshTokenPromise
-    }
-
-    this.refreshTokenPromise = (async () => {
-      try {
-        const refreshToken = await getAuthToken()
-        
-        if (!refreshToken) {
-          return null
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/v1/auth/refresh`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ refreshToken }),
-        })
-
-        if (!response.ok) {
-          return null
-        }
-
-        const data = await response.json()
-        
-        if (data.accessToken || data.token) {
-          return data.accessToken || data.token
-        }
-        
-        return null
-      } catch (error) {
-        console.error('Token refresh failed:', error)
-        return null
-      } finally {
-        this.refreshTokenPromise = null
-      }
-    })()
-
-    return this.refreshTokenPromise
   }
 
   // Public endpoints (no auth required)
@@ -358,15 +293,6 @@ class ApiClient {
         this.request('/api/v1/auth/resend-verification', {
           method: 'POST',
           body: JSON.stringify({ email }),
-          requiresAuth: false,
-        }),
-    },
-    
-    contact: {
-      submit: (data: ContactFormData): Promise<ContactResponse> =>
-        this.request('/api/v1/auth/contact', {
-          method: 'POST',
-          body: JSON.stringify(data),
           requiresAuth: false,
         }),
     },
@@ -452,6 +378,24 @@ class ApiClient {
 
       getBySlug: (slug: string) =>
         this.request(`/api/v1/events/${slug}`, { requiresAuth: false }),
+
+      // Guest-friendly: links the booking to the account when logged in.
+      register: (slug: string, data: unknown) =>
+        this.request(`/api/v1/events/${encodeURIComponent(slug)}/register`, {
+          method: 'POST',
+          body: JSON.stringify(data),
+          requiresAuth: false,
+        }),
+    },
+
+    orders: {
+      // Guest-friendly: links the order to the account when logged in.
+      create: (data: unknown) =>
+        this.request('/api/orders', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          requiresAuth: false,
+        }),
     },
 
     gallery: {
@@ -487,83 +431,14 @@ class ApiClient {
 
   // Protected endpoints (requires auth)
   protected = {
-    auth: {
-      logout: () => 
-        this.request('/api/v1/auth/logout', {
-          method: 'POST',
-        }),
-
-      getCurrentUser: () => 
-        this.request('/api/v1/auth/me'),
-
-      updateProfile: (data: {
-        name?: string;
-        username?: string;
-        email?: string;
-      }) =>
-        this.request('/api/v1/auth/profile', {
-          method: 'PUT',
-          body: JSON.stringify(data),
-        }),
-
-      changePassword: (data: {
-        currentPassword: string;
-        newPassword: string;
-        confirmPassword: string;
-      }) =>
-        this.request('/api/v1/auth/change-password', {
-          method: 'POST',
-          body: JSON.stringify(data),
-        }),
-    },
-
-    user: {
-      getProfile: () =>
-        this.request('/api/v1/users/profile'),
-
-      updateProfile: (data: any) =>
-        this.request('/api/v1/users/profile', {
-          method: 'PUT',
-          body: JSON.stringify(data),
-        }),
-    },
-
     events: {
-      register: (slug: string, data: { attendeeName: string; attendeePhone: string }) =>
-        this.request(`/api/v1/events/${slug}/register`, {
-          method: 'POST',
-          body: JSON.stringify(data),
-        }),
-
       registrationsMine: () =>
         this.request('/api/v1/events/registrations/mine'),
-
-      registrationStatus: (id: number | string) =>
-        this.request(`/api/v1/events/registrations/${id}/status`),
-
-      retryRegistration: (id: number | string) =>
-        this.request(`/api/v1/events/registrations/${id}/retry-payment`, {
-          method: 'POST',
-        }),
     },
 
     orders: {
-      create: (data: unknown) =>
-        this.request('/api/orders', {
-          method: 'POST',
-          body: JSON.stringify(data),
-        }),
-
       mine: () =>
         this.request('/api/orders/mine'),
-
-      status: (id: number | string) =>
-        this.request(`/api/orders/${id}/status`),
-
-      retry: (id: number | string) =>
-        this.request(`/api/orders/${id}/retry-payment`, {
-          method: 'POST',
-        }),
     },
   }
 
@@ -749,30 +624,6 @@ class ApiClient {
 
       deleteImage: (id: string) =>
         this.request(`/api/v1/gallery/images/${id}`, {
-          method: 'DELETE',
-        }),
-    },
-
-    contacts: {
-      getAll: () =>
-        this.request('/api/v1/contacts'),
-      
-      getOne: (id: string) =>
-        this.request(`/api/v1/contacts/${id}`),
-      
-      updateStatus: (id: string, data: {
-        status: 'pending' | 'read' | 'replied' | 'resolved' | 'spam';
-        response?: {
-          message: string;
-        };
-      }) =>
-        this.request(`/api/v1/contacts/${id}/status`, {
-          method: 'PATCH',
-          body: JSON.stringify(data),
-        }),
-      
-      delete: (id: string) =>
-        this.request(`/api/v1/contacts/${id}`, {
           method: 'DELETE',
         }),
     },

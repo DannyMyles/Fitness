@@ -61,8 +61,8 @@ export default function ContactClient() {
     {
       icon: Phone,
       title: 'Phone',
-      details: ['+254 701 437 959', '+254 711 111 111'],
-      link: 'tel:+254700000000',
+      details: ['+254 701 437 959'],
+      link: 'tel:+254701437959',
       color: 'from-orange-500 to-red-500'
     },
     {

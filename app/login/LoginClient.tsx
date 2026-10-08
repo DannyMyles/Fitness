@@ -11,7 +11,10 @@ import { api } from '@/app/lib/api';
 export default function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '';
+  // Only same-site paths — never bounce to another origin after login.
+  const rawCallback = searchParams.get('callbackUrl') || '';
+  const callbackUrl = rawCallback.startsWith('/') && !rawCallback.startsWith('//') ? rawCallback : '';
+  const sessionExpired = searchParams.get('expired') === '1';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -93,6 +96,12 @@ export default function LoginClient() {
             <h1 className="text-2xl font-bold text-fitness-dark mb-2">Welcome Back</h1>
             <p className="text-gray-600">Sign in to access your account</p>
           </div>
+
+          {sessionExpired && !error && (
+            <div role="status" className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+              Your session has expired. Please sign in again to continue.
+            </div>
+          )}
 
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">

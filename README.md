@@ -72,29 +72,35 @@ marksila254/
 
 ## 🚀 Getting Started
 
-1. **Clone the repository**
-   ```bash
-   cd marksila254
-   ```
+This site runs on the shared backend in `../mark254-commerce-api` (MariaDB), which
+also serves Source of Adventure (`../sos`). Start that first — see its README.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+cp .env.example .env    # BACKEND_URL, NEXT_PUBLIC_APP_KEY=fitness, COMMERCE_ADMIN_KEY, NEXTAUTH_SECRET
+npm install
+npm run dev             # http://localhost:3000
+```
 
-3. **Run development server**
-   ```bash
-   npm run dev
-   ```
+**How it talks to the backend:** the browser only calls this site's own `/api/v1/*`,
+`/api/orders`, `/api/products`, `/api/categories` and `/uploads/*`. `proxy.ts` forwards
+them to `BACKEND_URL` and sets `X-App-Key: fitness`, so this site only ever sees
+Fitness data. Server code uses `backendFetch` (`app/lib/backend.ts`).
 
-4. **Open in browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
+## 🛒 Ordering & booking (WhatsApp)
+
+No online payment. The cart is one page: items + name, phone and delivery location
+→ **Order on WhatsApp**. The order is saved (server-priced) and WhatsApp opens with
+the full summary; delivery and payment are agreed there. Events work the same way
+(**Book on WhatsApp**, with a participant count). No login is needed; logged-in
+customers also see their orders/bookings under **Account**.
+
+Admins confirm orders and mark them paid in **Admin → Orders**, and confirm/cancel
+bookings in **Admin → Events → Registrations**.
 
 ## 📝 Admin Access
 
-- **URL**: `/admin`
-- **Email**: admin@marksila254.com
-- **Password**: admin123
+- **URL**: `/admin` — sign in with an admin account of the `fitness` app
+  (the backend seed creates `admin@marksila254.com`; change its password).
 
 ## 🎨 Design System
 
@@ -116,8 +122,6 @@ marksila254/
 ## 🔒 Security Notes
 
 - Change default admin credentials in production
-- Implement proper authentication (NextAuth.js recommended)
-- Add rate limiting to contact forms
 - Use environment variables for sensitive data
 
 ## 📄 License
@@ -127,5 +131,3 @@ Copyright © 2024 Marksila254. All rights reserved.
 ---
 
 Built with ❤️ for fitness professionals
-
-# Fitness

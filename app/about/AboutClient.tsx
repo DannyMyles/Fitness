@@ -8,7 +8,6 @@ import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
 
 export default function AboutClient() {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [animatedStats, setAnimatedStats] = useState({
     clients: 0,
     years: 0,
@@ -17,8 +16,6 @@ export default function AboutClient() {
   });
 
   useEffect(() => {
-    setIsLoaded(true);
-
     // Animate stats on scroll
     const observer = new IntersectionObserver(
       (entries) => {
@@ -123,7 +120,7 @@ export default function AboutClient() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className={`relative transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+            <div className="relative enter-left">
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <Image
                   src="/images/026.JPG"
@@ -152,7 +149,7 @@ export default function AboutClient() {
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-fitness-primary/20 to-fitness-primary-dark/20 rounded-full blur-2xl"></div>
             </div>
 
-            <div className={`space-y-6 transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+            <div className="space-y-6 enter-right">
               <div className="inline-flex items-center gap-2 badge">
                 <Zap size={16} />
                 <span>My Fitness Journey</span>

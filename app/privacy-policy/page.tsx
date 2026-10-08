@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
         <li><strong>Event registration information:</strong> attendee name and phone number when you register for a training session or event.</li>
         <li><strong>Contact form information:</strong> name, phone number, email address (optional), and the content of any message you send us.</li>
         <li><strong>Newsletter information:</strong> your email address, if you subscribe to updates.</li>
-        <li><strong>Payment information:</strong> when you pay via M-Pesa, payment is processed through the mobile money network; we store a payment reference and status, not your M-Pesa PIN or full financial account details.</li>
+        <li><strong>Payment information:</strong> this website does not take payments. Payment is arranged with you directly on WhatsApp; we only record whether an order has been paid.</li>
       </ul>
 
       <h2>2. How We Use Your Information</h2>
@@ -59,7 +59,7 @@ export default function PrivacyPolicyPage() {
         business:
       </p>
       <ul>
-        <li>With payment processors (e.g. M-Pesa) to complete transactions</li>
+        <li>With WhatsApp (Meta), when you choose to send us your order or booking there</li>
         <li>With email delivery providers to send order confirmations, tickets, and account-related emails</li>
         <li>Where required by law, regulation, or a valid legal process</li>
       </ul>

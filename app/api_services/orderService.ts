@@ -1,12 +1,12 @@
-// orderService.ts — talks to the mark254-commerce-api backend.
-// Checkout (createOrder) requires the customer to be logged in on the
-// frontend (see CartClient's checkout gate) — it goes through the same-origin
-// authenticated api.ts client so the order gets associated with their
-// account. The backend route itself still supports guest checkout via
-// optionalAuth. Listing/updating orders (admin) goes through the separate
-// admin-key proxy — see app/api/commerce/admin/[...path]/route.ts.
+// orderService.ts — talks to the shared mark254-commerce-api backend.
+// Checkout is guest-friendly: createOrder goes through api.ts, which attaches
+// the session token when the customer happens to be logged in (so the order
+// shows up on their account) and works without one. The response carries a
+// WhatsApp link with the server-priced order summary. Listing/updating
+// orders (admin) goes through the admin-key proxy — see
+// app/api/commerce/admin/[...path]/route.ts.
 
-import { CreateOrderInput, CreateOrderResponse, Order, OrderPaymentStatus, OrderStatus, PaymentStatus } from '@/types/commerce';
+import { CreateOrderInput, CreateOrderResponse, Order, OrderStatus, PaymentStatus } from '@/types/commerce';
 import { api } from '../lib/api';
 
 async function handle<T>(res: Response): Promise<T> {
@@ -19,19 +19,11 @@ async function handle<T>(res: Response): Promise<T> {
 
 export const orderService = {
   createOrder: async (input: CreateOrderInput): Promise<CreateOrderResponse> => {
-    return api.protected.orders.create(input) as Promise<CreateOrderResponse>;
+    return api.public.orders.create(input) as Promise<CreateOrderResponse>;
   },
 
   getMine: async (): Promise<Order[]> => {
     return api.protected.orders.mine() as Promise<Order[]>;
-  },
-
-  getPaymentStatus: async (id: number): Promise<OrderPaymentStatus> => {
-    return api.protected.orders.status(id) as Promise<OrderPaymentStatus>;
-  },
-
-  retryPayment: async (id: number): Promise<CreateOrderResponse> => {
-    return api.protected.orders.retry(id) as Promise<CreateOrderResponse>;
   },
 
   admin: {

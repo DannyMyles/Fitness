@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  Dumbbell, Heart, Zap, Clock, Users, Award,
-  CheckCircle, Star, ArrowRight, Loader2, RefreshCw, AlertCircle, type LucideIcon
-} from 'lucide-react';
+import { whatsappLink } from '@/app/lib/backend';
+import { Dumbbell, Heart, Zap, Clock, Users, Award, CheckCircle, Star, ArrowRight, Loader2, RefreshCw, AlertCircle, type LucideIcon, MessageCircle } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
 import EmptyState from '@/components/ui/EmptyState';
@@ -38,15 +36,11 @@ const processSteps = [
 ];
 
 export default function ServicesClient() {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [isLoadingTrainings, setIsLoadingTrainings] = useState(true);
   const [trainingsError, setTrainingsError] = useState('');
 
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   const fetchTrainings = () => {
     setIsLoadingTrainings(true);
@@ -165,13 +159,15 @@ export default function ServicesClient() {
 
                   <div className="flex items-center justify-between pt-4 mt-auto border-t border-gray-100">
                     <span className="text-gradient-primary font-bold">{training.price}</span>
-                    <Link
-                      href="/contact"
-                      className="flex items-center gap-1 text-fitness-dark font-medium hover:text-fitness-primary transition-colors"
+                    <a
+                      href={whatsappLink(`Hi Marksila254! I'd like to start ${training.title} (${training.price}). When can we begin?`)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5b] transition-colors"
                     >
+                      <MessageCircle size={16} />
                       Get Started
-                      <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-                    </Link>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -186,7 +182,7 @@ export default function ServicesClient() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className={`relative transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+            <div className="relative enter-left">
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <img
                   src="/images/029.JPG"
@@ -212,7 +208,7 @@ export default function ServicesClient() {
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-gradient-to-br from-fitness-primary/20 to-fitness-primary-dark/20 rounded-full blur-2xl"></div>
             </div>
 
-            <div className={`transition-all duration-1000 delay-500 ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
+            <div className="enter-right">
               <div className="inline-flex items-center gap-2 badge mb-4">
                 <Zap size={16} />
                 <span>Why Train With Me</span>

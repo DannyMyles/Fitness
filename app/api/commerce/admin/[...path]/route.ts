@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/auth';
+import { backendFetch } from '@/app/lib/backend';
 
 // Proxies admin-only commerce requests (product/category CRUD, order list/status
-// updates) to the separate mark254-commerce-api backend, attaching the
-// server-only ADMIN key. This keeps that shared secret out of browser JS —
-// the client only ever talks to this same-origin route, gated by the
-// existing NextAuth admin session.
-const COMMERCE_API_URL = process.env.COMMERCE_API_URL || 'http://localhost:4000';
+// updates) to the shared mark254-commerce-api backend, attaching this app's
+// server-only admin key (COMMERCE_ADMIN_KEY — the `fitness` key, see the
+// backend's `npm run app`). The key never reaches browser JS; the client only
+// talks to this same-origin route, gated by the NextAuth admin session.
 const COMMERCE_ADMIN_KEY = process.env.COMMERCE_ADMIN_KEY || '';
 
 async function proxy(req: NextRequest, path: string[]) {
@@ -16,14 +16,15 @@ async function proxy(req: NextRequest, path: string[]) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const targetUrl = `${COMMERCE_API_URL}/api/${path.join('/')}${req.nextUrl.search}`;
+  const targetPath = `/api/${path.map(encodeURIComponent).join('/')}${req.nextUrl.search}`;
   const hasBody = !['GET', 'HEAD', 'DELETE'].includes(req.method);
   // Multipart bodies (product image uploads) must be forwarded as FormData
   // with no explicit Content-Type — fetch sets the correct multipart
   // boundary itself. Everything else keeps going through as JSON, unchanged.
   const isMultipart = (req.headers.get('content-type') || '').startsWith('multipart/form-data');
 
-  const response = await fetch(targetUrl, {
+  const response = await backendFetch(targetPath, {
+    cache: 'no-store',
     method: req.method,
     headers: {
       'x-admin-key': COMMERCE_ADMIN_KEY,

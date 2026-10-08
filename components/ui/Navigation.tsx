@@ -1,252 +1,163 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  Phone, Mail, Clock, Zap, User,
-  Dumbbell, Menu, X, LogOut
-} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import { ArrowUpRight, LogOut, Mail, Menu, MessageCircle, Phone, ShoppingBag, User, X } from 'lucide-react';
 import { useCartStore } from '@/app/lib/cartStore';
+import { whatsappLink } from '@/app/lib/backend';
 
-type NavItem = {
-  name: string;
-  href: string;
-};
+const links = [
+  { name: 'Home', href: '/' },
+  { name: 'About', href: '/about' },
+  { name: 'Services', href: '/services' },
+  { name: 'Events', href: '/events' },
+  { name: 'Shop', href: '/shop' },
+  { name: 'Gallery', href: '/gallery' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'Contact', href: '/contact' },
+];
 
-const Navigation = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+export default function Navigation() {
   const pathname = usePathname();
-  const { status: authStatus } = useSession();
+  const { status } = useSession();
   const cartCount = useCartStore((s) => s.count());
   const hasHydrated = useCartStore((s) => s.hasHydrated);
-
-  const navigation = {
-    main: [
-      { name: 'Home', href: '/' },
-      { name: 'About', href: '/about' },
-      { name: 'Services', href: '/services' },
-      { name: 'Gallery', href: '/gallery' },
-      { name: 'Events', href: '/events' },
-      { name: 'Shop', href: '/shop' },
-      { name: 'Contact', href: '/contact' },
-    ]
-  };
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
+  useEffect(() => setOpen(false), [pathname]);
 
-  const isActiveLink = (href: string) => {
-    if (href === '/') {
-      return pathname === href;
-    }
-    return pathname.startsWith(href);
-  };
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
+  const items = hasHydrated ? cartCount : 0;
+  const accountHref = status === 'authenticated' ? '/account' : '/login';
 
   return (
-    <>
-      {/* Top Contact Bar */}
-      <div className="bg-gray-50 text-gray-600 border-b border-gray-100 relative">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center py-2 text-sm">
-            <div className="hidden md:flex flex-wrap items-center gap-x-6 gap-y-2 mb-2 md:mb-0">
-              <div className="flex items-center gap-2 group">
-                <div className="p-1.5 bg-fitness-primary/10 rounded-lg group-hover:bg-fitness-primary/20 transition-colors">
-                  <Phone size={14} className="text-fitness-primary" />
-                </div>
-                <a
-                  href="tel:+254700000000"
-                  className="hover:text-fitness-primary transition-colors duration-300"
-                >
-                  +254 701 437 959
-                </a>
-              </div>
-              <div className="hidden md:block h-4 w-px bg-gray-200"></div>
-              <div className="flex items-center gap-2 group">
-                <div className="p-1.5 bg-fitness-accent/10 rounded-lg group-hover:bg-fitness-accent/20 transition-colors">
-                  <Mail size={14} className="text-fitness-accent" />
-                </div>
-                <a
-                  href="mailto:markotundo777@gmail.com"
-                  className="hover:text-fitness-accent transition-colors duration-300"
-                >
-                  markotundo777@gmail.com
-                </a>
-              </div>
-              <div className="hidden md:block h-4 w-px bg-gray-200"></div>
-              <div className="flex items-center gap-2 text-fitness-accent font-medium">
-                <div className="relative">
-                  <Clock size={14} />
-                  <span className="absolute inset-0 animate-pulse bg-fitness-accent rounded-full opacity-50"></span>
-                </div>
-                Available 6AM - 9PM
-              </div>
-            </div>
+    <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4">
+      <div
+        className={`mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-2xl border px-3 py-2 transition-all duration-300 sm:px-4 lg:rounded-full ${
+          scrolled || open
+            ? 'border-gray-200/80 bg-white/85 shadow-[0_8px_30px_-12px_rgba(15,17,23,0.25)] backdrop-blur-xl'
+            : 'border-transparent bg-white/60 backdrop-blur-md'
+        }`}
+      >
+        <Link href="/" className="flex shrink-0 items-center" aria-label="Marksila254 home">
+          <Image src="/images/logo.svg" alt="Marksila254" width={160} height={130} priority className="h-11 w-auto md:h-12" />
+        </Link>
 
-            <div className="flex items-center gap-4">
-              <Link
-                href={authStatus === 'authenticated' ? '/account' : '/login'}
-                className="flex items-center gap-2 text-sm hover:text-fitness-primary transition-all duration-300 hover:scale-105"
-              >
-                <div className="p-1.5 bg-gray-100 rounded-lg">
-                  <User size={14} />
-                </div>
-                <span>{authStatus === 'authenticated' ? 'My Account' : 'Login'}</span>
-              </Link>
-              {authStatus === 'authenticated' && (
-                <button
-                  onClick={() => signOut({ callbackUrl: '/' })}
-                  className="flex items-center gap-2 text-sm hover:text-fitness-primary transition-all duration-300 hover:scale-105"
-                  title="Log Out"
-                >
-                  <div className="p-1.5 bg-gray-100 rounded-lg">
-                    <LogOut size={14} />
-                  </div>
-                  <span className="hidden sm:inline">Log Out</span>
-                </button>
-              )}
-            </div>
-          </div>
+        <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              aria-current={isActive(l.href) ? 'page' : undefined}
+              className={`relative rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
+                isActive(l.href) ? 'bg-ink text-white' : 'text-gray-600 hover:bg-gray-100 hover:text-ink'
+              }`}
+            >
+              {l.name}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-1">
+          <Link
+            href={accountHref}
+            aria-label={status === 'authenticated' ? 'My account' : 'Log in'}
+            className="hidden rounded-full p-2.5 text-gray-700 transition-colors hover:bg-gray-100 sm:inline-flex"
+          >
+            <User size={20} />
+          </Link>
+          <Link
+            href="/cart"
+            aria-label={items > 0 ? `Cart, ${items} items` : 'Cart'}
+            className="relative rounded-full p-2.5 text-gray-700 transition-colors hover:bg-gray-100"
+          >
+            <ShoppingBag size={20} />
+            {items > 0 && (
+              <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-fitness-primary px-1 text-[11px] font-bold text-white">
+                {items}
+              </span>
+            )}
+          </Link>
+          <a
+            href={whatsappLink("Hi Marksila254! I'd like to start training.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-1 hidden items-center gap-1.5 rounded-full bg-fitness-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-fitness-primary-dark md:inline-flex"
+          >
+            Start training <ArrowUpRight size={16} />
+          </a>
+          <button
+            onClick={() => setOpen((o) => !o)}
+            className="rounded-full p-2.5 text-ink transition-colors hover:bg-gray-100 lg:hidden"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </div>
 
-      {/* Main Navigation */}
-      <header 
-        className={`sticky top-0 z-50 transition-all duration-500 ${
-          isScrolled 
-            ? 'bg-white/95 backdrop-blur-xl shadow-fitness' 
-            : 'bg-white shadow-soft'
+      {/* Mobile menu sheet */}
+      <div
+        className={`fixed inset-x-3 top-[4.75rem] bottom-3 z-40 overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl transition-all duration-300 lg:hidden ${
+          open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-2 opacity-0'
         }`}
       >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
-              <Image
-                src="/images/logo.svg"
-                alt="Marksila 254"
-                width={160}
-                height={130}
-                className="h-14 md:h-17 w-auto transform group-hover:rotate-6 transition-transform duration-500"
-              />
-            </Link>
-
-            {/* Desktop Navigation — pill style */}
-            <nav className="hidden lg:flex items-center gap-1 bg-gray-100/80 rounded-full p-1.5">
-              {navigation.main.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                    isActiveLink(item.href)
-                      ? 'bg-white text-fitness-primary shadow-sm'
-                      : 'text-gray-600 hover:text-fitness-dark hover:bg-white/60'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-
-            {/* CTA Buttons */}
-            <div className="hidden lg:flex items-center gap-3">
-              <Link
-                href="/shop"
-                className="relative p-2.5 text-gray-700 hover:text-fitness-primary transition-all duration-300 hover:scale-110 group"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
-                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
-                </svg>
-                {hasHydrated && cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white text-xs rounded-full flex items-center justify-center font-bold shadow-fitness">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-              <Link
-                href="/contact"
-                className="btn-primary rounded-full! flex items-center gap-2 hover:shadow-fitness-lg transform hover:-translate-y-1"
-              >
-                <Zap size={18} />
-                Get Started
-              </Link>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl hover:bg-gray-100 transition-all duration-300 hover:scale-105"
-              aria-label="Toggle menu"
+        <nav aria-label="Mobile" className="flex flex-col">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              className={`flex items-center justify-between border-b border-gray-100 py-3.5 font-display text-2xl font-bold tracking-tight ${
+                isActive(l.href) ? 'text-fitness-primary' : 'text-ink'
+              }`}
             >
-              {isMenuOpen ? (
-                <X size={24} className="text-fitness-dark animate-rotate" />
-              ) : (
-                <Menu size={24} className="text-fitness-dark" />
-              )}
+              {l.name}
+              <ArrowUpRight size={20} className="text-gray-300" />
+            </Link>
+          ))}
+        </nav>
+        <div className="mt-6 grid gap-3">
+          <a
+            href={whatsappLink("Hi Marksila254! I'd like to start training.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-3.5 font-semibold text-white"
+          >
+            <MessageCircle size={18} /> Chat on WhatsApp
+          </a>
+          <Link href={accountHref} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 py-3.5 font-semibold text-ink">
+            <User size={18} /> {status === 'authenticated' ? 'My account' : 'Log in'}
+          </Link>
+          {status === 'authenticated' && (
+            <button onClick={() => signOut({ callbackUrl: '/' })} className="inline-flex items-center justify-center gap-2 py-2 text-gray-500">
+              <LogOut size={16} /> Log out
             </button>
-          </div>
+          )}
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-100 animate-slide-down">
-            <div className="container mx-auto px-4 py-6">
-              {/* Mobile Navigation */}
-              <div className="space-y-1">
-                {navigation.main.map((item) => (
-                  <div key={item.name} className="border-b border-gray-100 last:border-0">
-                    <Link
-                      href={item.href}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`flex items-center justify-between py-4 font-semibold transition-all duration-300 ${
-                        isActiveLink(item.href) ? 'text-fitness-primary' : 'text-gray-800 hover:text-fitness-primary'
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-
-              {/* Mobile CTA */}
-              <div className="mt-6 space-y-3">
-                <Link
-                  href="/contact"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="btn-primary flex items-center justify-center gap-2"
-                >
-                  <Zap size={20} />
-                  Get Started
-                </Link>
-                <Link
-                  href="/shop"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="btn-secondary flex items-center justify-center gap-2"
-                >
-                  Shop Now
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-    </>
+        <div className="mt-6 space-y-2 text-sm text-gray-500">
+          <a href="tel:+254701437959" className="flex items-center gap-2"><Phone size={15} /> +254 701 437 959</a>
+          <a href="mailto:markotundo777@gmail.com" className="flex items-center gap-2"><Mail size={15} /> markotundo777@gmail.com</a>
+        </div>
+      </div>
+    </header>
   );
-};
-
-export default Navigation;
-
+}

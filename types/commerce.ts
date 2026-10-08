@@ -45,9 +45,10 @@ export interface OrderItemInput {
 
 export interface CreateOrderInput {
   customerName: string;
-  customerEmail: string;
   customerPhone: string;
+  customerEmail?: string;
   shippingAddress: string;
+  notes?: string;
   items: OrderItemInput[];
 }
 
@@ -61,58 +62,37 @@ export interface OrderItem {
   color: string | null;
 }
 
-export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
-export type PaymentStatus = 'pending' | 'paid' | 'failed';
+// Orders are confirmed with the customer on WhatsApp — there's no online
+// payment. An admin moves the status along and records payment received.
+export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+export type PaymentStatus = 'unpaid' | 'paid';
 
 export interface Order {
   id: number;
   orderNumber: string;
   customerName: string;
-  customerEmail: string;
+  customerEmail: string | null;
   customerPhone: string;
   shippingAddress: string;
+  notes: string | null;
   status: OrderStatus;
-  paymentMethod: string;
   paymentStatus: PaymentStatus;
-  paymentRef: string | null;
-  // Raw Safaricom STK push result, kept for admin visibility into why a
-  // payment failed (cancelled, insufficient funds, timed out, etc.).
-  paymentResultCode: number | null;
-  paymentResultDesc: string | null;
-  // Full M-Pesa transaction detail, populated once a payment has a
-  // paymentRef. phoneNumber/transactionAmount/transactionTime are only
-  // filled in once a real STK callback lands (not via the query-poll
-  // fallback), so they may be null even when paymentStatus is 'paid'.
-  mpesa: {
-    billReferenceNumber: string;
-    phoneNumber: string | null;
-    firstName: string;
-    transactionAmount: number | null;
-    transactionId: string | null;
-    transactionType: string;
-    transactionTime: string | null;
-    businessShortCode: string;
-  } | null;
   subtotal: number;
   shipping: number;
   total: number;
   createdAt: string;
+  updatedAt: string;
   items: OrderItem[];
 }
 
-export interface OrderPaymentStatus {
-  status: OrderStatus;
-  paymentStatus: PaymentStatus;
-  paymentFailureReason?: string;
-}
-
-export interface PaymentInitiation {
-  status: PaymentStatus;
-  reference: string;
+/** Pre-filled WhatsApp hand-off returned by the API after an order/booking is saved. */
+export interface WhatsAppHandoff {
+  number: string;
   message: string;
+  url: string;
 }
 
 export interface CreateOrderResponse {
   order: Order;
-  payment: PaymentInitiation;
+  whatsapp: WhatsAppHandoff | null;
 }

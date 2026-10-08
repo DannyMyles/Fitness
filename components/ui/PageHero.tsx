@@ -7,49 +7,41 @@ interface PageHeroProps {
   subtitle: string;
 }
 
-// Shared, compact hero panel used across About/Services/Gallery/Contact/Events —
-// consistent with the Home/Shop bento hero treatment, avoids each page rolling
-// its own full-bleed dark photo banner (which was inconsistent and hard to
-// read against varied source photos).
+/**
+ * Shared page banner (About, Services, Events, Gallery, Blog, Contact):
+ * a dark ink panel with a warm brand glow and a large display title.
+ * Same look as the footer, so every page opens and closes consistently.
+ */
 export default function PageHero({ badge, badgeIcon: Icon, title, subtitle }: PageHeroProps) {
+  // Highlight the last word of the title in the brand colour.
+  const words = title.trim().split(' ');
+  const last = words.pop();
+
   return (
-    <section className="bg-gray-50 pt-8 pb-4 md:pt-12">
-      <div className="container mx-auto px-4">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-fitness-primary via-fitness-primary to-fitness-primary-dark px-6 py-16 md:px-16 md:py-20 text-center shadow-fitness-lg ring-1 ring-white/10">
-          {/* Spotlight + texture layers */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(255,255,255,0.18),transparent_45%)]" />
-          <div className="absolute inset-0 opacity-[0.15] bg-pattern-dots" />
+    <section className="px-3 pt-3 sm:px-4">
+      <div className="relative mx-auto max-w-7xl overflow-hidden rounded-4xl bg-ink px-6 py-14 text-white md:px-16 md:py-24">
+        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-fitness-primary/35 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-32 left-1/4 h-72 w-72 rounded-full bg-fitness-primary/15 blur-3xl" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.07] bg-[linear-gradient(rgba(255,255,255,.6)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.6)_1px,transparent_1px)] bg-size-[48px_48px] mask-[radial-gradient(ellipse_at_center,black,transparent_75%)]"
+          aria-hidden
+        />
+        {Icon && (
+          <Icon size={280} strokeWidth={0.8} className="pointer-events-none absolute -bottom-12 -right-6 hidden rotate-12 text-white/6 md:block" aria-hidden />
+        )}
 
-          {/* Decorative blurred orbs */}
-          <div className="absolute -top-16 -left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-20 -right-16 w-80 h-80 bg-fitness-primary-dark/40 rounded-full blur-3xl" />
-
-          {/* Oversized watermark icon */}
-          {Icon && (
-            <Icon
-              size={260}
-              strokeWidth={1}
-              className="absolute -right-8 -bottom-10 text-white/10 rotate-12 pointer-events-none hidden md:block"
-            />
+        <div className="enter-up relative max-w-3xl">
+          {badge && (
+            <p className="eyebrow mb-5 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-fitness-primary-light backdrop-blur">
+              {Icon && <Icon size={14} />}
+              {badge}
+            </p>
           )}
-
-          <div className="relative z-10 max-w-2xl mx-auto">
-            {badge && (
-              <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full text-sm font-semibold text-white mb-6 shadow-sm">
-                {Icon && (
-                  <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
-                    <Icon size={12} />
-                  </span>
-                )}
-                {badge}
-              </div>
-            )}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-4 drop-shadow-sm">
-              {title}
-            </h1>
-            <div className="w-14 h-1 bg-white/40 rounded-full mx-auto mb-5" />
-            <p className="text-lg text-white/85 leading-relaxed">{subtitle}</p>
-          </div>
+          <h1 className="font-display text-4xl font-bold leading-[1.02] tracking-tight sm:text-5xl md:text-7xl">
+            {words.length > 0 && `${words.join(' ')} `}
+            <span className="text-fitness-primary">{last}</span>
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/70 md:text-lg">{subtitle}</p>
         </div>
       </div>
     </section>
