@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { ShieldCheck } from 'lucide-react';
 import LegalPageLayout from '@/components/ui/LegalPageLayout';
+import { getSite, telHref } from '@/app/lib/site';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const site = await getSite();
+  const email = site.contactEmail || 'markotundo777@gmail.com';
+  const phone = site.contactPhone || '+254 701 437 959';
   return (
     <LegalPageLayout
       title="Privacy Policy"
@@ -97,8 +101,8 @@ export default function PrivacyPolicyPage() {
       <h2>8. Contact Us</h2>
       <p>
         If you have questions about this Privacy Policy or wish to exercise any of your rights, contact us at{' '}
-        <a href="mailto:markotundo777@gmail.com">markotundo777@gmail.com</a> or{' '}
-        <a href="tel:+254701437959">+254 701 437 959</a>. We're based in Nairobi, Kenya.
+        <a href={`mailto:${email}`}>{email}</a> or{' '}
+        <a href={telHref(phone)}>{phone}</a>. We're based in {site.location || 'Nairobi, Kenya'}.
       </p>
 
       <h2>9. Changes to This Policy</h2>

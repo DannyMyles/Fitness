@@ -1,5 +1,20 @@
 import { api } from "../lib/api"
 
+export type PricingType = 'fixed' | 'per_person' | 'quote'
+
+export interface ServicePackage {
+  id: number
+  name: string
+  description: string | null
+  priceAmount: number | null
+  pricingType: PricingType
+  priceLabel: string | null
+  minParticipants: number | null
+  maxParticipants: number | null
+  features: string[]
+  popular: boolean
+}
+
 export interface Training {
   id: string
   title: string
@@ -7,12 +22,26 @@ export interface Training {
   description: string
   features: string[]
   price: string
+  priceAmount: number | null
+  pricingType: PricingType
+  category: string | null
+  audience: 'individual' | 'corporate' | 'both'
+  duration: string | null
+  groupSize: string | null
+  schedule: string | null
+  level: string | null
+  location: string | null
+  minParticipants: number | null
+  maxParticipants: number | null
+  bookingRequirements: string | null
   image: string
   icon?: string
   color?: string
   popular: boolean
+  available: boolean
   order: number
   published: boolean
+  packages: ServicePackage[]
   createdAt: string
   updatedAt: string
 }

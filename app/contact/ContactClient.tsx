@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   Phone, Mail, MapPin, Clock, Send,
@@ -10,10 +10,34 @@ import {
 } from 'lucide-react';
 import { FaWhatsapp, FaTiktok } from "react-icons/fa6";
 import PageHero from '@/components/ui/PageHero';
+import { useSite, useWhatsApp, usePageHeader } from '@/components/site/SiteProvider';
+import { telHref } from '@/app/lib/site';
+import { newRequestId } from '@/app/lib/enquiries';
+
+interface Faq { id: number; question: string; answer: string; category: string | null }
 
 const PHONE_REGEX = /^\+?[0-9\s-]{7,20}$/;
 
 export default function ContactClient() {
+  const header = usePageHeader('contact', { eyebrow: "Get In Touch", title: "Ready to Transform?", subtitle: "Contact me today and let's discuss how I can help you achieve your fitness goals." });
+  const site = useSite();
+  const whatsappLink = useWhatsApp();
+  const [reference, setReference] = useState('');
+  const [serviceNames, setServiceNames] = useState<string[]>([]);
+  const [faqs, setFaqs] = useState<Faq[]>([]);
+  const requestId = useRef(newRequestId());
+
+  useEffect(() => {
+    fetch('/api/v1/trainings')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setServiceNames((d.trainings ?? []).map((t: { title: string }) => t.title)))
+      .catch(() => {});
+    fetch('/api/v1/faqs')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setFaqs(d.faqs ?? []))
+      .catch(() => {});
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,7 +64,7 @@ export default function ContactClient() {
       const res = await fetch('/api/v1/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, requestId: requestId.current }),
       });
 
       if (!res.ok) {
@@ -48,6 +72,9 @@ export default function ContactClient() {
         throw new Error(data.error || data.message || 'Failed to send message');
       }
 
+      const data = await res.json().catch(() => ({}));
+      setReference(data.reference ?? '');
+      requestId.current = newRequestId();
       setSubmitted(true);
       setFormData({ name: '', email: '', phone: '', service: '', message: '' });
     } catch (err: any) {
@@ -58,55 +85,46 @@ export default function ContactClient() {
   };
 
   const contactInfo = [
-    {
+    site.contactPhone && {
       icon: Phone,
       title: 'Phone',
-      details: ['+254 701 437 959'],
-      link: 'tel:+254701437959',
+      details: [site.contactPhone],
+      link: telHref(site.contactPhone) ?? '#',
       color: 'from-orange-500 to-red-500'
     },
-    {
+    site.contactEmail && {
       icon: Mail,
       title: 'Email',
-      details: ['markotundo777@gmail.com', 'bookings@marksila254.com'],
-      link: 'mailto:markotundo777@gmail.com',
+      details: [site.contactEmail, site.settings.secondaryEmail].filter(Boolean) as string[],
+      link: `mailto:${site.contactEmail}`,
       color: 'from-green-500 to-emerald-500'
     },
-    {
+    site.location && {
       icon: MapPin,
       title: 'Location',
-      details: ['Nairobi, Kenya'],
-      link: '#',
+      details: [site.location],
+      link: site.settings.mapUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.location)}`,
       color: 'from-blue-500 to-indigo-500'
     },
-    {
+    site.settings.hours && {
       icon: Clock,
       title: 'Working Hours',
-      details: ['Mon - Sat: 6:00 AM - 9:00 PM', 'Sunday: 8:00 AM - 2:00 PM'],
+      details: [site.settings.hours],
       link: '#',
       color: 'from-yellow-500 to-orange-500'
     }
-  ];
+  ].filter(Boolean) as { icon: typeof Phone; title: string; details: string[]; link: string; color: string }[];
 
-  const services = [
-    'Personal Training',
-    'Group Classes',
-    'Online Training',
-    'Nutrition Coaching',
-    'Weight Loss Program',
-    'Muscle Building',
-    'Corporate Fitness',
-    'Other'
-  ];
+  const services = [...serviceNames, 'Other'];
 
   return (
     <div className="pt-0">
       {/* Hero Section */}
       <PageHero
-        badge="Get In Touch"
+        badge={header.eyebrow}
         badgeIcon={MessageCircle}
-        title="Ready to Transform?"
-        subtitle="Contact me today and let's discuss how I can help you achieve your fitness goals."
+        title={header.title}
+        subtitle={header.subtitle}
       />
 
       {/* Contact Info Cards */}
@@ -158,6 +176,11 @@ export default function ContactClient() {
                   <p className="text-gray-600 mb-6">
                     Thank you for reaching out. I'll get back to you as soon as possible.
                   </p>
+                  {reference && (
+                    <p className="-mt-3 mb-6 text-sm text-gray-500">
+                      Your reference: <span className="font-mono font-semibold text-gray-800">{reference}</span>
+                    </p>
+                  )}
                   <button
                     onClick={() => setSubmitted(false)}
                     className="btn-primary"
@@ -278,7 +301,7 @@ export default function ContactClient() {
                   <div className="w-10 h-1 bg-white/40 rounded-full mb-6" />
                   <div className="space-y-4">
                     <a
-                      href="https://wa.me/254701437959"
+                      href={whatsappLink(`Hi ${site.name}! I have a question.`)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:translate-x-2"
@@ -293,7 +316,7 @@ export default function ContactClient() {
                       <ArrowRight size={20} className="ml-auto" />
                     </a>
                     <Link
-                      href="/events"
+                      href="/services"
                       className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/20 hover:border-white/20 transition-all duration-300 hover:translate-x-2"
                     >
                       <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-fitness">
@@ -310,6 +333,7 @@ export default function ContactClient() {
               </div>
 
               {/* Social Media */}
+              {Object.values(site.settings.social ?? {}).some(Boolean) && (
               <div className="bg-white rounded-3xl p-8 shadow-card hover:shadow-fitness transition-all duration-500">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Follow Me</h3>
                 <p className="text-gray-600 mb-6">
@@ -317,10 +341,10 @@ export default function ContactClient() {
                 </p>
                 <div className="flex gap-4">
                   {[
-                    { icon: FaTiktok, color: 'from-gray-800 to-black', href: 'https://www.tiktok.com/@marksila254?_r=1&_t=ZS-98iPIkCwmXc' },
-                    { icon: Instagram, color: 'from-pink-500 to-purple-600', href: 'https://www.instagram.com/marksila254?igsh=MXIwZHl6dWFqZWZibA%3D%3D&utm_source=qr' },
-                    { icon: Facebook, color: 'from-blue-600 to-blue-700', href: 'https://www.facebook.com/share/14icQAkqW4y/?mibextid=wwXIfr' },
-                  ].map((social, index) => (
+                    { icon: FaTiktok, color: 'from-gray-800 to-black', href: site.settings.social?.tiktok },
+                    { icon: Instagram, color: 'from-pink-500 to-purple-600', href: site.settings.social?.instagram },
+                    { icon: Facebook, color: 'from-blue-600 to-blue-700', href: site.settings.social?.facebook },
+                  ].filter((x) => x.href).map((social, index) => (
                     <a
                       key={index}
                       href={social.href}
@@ -333,45 +357,39 @@ export default function ContactClient() {
                   ))}
                 </div>
               </div>
+              )}
 
             </div>
           </div>
         </div>
       </section>
 
-      {/* Map Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-2 badge mb-4">
-            <MapPin size={16} />
-            <span>Visit My Studio</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Come See Me <span className="text-gradient-mixed">In Person</span>
-          </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Visit my fitness studio for a consultation or to learn more about my training programs.
-          </p>
-          <a
-            href="https://www.google.com/maps/search/?api=1&query=Nairobi%2C+Kenya"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl h-80 flex items-center justify-center relative overflow-hidden group cursor-pointer"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-fitness-primary/5 to-fitness-primary-dark/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div className="text-center relative z-10">
-              <div className="w-20 h-20 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark rounded-full flex items-center justify-center mx-auto mb-4 shadow-fitness-lg transform transition-all duration-500 group-hover:scale-110">
-                <MapPin size={36} className="text-white" />
+      {faqs.length > 0 && (
+        <section className="py-20">
+          <div className="container mx-auto max-w-3xl px-4">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 badge mb-4">
+                <MessageCircle size={16} />
+                <span>FAQ</span>
               </div>
-              <p className="text-gray-600 mb-4">Nairobi, Kenya</p>
-              <span className="inline-flex items-center gap-2 text-fitness-primary font-medium">
-                Open in Google Maps
-                <ArrowRight size={18} />
-              </span>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                Questions, <span className="text-gradient-mixed">answered</span>
+              </h2>
             </div>
-          </a>
-        </div>
-      </section>
+            <div className="divide-y divide-gray-100 overflow-hidden rounded-3xl bg-white shadow-fitness">
+              {faqs.map((f) => (
+                <details key={f.id} className="group p-5 sm:p-6 open:bg-fitness-primary/5">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-gray-900 [&::-webkit-details-marker]:hidden">
+                    {f.question}
+                    <ArrowRight size={18} className="shrink-0 text-fitness-primary transition-transform group-open:rotate-90" />
+                  </summary>
+                  <p className="mt-3 whitespace-pre-line text-gray-600">{f.answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

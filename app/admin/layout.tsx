@@ -6,23 +6,59 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Toaster } from 'react-hot-toast';
 import {
-  LayoutDashboard, Users, ShoppingBag, FileText,
+  LayoutDashboard, Users, ShoppingBag, FileText, ArrowLeftRight, Inbox, CalendarCheck, Settings, Megaphone, Send, Store,
   LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar, Image as ImageIcon, Home, Mail, Quote
 } from 'lucide-react';
+import { Toaster as KitToaster } from '@/components/admin-kit/ui';
 
-const sidebarLinks = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
-  { icon: Users, label: 'Users', href: '/admin/users' },
-  { icon: ShoppingBag, label: 'Products', href: '/admin/products' },
-  { icon: Tags, label: 'Categories', href: '/admin/categories' },
-  { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
-  { icon: Dumbbell, label: 'Services', href: '/admin/services' },
-  { icon: Calendar, label: 'Events', href: '/admin/events' },
-  { icon: FileText, label: 'Blog', href: '/admin/blog' },
-  { icon: Quote, label: 'Testimonials', href: '/admin/blog/testimonials' },
-  { icon: ImageIcon, label: 'Gallery', href: '/admin/gallery' },
-  { icon: Mail, label: 'Newsletter', href: '/admin/newsletter' },
+const sidebarGroups = [
+  {
+    title: 'Overview',
+    links: [
+      { icon: LayoutDashboard, label: 'Dashboard', href: '/admin' },
+      { icon: CalendarCheck, label: 'Bookings', href: '/admin/bookings' },
+      { icon: Inbox, label: 'Enquiries & quotes', href: '/admin/enquiries' },
+    ],
+  },
+  {
+    title: 'Offerings',
+    links: [
+      { icon: Dumbbell, label: 'Services & packages', href: '/admin/services' },
+      { icon: Calendar, label: 'Events', href: '/admin/events' },
+    ],
+  },
+  {
+    title: 'Shop',
+    links: [
+      { icon: Store, label: 'Shop overview', href: '/admin/shop' },
+      { icon: ShoppingCart, label: 'Orders', href: '/admin/orders' },
+      { icon: ShoppingBag, label: 'Products', href: '/admin/products' },
+      { icon: Tags, label: 'Categories', href: '/admin/categories' },
+    ],
+  },
+  {
+    title: 'Website',
+    links: [
+      { icon: Megaphone, label: 'FAQs & banners', href: '/admin/content' },
+      { icon: FileText, label: 'Blog', href: '/admin/blog' },
+      { icon: Quote, label: 'Testimonials', href: '/admin/blog/testimonials' },
+      { icon: ImageIcon, label: 'Gallery', href: '/admin/gallery' },
+      { icon: Mail, label: 'Newsletter', href: '/admin/newsletter' },
+    ],
+  },
+  {
+    title: 'System',
+    links: [
+      { icon: Users, label: 'Users', href: '/admin/users' },
+      { icon: Send, label: 'Email log', href: '/admin/emails' },
+      { icon: Settings, label: 'Settings', href: '/admin/settings' },
+    ],
+  },
 ];
+
+// The other app sharing this backend, for admins who manage both.
+const PARTNER_ADMIN_URL = process.env.NEXT_PUBLIC_PARTNER_ADMIN_URL;
+const PARTNER_NAME = process.env.NEXT_PUBLIC_PARTNER_NAME || 'other site';
 
 export default function AdminLayout({
   children,
@@ -56,6 +92,7 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <KitToaster />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -86,27 +123,43 @@ export default function AdminLayout({
           </Link>
         </div>
 
-        <nav className="mt-6">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
+        <nav className="absolute top-[89px] bottom-[215px] left-0 right-0 overflow-y-auto py-4" aria-label="Admin">
+          {sidebarGroups.map((group) => (
+          <div key={group.title} className="mb-3">
+          <p className="px-6 pb-1 text-[11px] font-semibold uppercase tracking-wider text-white/35">{group.title}</p>
+          {group.links.map((link) => {
+            const isActive =
+              link.href === '/admin'
+                ? pathname === '/admin'
+                : (pathname === link.href || pathname.startsWith(link.href + '/')) &&
+                  !(link.href === '/admin/blog' && pathname.startsWith('/admin/blog/testimonials'));
             return (
               <Link
                 key={link.label}
                 href={link.href}
-                className={`flex items-center gap-3 px-6 py-3 transition-all duration-200 ${
+                onClick={() => setIsSidebarOpen(false)}
+                className={`flex items-center gap-3 px-6 py-2.5 transition-all duration-200 ${
                   isActive 
                     ? 'bg-[#FF6B35]/20 text-white border-l-4 border-[#FF6B35]' 
                     : 'text-gray-400 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <link.icon size={20} />
-                <span>{link.label}</span>
+                <link.icon size={18} />
+                <span className="text-sm">{link.label}</span>
               </Link>
             );
           })}
+          </div>
+          ))}
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-1">
+          {PARTNER_ADMIN_URL && (
+            <a href={PARTNER_ADMIN_URL} className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1">
+              <ArrowLeftRight size={20} />
+              <span>Switch to {PARTNER_NAME}</span>
+            </a>
+          )}
           <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1">
             <Home size={20} />
             <span>Back to Website</span>

@@ -4,6 +4,8 @@ import "./globals.css";
 import SiteChrome from "@/components/ui/SiteChrome";
 import AuthProvider from "./providers/AuthProvider";
 import RevealObserver from "@/components/ui/RevealObserver";
+import { SiteProvider } from "@/components/site/SiteProvider";
+import { getSite } from "@/app/lib/site";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -20,63 +22,46 @@ const SITE_NAME = "Marksila254";
 const DEFAULT_DESCRIPTION =
   "Transform your fitness journey with Marksila254. Expert personal training, group fitness classes, nutrition guidance, and professional workout programs tailored to your goals in Nairobi, Kenya.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(APP_URL),
-  title: {
-    default: `${SITE_NAME} | Professional Fitness Instructor & Personal Trainer`,
-    template: `%s | ${SITE_NAME}`,
-  },
-  description: DEFAULT_DESCRIPTION,
-  keywords: "fitness trainer, personal trainer, gym, workout, weight loss, muscle building, fitness classes, nutrition, Kenya",
-  icons: {
-    icon: '/images/logo.svg',
-  },
-  manifest: '/site.webmanifest',
-  robots: {
-    index: true,
-    follow: true,
-  },
-  openGraph: {
-    type: 'website',
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} | Professional Fitness Instructor & Personal Trainer`,
-    description: DEFAULT_DESCRIPTION,
-    url: APP_URL,
-    locale: 'en_KE',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `${SITE_NAME} | Professional Fitness Instructor & Personal Trainer`,
-    description: DEFAULT_DESCRIPTION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const site = await getSite();
+  const name = site.name || SITE_NAME;
+  const title = `${name} | ${site.tagline || 'Professional Fitness Instructor & Personal Trainer'}`;
+  const description = site.settings.seo?.description || DEFAULT_DESCRIPTION;
+  return {
+    metadataBase: new URL(APP_URL),
+    title: { default: title, template: `%s | ${name}` },
+    description,
+    keywords: "fitness trainer, personal trainer, gym, workout, weight loss, muscle building, fitness classes, corporate wellness, team building, Kenya",
+    icons: { icon: '/images/logo.svg' },
+    manifest: '/site.webmanifest',
+    robots: { index: true, follow: true },
+    openGraph: { type: 'website', siteName: name, title, description, url: APP_URL, locale: 'en_KE' },
+    twitter: { card: 'summary_large_image', title, description },
+  };
+}
 
-const localBusinessJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  name: SITE_NAME,
-  description: DEFAULT_DESCRIPTION,
-  url: APP_URL,
-  image: `${APP_URL}/images/logo.svg`,
-  telephone: process.env.NEXT_PUBLIC_PHONE,
-  email: process.env.NEXT_PUBLIC_EMAIL,
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Nairobi',
-    addressCountry: 'KE',
-  },
-  sameAs: [
-    process.env.NEXT_PUBLIC_TIKTOK,
-    process.env.NEXT_PUBLIC_INSTAGRAM,
-    process.env.NEXT_PUBLIC_FACEBOOK,
-  ].filter(Boolean),
-};
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const site = await getSite();
+  const localBusinessJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    name: site.name,
+    description: site.settings.seo?.description || DEFAULT_DESCRIPTION,
+    url: APP_URL,
+    image: `${APP_URL}/images/logo.svg`,
+    telephone: site.contactPhone ?? undefined,
+    email: site.contactEmail ?? undefined,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: site.location?.split(',')[0] || 'Nairobi',
+      addressCountry: 'KE',
+    },
+    sameAs: Object.values(site.settings.social ?? {}).filter(Boolean),
+  };
   return (
     <html lang="en" className={`${inter.variable} ${montserrat.variable}`} suppressHydrationWarning>
       <head>
@@ -91,7 +76,9 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
         />
         <AuthProvider>
-          <SiteChrome>{children}</SiteChrome>
+          <SiteProvider site={site}>
+            <SiteChrome>{children}</SiteChrome>
+          </SiteProvider>
           <RevealObserver />
         </AuthProvider>
       </body>

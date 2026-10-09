@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Cookie } from 'lucide-react';
 import LegalPageLayout from '@/components/ui/LegalPageLayout';
+import { getSite, telHref } from '@/app/lib/site';
 
 export const metadata: Metadata = {
   title: 'Cookie Policy',
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CookiePolicyPage() {
+export default async function CookiePolicyPage() {
+  const site = await getSite();
+  const email = site.contactEmail || 'markotundo777@gmail.com';
+  const phone = site.contactPhone || '+254 701 437 959';
   return (
     <LegalPageLayout
       title="Cookie Policy"
@@ -74,7 +78,7 @@ export default function CookiePolicyPage() {
       <h2>6. Contact Us</h2>
       <p>
         Questions about this Cookie Policy? Reach us at{' '}
-        <a href="mailto:markotundo777@gmail.com">markotundo777@gmail.com</a>.
+        <a href={`mailto:${email}`}>{email}</a>.
       </p>
     </LegalPageLayout>
   );

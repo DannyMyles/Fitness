@@ -6,14 +6,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
+import { useSite, usePageHeader } from '@/components/site/SiteProvider';
+
+const STAT_ICONS = [Users, Clock, Award, Target];
+const VALUE_ICONS = [Heart, Target, Dumbbell, Zap];
+
+/** "100+" → { n: 100, prefix: '', suffix: '+' } so the number can count up. */
+function parseStat(value: string) {
+  const m = value.match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
+  return m ? { prefix: m[1], n: Number(m[2]), suffix: m[3] } : null;
+}
 
 export default function AboutClient() {
-  const [animatedStats, setAnimatedStats] = useState({
-    clients: 0,
-    years: 0,
-    certifications: 0,
-    success: 0
-  });
+  const header = usePageHeader('about', { eyebrow: 'Certified Personal Trainer', title: 'About Marksila254', subtitle: 'Passionate about helping people transform their lives through fitness, proper nutrition, and sustainable lifestyle changes.' });
+  const site = useSite();
+  // Count-up progress 0 → 1 for the stats (edited in Admin → Settings).
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     // Animate stats on scroll
@@ -37,60 +45,27 @@ export default function AboutClient() {
   }, []);
 
   const animateStats = () => {
-    const duration = 2000;
     const steps = 60;
-    const stepDuration = duration / steps;
-
+    let step = 0;
     const interval = setInterval(() => {
-      setAnimatedStats(prev => ({
-        clients: Math.min(prev.clients + 2, 100),
-        years: Math.min(prev.years + 0.2, 10),
-        certifications: Math.min(prev.certifications + 0.1, 2),
-        success: Math.min(prev.success + 2, 98)
-      }));
-    }, stepDuration);
-
-    setTimeout(() => clearInterval(interval), duration);
+      step += 1;
+      setProgress(Math.min(1, step / steps));
+      if (step >= steps) clearInterval(interval);
+    }, 2000 / steps);
   };
 
-  const stats = [
-    { icon: Users, key: 'clients' as const, label: 'Clients Transformed', suffix: '+' },
-    { icon: Clock, key: 'years' as const, label: 'Years Experience', suffix: '' },
-    { icon: Award, key: 'certifications' as const, label: 'Certifications', suffix: '' },
-    { icon: Target, key: 'success' as const, label: 'Success Rate', suffix: '%' }
-  ];
+  const stats = (site.settings.stats ?? []).map((stat, i) => ({ ...stat, icon: STAT_ICONS[i % STAT_ICONS.length], parsed: parseStat(stat.value) }));
 
-  const values = [
-    {
-      icon: Heart,
-      title: 'Client-First',
-      description: 'Every program is tailored to your unique goals, fitness level, and lifestyle.'
-    },
-    {
-      icon: Target,
-      title: 'Results Driven',
-      description: 'We focus on measurable progress and sustainable results, not quick fixes.'
-    },
-    {
-      icon: Dumbbell,
-      title: 'Expert Knowledge',
-      description: 'Certified training with up-to-date techniques in fitness and nutrition.'
-    },
-    {
-      icon: Zap,
-      title: 'Energy & Passion',
-      description: 'Bringing enthusiasm and motivation to every session we conduct.'
-    }
-  ];
+  const values = (site.settings.values ?? []).map((v, i) => ({ title: v.title, description: v.text, icon: VALUE_ICONS[i % VALUE_ICONS.length] }));
 
   return (
     <div className="pt-0">
       {/* Hero Section */}
       <PageHero
-        badge="Certified Personal Trainer"
+        badge={header.eyebrow}
         badgeIcon={Award}
-        title="About Marksila254"
-        subtitle="Passionate about helping people transform their lives through fitness, proper nutrition, and sustainable lifestyle changes."
+        title={header.title}
+        subtitle={header.subtitle}
       />
 
       {/* Stats Section */}
@@ -106,8 +81,9 @@ export default function AboutClient() {
                   <stat.icon size={28} className="text-fitness-primary" />
                 </div>
                 <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                  {Math.round(animatedStats[stat.key])}
-                  {stat.suffix}
+                  {stat.parsed
+                    ? `${stat.parsed.prefix}${Math.round(stat.parsed.n * progress)}${stat.parsed.suffix}`
+                    : stat.value}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
               </div>
@@ -156,25 +132,16 @@ export default function AboutClient() {
               </div>
               
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Transforming Lives Through <span className="text-gradient-mixed">Fitness</span>
+                {site.settings.about?.headline || 'Transforming Lives Through Fitness'}
               </h2>
               
               <div className="space-y-4 text-gray-800 leading-relaxed">
-                <p>
-                  I started my fitness journey over a decade ago, driven by a personal transformation 
-                  that changed my life. What began as a personal quest for better health quickly 
-                  turned into a passion for helping others achieve their goals.
-                </p>
-                <p>
-                  Through years of dedicated study, certification, and hands-on experience, I've 
-                  developed training methodologies that deliver real results. My approach combines 
-                  scientific training principles with practical nutrition guidance to create 
-                  sustainable lifestyle changes.
-                </p>
-                <p>
-                  Whether you're looking to lose weight, build muscle, improve athletic performance,
-                  or simply feel more energetic, I'm here to guide you every step of the way.
-                </p>
+                {(site.settings.about?.story || site.settings.about?.body || '')
+                  .split(/\n{2,}/)
+                  .filter(Boolean)
+                  .map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
               </div>
 
               <div className="pt-4">

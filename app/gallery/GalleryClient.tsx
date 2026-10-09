@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, Instagram, Facebook, Loader2, AlertCircle, Image as ImageIcon, RefreshCw, Play, Youtube } from 'lucide-react';
 import { FaTiktok } from 'react-icons/fa6';
 import PageHero from '@/components/ui/PageHero';
+import { usePageHeader } from '@/components/site/SiteProvider';
 import EmptyState from '@/components/ui/EmptyState';
 import { galleryService, GalleryCategory, GalleryImage } from '@/app/api_services/galleryService';
 import { youtubeService, YoutubeVideo } from '@/app/api_services/youtubeService';
@@ -11,6 +12,7 @@ import { youtubeService, YoutubeVideo } from '@/app/api_services/youtubeService'
 const VIDEOS_PAGE_SIZE = 9;
 
 export default function GalleryClient() {
+  const header = usePageHeader('gallery', { eyebrow: '', title: 'Photo & Video Gallery', subtitle: 'Explore moments from training sessions, client transformations, fitness events, and more.' });
   const [activeTab, setActiveTab] = useState<'photos' | 'videos'>('photos');
 
   const [categories, setCategories] = useState<GalleryCategory[]>([]);
@@ -64,10 +66,7 @@ export default function GalleryClient() {
   return (
     <div className="pt-0">
       {/* Hero Section */}
-      <PageHero
-        title="Photo & Video Gallery"
-        subtitle="Explore moments from training sessions, client transformations, fitness events, and more."
-      />
+      <PageHero badge={header.eyebrow} title={header.title} subtitle={header.subtitle} />
 
       {/* Photos / Videos toggle */}
       <div className="pt-16 flex justify-center">

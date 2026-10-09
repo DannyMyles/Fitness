@@ -70,6 +70,8 @@ export interface BookingInput {
   attendeeEmail?: string
   participants: number
   notes?: string
+  /** Same id on a retry = the server returns the original booking. */
+  requestId?: string
 }
 
 export interface MyRegistration {

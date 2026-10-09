@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { FileText } from 'lucide-react';
 import LegalPageLayout from '@/components/ui/LegalPageLayout';
+import { getSite, telHref } from '@/app/lib/site';
 
 export const metadata: Metadata = {
   title: 'Terms & Conditions',
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TermsAndConditionsPage() {
+export default async function TermsAndConditionsPage() {
+  const site = await getSite();
+  const email = site.contactEmail || 'markotundo777@gmail.com';
+  const phone = site.contactPhone || '+254 701 437 959';
   return (
     <LegalPageLayout
       title="Terms & Conditions"
@@ -105,8 +109,8 @@ export default function TermsAndConditionsPage() {
       <h2>10. Contact Us</h2>
       <p>
         Questions about these Terms? Reach us at{' '}
-        <a href="mailto:markotundo777@gmail.com">markotundo777@gmail.com</a> or{' '}
-        <a href="tel:+254701437959">+254 701 437 959</a>.
+        <a href={`mailto:${email}`}>{email}</a> or{' '}
+        <a href={telHref(phone)}>{phone}</a>.
       </p>
     </LegalPageLayout>
   );

@@ -47,16 +47,20 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
 
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Email and password are required")
         }
 
         // Logs in against the shared API as the `fitness` app — accounts are
         // per app, so a Source of Adventure account can't sign in here.
+        // Pass the visitor's address on so the API rate-limits logins per
+        // person rather than treating every visitor as this one server.
+        const forwardedFor = req?.headers?.['x-forwarded-for']
+        const clientIp = (Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor)?.split(',')[0]?.trim()
         const response = await backendFetch('/api/v1/auth/login', {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(clientIp ? { "x-forwarded-for": clientIp } : {}) },
           body: JSON.stringify({ email: credentials.email, password: credentials.password }),
           cache: 'no-store',
         })

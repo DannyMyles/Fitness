@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { RefreshCw } from 'lucide-react';
 import LegalPageLayout from '@/components/ui/LegalPageLayout';
+import { getSite, telHref } from '@/app/lib/site';
 
 export const metadata: Metadata = {
   title: 'Refund & Returns Policy',
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RefundPolicyPage() {
+export default async function RefundPolicyPage() {
+  const site = await getSite();
+  const email = site.contactEmail || 'markotundo777@gmail.com';
+  const phone = site.contactPhone || '+254 701 437 959';
   return (
     <LegalPageLayout
       title="Refund & Returns Policy"
@@ -31,7 +35,7 @@ export default function RefundPolicyPage() {
       <ul>
         <li>Request a return or exchange within <strong>7 days</strong> of receiving your order.</li>
         <li>Items must be unworn, unwashed, and in their original condition with tags attached.</li>
-        <li>To start a return or exchange, contact us with your order number at <a href="mailto:markotundo777@gmail.com">markotundo777@gmail.com</a> or on WhatsApp.</li>
+        <li>To start a return or exchange, contact us with your order number at <a href={`mailto:${email}`}>{email}</a> or on WhatsApp.</li>
         <li>For a sizing exchange, we'll arrange a swap for the correct size, subject to availability.</li>
         <li>Return shipping is covered by the customer unless the item arrived damaged or incorrect, in which case we cover the cost.</li>
       </ul>
@@ -72,8 +76,8 @@ export default function RefundPolicyPage() {
       <h2>7. Contact Us</h2>
       <p>
         For any return, exchange, refund, or cancellation request, reach us at{' '}
-        <a href="mailto:markotundo777@gmail.com">markotundo777@gmail.com</a> or{' '}
-        <a href="tel:+254701437959">+254 701 437 959</a>.
+        <a href={`mailto:${email}`}>{email}</a> or{' '}
+        <a href={telHref(phone)}>{phone}</a>.
       </p>
     </LegalPageLayout>
   );

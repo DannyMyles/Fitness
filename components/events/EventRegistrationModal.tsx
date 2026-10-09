@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Loader2, AlertCircle, CheckCircle, X, Minus, Plus, MessageCircle, Calendar, MapPin } from 'lucide-react';
 import { eventService, EventItem, RegistrationResponse } from '@/app/api_services/eventService';
+import { newRequestId } from '@/app/lib/enquiries';
 import {
   PHONE_REGEX,
   cancelWhatsAppTab,
@@ -32,6 +33,7 @@ export default function EventRegistrationModal({ event, onClose, onRegistered }:
   const maxParticipants = Math.max(1, Math.min(20, event.spotsRemaining));
 
   const [attendeeName, setAttendeeName] = useState('');
+  const requestId = useRef(newRequestId());
   const [attendeePhone, setAttendeePhone] = useState('');
   const [participants, setParticipants] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,6 +75,7 @@ export default function EventRegistrationModal({ event, onClose, onRegistered }:
         attendeeName: attendeeName.trim(),
         attendeePhone: attendeePhone.trim(),
         participants,
+        requestId: requestId.current,
       });
       saveContactDetails({ name: attendeeName.trim(), phone: attendeePhone.trim() });
       if (result.whatsapp) setWhatsappOpened(sendToWhatsApp(tab, result.whatsapp.url));

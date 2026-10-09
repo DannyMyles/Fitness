@@ -7,10 +7,12 @@ import {
   Loader2, Calendar, Clock, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
+import { usePageHeader } from '@/components/site/SiteProvider';
 import EmptyState from '@/components/ui/EmptyState';
 import { blogService, Blog, Category } from '@/app/api_services/blogService';
 
 export default function BlogClient() {
+  const header = usePageHeader('blog', { eyebrow: 'Insights & Tips', title: 'The Blog', subtitle: 'Training advice, nutrition tips, and updates from the team.' });
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -55,10 +57,10 @@ export default function BlogClient() {
   return (
     <div className="pt-0">
       <PageHero
-        badge="Insights & Tips"
+        badge={header.eyebrow}
         badgeIcon={Newspaper}
-        title="The Blog"
-        subtitle="Training advice, nutrition tips, and updates from the Marksila254 team."
+        title={header.title}
+        subtitle={header.subtitle}
       />
 
       <section className="py-20 bg-gray-50">

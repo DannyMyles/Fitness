@@ -9,7 +9,13 @@ import { useCartStore } from '@/app/lib/cartStore';
 import { Category, Product } from '@/types/commerce';
 import EmptyState from '@/components/ui/EmptyState';
 
-const heroTiles = [
+// Hero collage: featured products (Admin → Products → Featured); these until loaded.
+const TILE_STYLES = [
+  { rotate: '-rotate-3', z: 'z-20' },
+  { rotate: 'rotate-2', z: 'z-10' },
+  { rotate: '-rotate-2', z: 'z-0' },
+];
+const FALLBACK_TILES = [
   { src: '/images/mark254/tshirts/tshirts_01.png', rotate: '-rotate-3', z: 'z-20' },
   { src: '/images/mark254/hoodies_pullover/hoodies_pullover_02.png', rotate: 'rotate-2', z: 'z-10' },
   { src: '/images/mark254/bottles/bottles_04.png', rotate: '-rotate-2', z: 'z-0' },
@@ -22,6 +28,8 @@ export default function ShopClient() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [heroImages, setHeroImages] = useState<string[]>(FALLBACK_TILES.map((t) => t.src));
+  const heroTiles = heroImages.map((src, i) => ({ src, ...TILE_STYLES[i] }));
 
   const lines = useCartStore((s) => s.lines);
   const addItem = useCartStore((s) => s.addItem);
@@ -35,6 +43,16 @@ export default function ShopClient() {
       .getCategories()
       .then(setCategories)
       .catch(() => setError('Could not load categories.'));
+    productService
+      .getProducts({})
+      .then((all) => {
+        const picks = [...all.filter((p) => p.featured), ...all.filter((p) => !p.featured)]
+          .map((p) => p.images[0])
+          .filter(Boolean)
+          .slice(0, 3);
+        if (picks.length === 3) setHeroImages(picks);
+      })
+      .catch(() => {});
   }, []);
 
   const fetchProducts = () => {

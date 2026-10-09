@@ -2,18 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/app/lib/auth';
 import { backendFetch } from '@/app/lib/backend';
 
-// Proxies admin-only commerce requests (product/category CRUD, order list/status
-// updates) to the shared mark254-commerce-api backend, attaching this app's
-// server-only admin key (COMMERCE_ADMIN_KEY — the `fitness` key, see the
-// backend's `npm run app`). The key never reaches browser JS; the client only
-// talks to this same-origin route, gated by the NextAuth admin session.
+// Proxies admin requests (shop, bookings, enquiries, services, content,
+// settings) to the shared mark254-commerce-api backend as the `fitness` app.
+// It is gated by the NextAuth admin session and forwards that admin's own
+// backend token, so every change is made — and can be audited — as a real
+// admin account. COMMERCE_ADMIN_KEY (optional, server-only) is still sent for
+// backwards compatibility; neither credential ever reaches browser JS.
 const COMMERCE_ADMIN_KEY = process.env.COMMERCE_ADMIN_KEY || '';
 
+/** State-changing requests must come from this site's own pages. */
+function sameOrigin(req: NextRequest) {
+  const origin = req.headers.get('origin');
+  return !origin || origin === req.nextUrl.origin || origin === `${req.headers.get('x-forwarded-proto') ?? 'http'}://${req.headers.get('host')}`;
+}
+
 async function proxy(req: NextRequest, path: string[]) {
+  let admin;
   try {
-    await requireAdmin();
+    admin = await requireAdmin();
   } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (req.method !== 'GET' && !sameOrigin(req)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   const targetPath = `/api/${path.map(encodeURIComponent).join('/')}${req.nextUrl.search}`;
@@ -27,7 +38,8 @@ async function proxy(req: NextRequest, path: string[]) {
     cache: 'no-store',
     method: req.method,
     headers: {
-      'x-admin-key': COMMERCE_ADMIN_KEY,
+      authorization: `Bearer ${admin.accessToken}`,
+      ...(COMMERCE_ADMIN_KEY ? { 'x-admin-key': COMMERCE_ADMIN_KEY } : {}),
       ...(isMultipart ? {} : { 'Content-Type': 'application/json' }),
     },
     body: !hasBody ? undefined : isMultipart ? await req.formData() : await req.text(),

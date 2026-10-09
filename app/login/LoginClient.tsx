@@ -140,7 +140,7 @@ export default function LoginClient() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-fitness-primary transition-colors"
-                  placeholder="admin@marksila254.com"
+                  placeholder="you@example.com"
                   required
                 />
               </div>

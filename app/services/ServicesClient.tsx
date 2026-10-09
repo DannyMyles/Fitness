@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { whatsappLink } from '@/app/lib/backend';
 import { Dumbbell, Heart, Zap, Clock, Users, Award, CheckCircle, Star, ArrowRight, Loader2, RefreshCw, AlertCircle, type LucideIcon, MessageCircle } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
 import CtaSection from '@/components/ui/CtaSection';
 import EmptyState from '@/components/ui/EmptyState';
 import { Training, trainingService } from '@/app/api_services/trainingService';
+import ServiceBookingModal from '@/components/booking/ServiceBookingModal';
+import { useSite, usePageHeader } from '@/components/site/SiteProvider';
+import { useAverageRating } from '@/app/hooks/useAverageRating';
+import { priceLabelFor } from '@/app/lib/enquiries';
 
 const iconMap: Record<string, LucideIcon> = { Dumbbell, Heart, Zap, Clock, Users, Award, Star, CheckCircle };
 const colorPalette = [
@@ -19,27 +22,19 @@ const colorPalette = [
   'from-yellow-500 to-orange-500',
 ];
 
-const benefits = [
-  'Certified & experienced trainer',
-  'Personalized approach for every client',
-  'Modern training techniques',
-  'Flexible scheduling options',
-  'Online & in-person sessions',
-  'Ongoing support & motivation'
-];
-
-const processSteps = [
-  { step: '01', title: 'Consultation', description: 'Free initial consultation to discuss your goals and assess your needs.' },
-  { step: '02', title: 'Custom Plan', description: 'Receive a personalized training and nutrition plan tailored to you.' },
-  { step: '03', title: 'Training', description: 'Begin your training program with ongoing support and adjustments.' },
-  { step: '04', title: 'Results', description: 'Achieve your goals and maintain your new healthy lifestyle.' }
-];
 
 export default function ServicesClient() {
+  const header = usePageHeader('services', { eyebrow: 'Professional Services', title: 'My Services', subtitle: 'Professional fitness services tailored to help you achieve your health and wellness goals.' });
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [trainings, setTrainings] = useState<Training[]>([]);
   const [isLoadingTrainings, setIsLoadingTrainings] = useState(true);
   const [trainingsError, setTrainingsError] = useState('');
+  const [booking, setBooking] = useState<Training | null>(null);
+  const site = useSite();
+  const rating = useAverageRating();
+  // Benefits and steps are edited in Admin → Settings.
+  const benefits = (site.settings.values ?? []).map((v) => v.title);
+  const processSteps = (site.settings.steps ?? []).map((st, i) => ({ step: String(i + 1).padStart(2, '0'), title: st.title, description: st.text }));
 
 
   const fetchTrainings = () => {
@@ -47,7 +42,8 @@ export default function ServicesClient() {
     setTrainingsError('');
     trainingService
       .getAllTrainings()
-      .then((response) => setTrainings(trainingService.sortForDisplay(response.trainings)))
+      // Corporate-only offerings live on /corporate.
+      .then((response) => setTrainings(trainingService.sortForDisplay(response.trainings).filter((t) => t.audience !== 'corporate')))
       .catch(() => setTrainingsError('Could not load services. Please check back shortly.'))
       .finally(() => setIsLoadingTrainings(false));
   };
@@ -60,10 +56,10 @@ export default function ServicesClient() {
     <div className="pt-0">
       {/* Hero Section */}
       <PageHero
-        badge="Professional Services"
+        badge={header.eyebrow}
         badgeIcon={Zap}
-        title="My Services"
-        subtitle="Professional fitness services tailored to help you achieve your health and wellness goals."
+        title={header.title}
+        subtitle={header.subtitle}
       />
         
       {/* Services Grid */}
@@ -158,16 +154,19 @@ export default function ServicesClient() {
                   </div>
 
                   <div className="flex items-center justify-between pt-4 mt-auto border-t border-gray-100">
-                    <span className="text-gradient-primary font-bold">{training.price}</span>
-                    <a
-                      href={whatsappLink(`Hi Marksila254! I'd like to start ${training.title} (${training.price}). When can we begin?`)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5b] transition-colors"
-                    >
-                      <MessageCircle size={16} />
-                      Get Started
-                    </a>
+                    <span className="text-gradient-primary font-bold">{priceLabelFor(training)}</span>
+                    {training.available ? (
+                      <button
+                        type="button"
+                        onClick={() => setBooking(training)}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5b] transition-colors"
+                      >
+                        <MessageCircle size={16} />
+                        Book now
+                      </button>
+                    ) : (
+                      <span className="rounded-full bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-500">Currently unavailable</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -198,8 +197,8 @@ export default function ServicesClient() {
                     <Star size={28} className="text-white" />
                   </div>
                   <div>
-                    <div className="text-3xl font-bold">4.9/5</div>
-                    <div className="text-sm text-white/90">Client Rating</div>
+                    <div className="text-3xl font-bold">{rating ? `${rating.avg.toFixed(1)}/5` : site.settings.stats?.[0]?.value ?? '★'}</div>
+                    <div className="text-sm text-white/90">{rating ? `from ${rating.count} reviews` : site.settings.stats?.[0]?.label ?? 'Client focused'}</div>
                   </div>
                 </div>
               </div>
@@ -219,8 +218,8 @@ export default function ServicesClient() {
               </h2>
               
               <p className="text-gray-700 mb-8 leading-relaxed">
-                With over 10 years of experience and hundreds of satisfied clients, I bring 
-                expertise, passion, and personalized attention to every training session.
+                {site.settings.about?.body ||
+                  'Expertise, passion, and personalized attention in every training session.'}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -364,6 +363,8 @@ export default function ServicesClient() {
           </div>
         </div>
       </section>
+
+      {booking && <ServiceBookingModal service={booking} onClose={() => setBooking(null)} />}
 
       <CtaSection
         title="Ready to Transform Your Life?"

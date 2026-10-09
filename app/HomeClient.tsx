@@ -12,44 +12,52 @@ import {
   AlertCircle, CheckCircle, Upload
 } from 'lucide-react';
 import { testimonialService, Testimonial } from '@/app/api_services/testimonialService';
+import { useSite } from '@/components/site/SiteProvider';
+import { galleryService } from '@/app/api_services/galleryService';
+
+interface Banner { id: number; title: string; subtitle: string | null; badge: string | null; image: string | null; ctaLabel: string | null; ctaUrl: string | null }
 
 // Gallery images
-const galleryImages = [
+// Shown only until photos are uploaded in Admin → Gallery.
+const FALLBACK_GALLERY = [
   { src: "/images/004.JPG", alt: "Fitness Training" },
   { src: "/images/028.JPG", alt: "Weight Training" },
   { src: "/images/021.JPG", alt: "Personal Training" },
   { src: "/images/007.JPG", alt: "HIIT Workout" },
 ];
 
-// Features data
-const features = [
-  {
-    icon: Dumbbell,
-    title: "Modern Equipment",
-    description: "State-of-the-art fitness equipment for optimal training results",
-    color: "from-orange-500 to-red-500"
-  },
-  {
-    icon: Heart,
-    title: "Personalized Plans",
-    description: "Customized workout and nutrition plans tailored to your goals",
-    color: "from-green-500 to-emerald-500"
-  },
-  {
-    icon: Zap,
-    title: "Online Support",
-    description: "24/7 virtual support and guidance for your fitness journey",
-    color: "from-yellow-500 to-orange-500"
-  },
-  {
-    icon: Clock,
-    title: "Flexible Schedule",
-    description: "Training sessions available early morning to late evening",
-    color: "from-fitness-primary-dark to-fitness-primary"
-  }
+// Icons/colours for the highlights edited in Admin → Settings → Homepage.
+const FEATURE_STYLES = [
+  { icon: Dumbbell, color: "from-orange-500 to-red-500" },
+  { icon: Heart, color: "from-green-500 to-emerald-500" },
+  { icon: Zap, color: "from-yellow-500 to-orange-500" },
+  { icon: Clock, color: "from-fitness-primary-dark to-fitness-primary" },
 ];
 
 export default function HomeClient() {
+  const site = useSite();
+  const features = (site.settings.highlights ?? []).map((h, i) => ({
+    title: h.title,
+    description: h.text,
+    ...FEATURE_STYLES[i % FEATURE_STYLES.length],
+  }));
+  const [clientsStat, experienceStat] = site.settings.stats ?? [];
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [galleryImages, setGalleryImages] = useState(FALLBACK_GALLERY);
+  useEffect(() => {
+    galleryService
+      .getImages()
+      .then((images) => {
+        if (images.length) setGalleryImages(images.map((i) => ({ src: galleryService.getImageUrl(i), alt: i.title || 'Training moment' })));
+      })
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    fetch('/api/v1/banners?placement=home')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => d && setBanners(d.banners ?? []))
+      .catch(() => {});
+  }, []);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isLoadingTestimonials, setIsLoadingTestimonials] = useState(true);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -141,6 +149,33 @@ export default function HomeClient() {
     <>
       <Hero />
 
+      {banners.length > 0 && (
+        <section className="container mx-auto px-4 pb-12">
+          <div className={`grid gap-4 ${banners.length > 1 ? 'md:grid-cols-2' : ''}`}>
+            {banners.slice(0, 2).map((b) => (
+              <div key={b.id} className="relative overflow-hidden rounded-3xl bg-ink text-white">
+                {b.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={b.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+                )}
+                <div className="relative flex flex-col gap-3 p-7 md:flex-row md:items-end md:justify-between md:p-10">
+                  <div className="max-w-2xl">
+                    {b.badge && <span className="mb-3 inline-block rounded-full bg-fitness-primary px-3 py-1 text-xs font-bold uppercase tracking-wider">{b.badge}</span>}
+                    <h2 className="font-display text-2xl font-bold md:text-3xl">{b.title}</h2>
+                    {b.subtitle && <p className="mt-2 text-white/80">{b.subtitle}</p>}
+                  </div>
+                  {b.ctaLabel && b.ctaUrl && (
+                    <Link href={b.ctaUrl} className="inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-white px-6 py-3 font-semibold text-ink transition-colors hover:bg-fitness-primary hover:text-white md:self-auto">
+                      {b.ctaLabel} <ArrowRight size={18} />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
       <section className="">
         <div className="container mx-auto px-4">
@@ -192,10 +227,12 @@ export default function HomeClient() {
               </div>
               
               {/* Experience Badge */}
+              {experienceStat && (
               <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-fitness-primary to-fitness-primary-dark text-white rounded-2xl p-6 shadow-fitness-lg animate-bounce-slow">
-                <div className="text-3xl font-bold">10</div>
-                <div className="text-sm">Years Experience</div>
+                <div className="text-3xl font-bold">{experienceStat.value}</div>
+                <div className="text-sm">{experienceStat.label}</div>
               </div>
+              )}
               
               {/* Stats Badge */}
               <div className="absolute -top-6 -left-6 glass rounded-2xl p-5 shadow-fitness">
@@ -204,8 +241,8 @@ export default function HomeClient() {
                     <Users size={28} className="text-fitness-primary" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-gray-900">100+</div>
-                    <div className="text-sm text-gray-600">Clients</div>
+                    <div className="text-2xl font-bold text-gray-900">{clientsStat?.value ?? '—'}</div>
+                    <div className="text-sm text-gray-600">{clientsStat?.label ?? 'Clients'}</div>
                   </div>
                 </div>
               </div>
@@ -218,7 +255,7 @@ export default function HomeClient() {
               </div>
               
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                About <span className="text-gradient-primary">Marksila254</span>
+                About <span className="text-gradient-primary">{site.name}</span>
               </h2>
               
               <p className="text-lg text-gray-700 leading-relaxed">

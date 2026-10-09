@@ -7,7 +7,8 @@ A modern, responsive website for Marksila254, a professional fitness instructor 
 ### Public Pages
 - **Home** - Hero section with call-to-action, stats, and featured content
 - **About** - Trainer profile, experience, and certifications
-- **Services** - Training programs, pricing, and service details
+- **Services** - Training programs, pricing and packages, bookable online (saved + WhatsApp)
+- **Corporate** - Corporate wellness, team-building, hikes, office fitness and group memberships, with corporate booking and tailored quote requests
 - **Gallery** - Photo gallery with filtering by category
 - **Events** - Upcoming fitness events with registration
 - **Shop** - E-commerce store for fitness products and merchandise
@@ -15,7 +16,13 @@ A modern, responsive website for Marksila254, a professional fitness instructor 
 - **Contact** - Contact form and business information
 
 ### Admin Dashboard
-- **Dashboard** - Overview with stats, recent orders, upcoming events
+- **Dashboard** - Bookings/enquiries by status, recent activity, upcoming capacity, email health
+- **Bookings** - Every event booking with search, filters, pagination; confirm / complete / cancel (customer emailed), send reminders
+- **Enquiries & quotes** - Contact messages, service & corporate bookings, quote requests; set status, quote amount, notes, email the customer
+- **Services & packages** - Individual and corporate offerings, categories, pricing (fixed / per person / quotation), packages, availability
+- **FAQs & banners** - FAQ entries and homepage/corporate banners with optional date windows
+- **Settings** - Contact details, WhatsApp number, hours, social links, hero/about copy, stats, steps, email branding, test email
+- **Email log** - Delivery status of every email (sent / failed / not sent)
 - **User Management** - Manage registered users
 - **Product Management** - Add, edit, delete products
 - **Order Management** - View and process orders
@@ -72,14 +79,18 @@ marksila254/
 
 ## 🚀 Getting Started
 
-This site runs on the shared backend in `../mark254-commerce-api` (MariaDB), which
+This site runs on the shared backend in `../marksila_api` (MariaDB), which
 also serves Source of Adventure (`../sos`). Start that first — see its README.
 
 ```bash
-cp .env.example .env    # BACKEND_URL, NEXT_PUBLIC_APP_KEY=fitness, COMMERCE_ADMIN_KEY, NEXTAUTH_SECRET
+cp .env.example .env.local   # BACKEND_URL, NEXT_PUBLIC_APP_KEY=fitness, NEXTAUTH_URL, NEXTAUTH_SECRET
 npm install
-npm run dev             # http://localhost:3000
+npm run dev                  # http://localhost:3000 (port pinned; SOS uses 3001)
 ```
+
+Contact details, social links, hours and page copy come from the database
+(**Admin → Settings**), not from env vars. `app/lib/site.ts` loads them once per
+minute in the root layout; client components read them with `useSite()`.
 
 **How it talks to the backend:** the browser only calls this site's own `/api/v1/*`,
 `/api/orders`, `/api/products`, `/api/categories` and `/uploads/*`. `proxy.ts` forwards
@@ -94,13 +105,23 @@ the full summary; delivery and payment are agreed there. Events work the same wa
 (**Book on WhatsApp**, with a participant count). No login is needed; logged-in
 customers also see their orders/bookings under **Account**.
 
-Admins confirm orders and mark them paid in **Admin → Orders**, and confirm/cancel
-bookings in **Admin → Events → Registrations**.
+Services and corporate packages use the same pattern: the booking form saves an
+enquiry (reference like `MKE-7KQ2ZD`) and opens WhatsApp with the service, package,
+group size, date and contact details prefilled. Opening WhatsApp does not confirm
+anything — the team confirms or sends a quote from **Admin → Enquiries**. Retried
+submissions (double taps, flaky networks) are de-duplicated with a request id.
+
+Admins confirm orders and mark them paid in **Admin → Orders**, and confirm/complete/cancel
+bookings in **Admin → Bookings** (or per event under **Events → Registrations**).
 
 ## 📝 Admin Access
 
-- **URL**: `/admin` — sign in with an admin account of the `fitness` app
-  (the backend seed creates `admin@marksila254.com`; change its password).
+- **URL**: `/admin` — sign in with an admin account of the `fitness` app.
+  Set or reset a password from the backend:
+  `ADMIN_PASSWORD='…' npm run app -- set-password --key fitness --email admin@marksila254.com`
+- Admin API calls go through `app/api/commerce/admin/[...path]`, which checks the
+  NextAuth admin session and forwards that admin's own backend token (no shared key needed).
+- `NEXT_PUBLIC_PARTNER_ADMIN_URL` adds a "Switch to Source of Adventure admin" link.
 
 ## 🎨 Design System
 

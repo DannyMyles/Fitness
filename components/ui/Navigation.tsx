@@ -5,18 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { ArrowUpRight, LogOut, Mail, Menu, MessageCircle, Phone, ShoppingBag, User, X } from 'lucide-react';
+import { ArrowUpRight, LogOut, Menu, ShoppingBag, User, X } from 'lucide-react';
 import { useCartStore } from '@/app/lib/cartStore';
-import { whatsappLink } from '@/app/lib/backend';
 
+// The logo links home; About, Gallery and Blog live in the footer.
 const links = [
-  { name: 'Home', href: '/' },
-  { name: 'About', href: '/about' },
   { name: 'Services', href: '/services' },
+  { name: 'Corporate', href: '/corporate' },
   { name: 'Events', href: '/events' },
   { name: 'Shop', href: '/shop' },
-  { name: 'Gallery', href: '/gallery' },
-  { name: 'Blog', href: '/blog' },
   { name: 'Contact', href: '/contact' },
 ];
 
@@ -96,14 +93,12 @@ export default function Navigation() {
               </span>
             )}
           </Link>
-          <a
-            href={whatsappLink("Hi Marksila254! I'd like to start training.")}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/services"
             className="ml-1 hidden items-center gap-1.5 rounded-full bg-fitness-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-fitness-primary-dark md:inline-flex"
           >
-            Start training <ArrowUpRight size={16} />
-          </a>
+            Book a session <ArrowUpRight size={16} />
+          </Link>
           <button
             onClick={() => setOpen((o) => !o)}
             className="rounded-full p-2.5 text-ink transition-colors hover:bg-gray-100 lg:hidden"
@@ -136,14 +131,9 @@ export default function Navigation() {
           ))}
         </nav>
         <div className="mt-6 grid gap-3">
-          <a
-            href={whatsappLink("Hi Marksila254! I'd like to start training.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-3.5 font-semibold text-white"
-          >
-            <MessageCircle size={18} /> Chat on WhatsApp
-          </a>
+          <Link href="/services" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-fitness-primary py-3.5 font-semibold text-white">
+            Book a session
+          </Link>
           <Link href={accountHref} className="inline-flex items-center justify-center gap-2 rounded-2xl border border-gray-200 py-3.5 font-semibold text-ink">
             <User size={18} /> {status === 'authenticated' ? 'My account' : 'Log in'}
           </Link>
@@ -152,10 +142,6 @@ export default function Navigation() {
               <LogOut size={16} /> Log out
             </button>
           )}
-        </div>
-        <div className="mt-6 space-y-2 text-sm text-gray-500">
-          <a href="tel:+254701437959" className="flex items-center gap-2"><Phone size={15} /> +254 701 437 959</a>
-          <a href="mailto:markotundo777@gmail.com" className="flex items-center gap-2"><Mail size={15} /> markotundo777@gmail.com</a>
         </div>
       </div>
     </header>

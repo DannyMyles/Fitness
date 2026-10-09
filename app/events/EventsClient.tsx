@@ -7,6 +7,7 @@ import {
   Zap, ArrowRight, Heart, Loader2, AlertCircle, RefreshCw
 } from 'lucide-react';
 import PageHero from '@/components/ui/PageHero';
+import { usePageHeader, useSite } from '@/components/site/SiteProvider';
 import CtaSection from '@/components/ui/CtaSection';
 import EmptyState from '@/components/ui/EmptyState';
 import EventRegistrationModal from '@/components/events/EventRegistrationModal';
@@ -20,6 +21,8 @@ const processSteps = [
 ];
 
 export default function EventsClient() {
+  const site = useSite();
+  const header = usePageHeader('events', { eyebrow: 'Upcoming Sessions', title: 'Fitness Events', subtitle: 'Join our upcoming training sessions, workshops, and fitness events. Reserve your spot and be part of the community.' });
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +57,7 @@ export default function EventsClient() {
     location: {
       '@type': 'Place',
       name: event.location,
-      address: 'Nairobi, Kenya',
+      address: site.location || 'Nairobi, Kenya',
     },
     description: event.description,
     offers: {
@@ -88,10 +91,10 @@ export default function EventsClient() {
 
       {/* Hero Section */}
       <PageHero
-        badge="Upcoming Sessions"
+        badge={header.eyebrow}
         badgeIcon={Calendar}
-        title="Fitness Events"
-        subtitle="Join our upcoming training sessions, workshops, and fitness events. Reserve your spot and be part of the community."
+        title={header.title}
+        subtitle={header.subtitle}
       />
       {/* Events List */}
       <section className="pt-6 pb-16 md:py-20 bg-gradient-to-br from-fitness-light via-white to-fitness-primary/5">
