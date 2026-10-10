@@ -139,7 +139,7 @@ export default function ServiceBookingModal({ service, initialPackageId, mode: i
         <div className="relative h-28 shrink-0 bg-fitness-dark">
           {service.image && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={service.image} alt="" className="h-full w-full object-cover opacity-70" />
+            <img src={service.image} alt="" className="h-full w-full object-cover object-[50%_25%] opacity-70" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-black/10" />
           <button onClick={onClose} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-gray-700 hover:bg-white" aria-label="Close">

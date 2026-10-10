@@ -160,7 +160,7 @@ export default function ServicesView({ showStyleFields = false, categoryHints = 
               <div className="relative h-36 bg-gray-100">
                 {s.image && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={s.image} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  <img src={s.image} alt="" className="h-full w-full object-cover object-[50%_25%]" loading="lazy" />
                 )}
                 <div className="absolute left-3 top-3 flex flex-wrap gap-1">
                   {s.category && <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-gray-800">{s.category}</span>}
@@ -501,7 +501,7 @@ function ServiceEditor({ service, categories, showStyleFields, onClose, onSaved 
           <div className="flex h-32 items-center justify-center overflow-hidden rounded-xl bg-gray-100">
             {preview ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={preview} alt="" className="h-full w-full object-cover" />
+              <img src={preview} alt="" className="h-full w-full object-cover object-[50%_25%]" />
             ) : (
               <ImagePlus className="h-8 w-8 text-gray-400" />
             )}

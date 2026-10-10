@@ -122,11 +122,11 @@ export default function ServicesClient({ initialTrainings }: { initialTrainings:
                   </div>
                 )}
 
-                <div className="relative h-52 sm:h-auto sm:w-2/5 shrink-0 overflow-hidden service-card-image">
+                <div className="relative aspect-[4/3] sm:aspect-auto sm:w-2/5 shrink-0 overflow-hidden service-card-image">
                   <img
                     src={training.image}
                     alt={training.title}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-[50%_25%]"
                   />
                   <div className={`absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-gray-900/80 via-gray-900/20 to-transparent`}></div>
                   <div className={`absolute bottom-4 left-4 w-14 h-14 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center transform transition-all duration-500 group-hover:scale-110 group-hover:rotate-6`}>

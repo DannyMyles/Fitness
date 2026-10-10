@@ -208,10 +208,10 @@ function CorporateCard({ service: s, onBook }: { service: Training; onBook: (pac
   ].filter(Boolean) as { icon: typeof Clock; text: string }[];
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-fitness-lg">
-      <div className="relative h-48 overflow-hidden bg-gray-200">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-200">
         {s.image && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+          <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover object-[50%_25%] transition-transform duration-500 group-hover:scale-105" />
         )}
         {s.category && <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-800">{s.category}</span>}
         {s.popular && <span className="absolute right-4 top-4 rounded-full bg-fitness-primary px-3 py-1 text-xs font-bold text-white">Popular</span>}
