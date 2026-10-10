@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Plus, Minus, Shield, RefreshCw, Dumbbell, Loader2, ArrowUpRight, Search, AlertCircle, MessageCircle, Wallet } from 'lucide-react';
+import { ShoppingCart, Shield, RefreshCw, Dumbbell, Loader2, Search, AlertCircle, MessageCircle, Wallet, ArrowUpDown } from 'lucide-react';
 import { productService } from '@/app/api_services/productService';
 import { useCartStore } from '@/app/lib/cartStore';
 import { Category, Product } from '@/types/commerce';
 import EmptyState from '@/components/ui/EmptyState';
+import ProductCard from '@/components/shop/ProductCard';
 
 // Hero collage: featured products (Admin → Products → Featured); these until loaded.
 const TILE_STYLES = [
@@ -16,10 +17,18 @@ const TILE_STYLES = [
   { rotate: '-rotate-2', z: 'z-0' },
 ];
 const FALLBACK_TILES = [
-  { src: '/images/mark254/tshirts/tshirts_01.png', rotate: '-rotate-3', z: 'z-20' },
-  { src: '/images/mark254/hoodies_pullover/hoodies_pullover_02.png', rotate: 'rotate-2', z: 'z-10' },
-  { src: '/images/mark254/bottles/bottles_04.png', rotate: '-rotate-2', z: 'z-0' },
+  { src: '/images/marksila/tshirts/tshirts_01.webp', rotate: '-rotate-3', z: 'z-20' },
+  { src: '/images/marksila/hoodies_pullover/hoodies_pullover_02.webp', rotate: 'rotate-2', z: 'z-10' },
+  { src: '/images/marksila/bottles/bottles_04.webp', rotate: '-rotate-2', z: 'z-0' },
 ];
+
+const SORTS = {
+  featured: { label: 'Featured', compare: (a: Product, b: Product) => Number(b.featured) - Number(a.featured) },
+  newest: { label: 'Newest arrivals', compare: (a: Product, b: Product) => Number(b.isNew) - Number(a.isNew) || b.createdAt.localeCompare(a.createdAt) },
+  'price-asc': { label: 'Price: low to high', compare: (a: Product, b: Product) => a.price - b.price },
+  'price-desc': { label: 'Price: high to low', compare: (a: Product, b: Product) => b.price - a.price },
+};
+type SortKey = keyof typeof SORTS;
 
 export default function ShopClient() {
   const [activeCategory, setActiveCategory] = useState('All');
@@ -31,9 +40,7 @@ export default function ShopClient() {
   const [heroImages, setHeroImages] = useState<string[]>(FALLBACK_TILES.map((t) => t.src));
   const heroTiles = heroImages.map((src, i) => ({ src, ...TILE_STYLES[i] }));
 
-  const lines = useCartStore((s) => s.lines);
-  const addItem = useCartStore((s) => s.addItem);
-  const setQuantity = useCartStore((s) => s.setQuantity);
+  const [sort, setSort] = useState<SortKey>('featured');
   const subtotal = useCartStore((s) => s.subtotal());
   const cartCount = useCartStore((s) => s.count());
   const hasHydrated = useCartStore((s) => s.hasHydrated);
@@ -73,16 +80,8 @@ export default function ShopClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeCategory, searchQuery]);
 
-  const quantityInCart = useMemo(() => {
-    const map = new Map<number, number>();
-    // Cart is localStorage-backed — treat it as empty until hydration
-    // completes so the first client render always matches SSR output.
-    if (!hasHydrated) return map;
-    for (const line of lines) {
-      map.set(line.productId, (map.get(line.productId) ?? 0) + line.quantity);
-    }
-    return map;
-  }, [lines, hasHydrated]);
+  // Array.prototype.sort is stable, so ties keep the API's order.
+  const sortedProducts = useMemo(() => [...products].sort(SORTS[sort].compare), [products, sort]);
 
   const productsJsonLd = {
     '@context': 'https://schema.org',
@@ -195,7 +194,7 @@ export default function ShopClient() {
       </section>
 
       {/* Shop Section */}
-      <section className="pt-4 pb-16 md:py-20 bg-gray-50">
+      <section className="pt-4 pb-16 md:pt-8 md:pb-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-5 lg:gap-8">
             {/* Sidebar */}
@@ -245,10 +244,25 @@ export default function ShopClient() {
 
             {/* Products Grid */}
             <div className="lg:w-3/4">
-              <div className="flex items-center justify-between mb-6">
-                <p className="text-gray-700">
-                  {isLoading ? 'Loading products…' : `Showing ${products.length} products`}
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-gray-600">
+                  {isLoading ? 'Loading products…' : (
+                    <><span className="font-semibold text-gray-900">{products.length}</span> {products.length === 1 ? 'product' : 'products'}</>
+                  )}
                 </p>
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <ArrowUpDown size={16} className="text-gray-400" />
+                  <span className="hidden sm:inline">Sort by</span>
+                  <select
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as SortKey)}
+                    className="rounded-full border border-gray-200 bg-white py-2 pl-3 pr-8 text-sm font-medium text-gray-800 focus:border-fitness-primary focus:outline-none focus:ring-2 focus:ring-fitness-primary/30"
+                  >
+                    {(Object.keys(SORTS) as SortKey[]).map((key) => (
+                      <option key={key} value={key}>{SORTS[key].label}</option>
+                    ))}
+                  </select>
+                </label>
               </div>
 
               {error ? (
@@ -284,72 +298,10 @@ export default function ShopClient() {
                   />
                 )
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => {
-                    const inCart = quantityInCart.get(product.id) ?? 0;
-                    return (
-                      <div key={product.id} className="card-fitness overflow-hidden group">
-                        <Link href={`/shop/${product.slug}`} className="relative h-56 overflow-hidden bg-gray-100 block">
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-500"
-                          />
-                          {product.isNew && (
-                            <div className="absolute top-3 left-3 bg-fitness-primary text-white text-xs font-semibold px-3 py-1 rounded-full">
-                              New
-                            </div>
-                          )}
-                          {!product.inStock && (
-                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                              <span className="text-white font-semibold">Out of Stock</span>
-                            </div>
-                          )}
-                        </Link>
-
-                        <div className="p-5">
-                          <p className="text-sm text-fitness-primary mb-1">{product.category?.name}</p>
-                          <Link href={`/shop/${product.slug}`}>
-                            <h3 className="font-bold text-gray-900 mb-2 hover:text-fitness-primary transition-colors">{product.name}</h3>
-                          </Link>
-                          <p className="text-sm text-gray-800 mb-3 line-clamp-2">{product.description}</p>
-
-                          <div className="flex items-center justify-between mb-4">
-                            <span className="text-xl font-bold text-fitness-primary">
-                              KES {product.price.toLocaleString()}
-                            </span>
-                          </div>
-
-                          {inCart > 0 ? (
-                            <div className="flex items-center justify-between bg-gray-100 rounded-lg p-2">
-                              <button
-                                onClick={() => setQuantity(product.id, inCart - 1)}
-                                className="p-1 hover:text-fitness-primary transition-colors"
-                              >
-                                <Minus size={18} />
-                              </button>
-                              <span className="font-semibold">{inCart}</span>
-                              <button
-                                onClick={() => addItem(product, 1)}
-                                className="p-1 hover:text-fitness-primary transition-colors"
-                              >
-                                <Plus size={18} />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => addItem(product, 1)}
-                              disabled={!product.inStock}
-                              className="w-full btn-fitness flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <ShoppingCart size={18} />
-                              Add to Cart
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3">
+                  {sortedProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
                 </div>
               )}
             </div>

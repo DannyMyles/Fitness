@@ -121,7 +121,6 @@ bookings in **Admin → Bookings** (or per event under **Events → Registration
   `ADMIN_PASSWORD='…' npm run app -- set-password --key fitness --email admin@marksila254.com`
 - Admin API calls go through `app/api/commerce/admin/[...path]`, which checks the
   NextAuth admin session and forwards that admin's own backend token (no shared key needed).
-- `NEXT_PUBLIC_PARTNER_ADMIN_URL` adds a "Switch to Source of Adventure admin" link.
 
 ## 🎨 Design System
 

@@ -23,11 +23,14 @@ const colorPalette = [
 ];
 
 
-export default function ServicesClient() {
+// Corporate-only offerings live on /corporate.
+const forThisPage = (list: Training[]) => trainingService.sortForDisplay(list).filter((t) => t.audience !== 'corporate');
+
+export default function ServicesClient({ initialTrainings }: { initialTrainings: Training[] | null }) {
   const header = usePageHeader('services', { eyebrow: 'Professional Services', title: 'My Services', subtitle: 'Professional fitness services tailored to help you achieve your health and wellness goals.' });
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [trainings, setTrainings] = useState<Training[]>([]);
-  const [isLoadingTrainings, setIsLoadingTrainings] = useState(true);
+  const [trainings, setTrainings] = useState<Training[]>(() => (initialTrainings ? forThisPage(initialTrainings) : []));
+  const [isLoadingTrainings, setIsLoadingTrainings] = useState(!initialTrainings);
   const [trainingsError, setTrainingsError] = useState('');
   const [booking, setBooking] = useState<Training | null>(null);
   const site = useSite();
@@ -42,14 +45,14 @@ export default function ServicesClient() {
     setTrainingsError('');
     trainingService
       .getAllTrainings()
-      // Corporate-only offerings live on /corporate.
-      .then((response) => setTrainings(trainingService.sortForDisplay(response.trainings).filter((t) => t.audience !== 'corporate')))
+      .then((response) => setTrainings(forThisPage(response.trainings)))
       .catch(() => setTrainingsError('Could not load services. Please check back shortly.'))
       .finally(() => setIsLoadingTrainings(false));
   };
 
   useEffect(() => {
-    fetchTrainings();
+    if (!initialTrainings) fetchTrainings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

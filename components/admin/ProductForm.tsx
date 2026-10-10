@@ -311,7 +311,7 @@ export default function ProductForm({ initial, onSubmit, submitLabel }: ProductF
                         type="text"
                         value={slot.url ?? ''}
                         onChange={(e) => handleSlotUrlChange(slot.key, e.target.value)}
-                        placeholder="/images/mark254/tshirts/tshirts_01.png"
+                        placeholder="/images/marksila/tshirts/tshirts_01.webp"
                         className="w-full px-2 py-1 text-xs border border-gray-300 rounded font-mono"
                       />
                     </div>

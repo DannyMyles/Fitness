@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { Toaster } from 'react-hot-toast';
 import {
-  LayoutDashboard, Users, ShoppingBag, FileText, ArrowLeftRight, Inbox, CalendarCheck, Settings, Megaphone, Send, Store,
+  LayoutDashboard, Users, ShoppingBag, FileText, Inbox, CalendarCheck, Settings, Megaphone, Send, Store,
   LogOut, Menu, X, Dumbbell, ShoppingCart, Loader2, Tags, Calendar, Image as ImageIcon, Home, Mail, Quote
 } from 'lucide-react';
 import { Toaster as KitToaster } from '@/components/admin-kit/ui';
@@ -55,10 +55,6 @@ const sidebarGroups = [
     ],
   },
 ];
-
-// The other app sharing this backend, for admins who manage both.
-const PARTNER_ADMIN_URL = process.env.NEXT_PUBLIC_PARTNER_ADMIN_URL;
-const PARTNER_NAME = process.env.NEXT_PUBLIC_PARTNER_NAME || 'other site';
 
 export default function AdminLayout({
   children,
@@ -154,12 +150,6 @@ export default function AdminLayout({
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-white/10 space-y-1">
-          {PARTNER_ADMIN_URL && (
-            <a href={PARTNER_ADMIN_URL} className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1">
-              <ArrowLeftRight size={20} />
-              <span>Switch to {PARTNER_NAME}</span>
-            </a>
-          )}
           <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors py-1">
             <Home size={20} />
             <span>Back to Website</span>

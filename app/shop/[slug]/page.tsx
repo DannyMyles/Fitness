@@ -4,6 +4,7 @@ import { productService } from '@/app/api_services/productService';
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ color?: string | string[] }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -27,7 +28,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
   const { slug } = await params;
-  return <ProductDetailClient slug={slug} />;
+  const { color } = await searchParams;
+  return <ProductDetailClient slug={slug} initialColor={typeof color === 'string' ? color : undefined} />;
 }
