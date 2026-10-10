@@ -15,6 +15,7 @@ import { useSite } from '@/components/site/SiteProvider';
 import Price from '@/components/shop/Price';
 import ProductCard from '@/components/shop/ProductCard';
 import { ProductDetail } from '@/types/commerce';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 const MAX_QUANTITY = 10;
 
@@ -219,7 +220,7 @@ export default function ProductDetailClient({ slug, initialColor }: { slug: stri
               </button>
             )}
             <img
-              src={currentImage}
+              src={optimizedSrc(currentImage, 1920)}
               alt={product.name}
               className="max-h-full max-w-full object-contain"
               onClick={(e) => e.stopPropagation()}
@@ -247,7 +248,7 @@ export default function ProductDetailClient({ slug, initialColor }: { slug: stri
                     index === imageIndex ? 'ring-fitness-primary' : 'ring-transparent opacity-60 hover:opacity-100'
                   )}
                 >
-                  <img src={img} alt="" className="h-full w-full object-contain p-1" />
+                  <img src={optimizedSrc(img, 384)} alt="" className="h-full w-full object-contain p-1" />
                 </button>
               ))}
             </div>
@@ -287,7 +288,7 @@ export default function ProductDetailClient({ slug, initialColor }: { slug: stri
                           index === imageIndex ? 'border-fitness-primary' : 'border-gray-200 hover:border-gray-400'
                         )}
                       >
-                        <img src={img} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+                        <img src={optimizedSrc(img, 384)} alt="" className="h-full w-full object-contain mix-blend-multiply" />
                       </button>
                     ))}
                   </div>
@@ -304,7 +305,7 @@ export default function ProductDetailClient({ slug, initialColor }: { slug: stri
                   {currentImage && (
                     <img
                       key={currentImage}
-                      src={currentImage}
+                      src={optimizedSrc(currentImage, 1200)}
                       alt={`${product.name}${galleryColor ? ` in ${galleryColor}` : ''}`}
                       className="h-full w-full object-contain mix-blend-multiply transition-transform duration-200 ease-out"
                       style={zoom ? { transform: 'scale(2)', transformOrigin: `${zoom.x}% ${zoom.y}%` } : undefined}
@@ -390,7 +391,7 @@ export default function ProductDetailClient({ slug, initialColor }: { slug: stri
                         )}
                       >
                         <span className="block aspect-square bg-gray-50">
-                          {preview && <img src={preview} alt="" className="h-full w-full object-contain mix-blend-multiply" />}
+                          {preview && <img src={optimizedSrc(preview, 384)} alt="" className="h-full w-full object-contain mix-blend-multiply" />}
                         </span>
                         <span className="flex items-center justify-between gap-1 border-t border-gray-100 px-2 py-1.5 text-xs font-medium text-gray-800">
                           {color}

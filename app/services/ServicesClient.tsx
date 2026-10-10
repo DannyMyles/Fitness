@@ -11,6 +11,7 @@ import ServiceBookingModal from '@/components/booking/ServiceBookingModal';
 import { useSite, usePageHeader } from '@/components/site/SiteProvider';
 import { useAverageRating } from '@/app/hooks/useAverageRating';
 import { priceLabelFor } from '@/app/lib/enquiries';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 const iconMap: Record<string, LucideIcon> = { Dumbbell, Heart, Zap, Clock, Users, Award, Star, CheckCircle };
 const colorPalette = [
@@ -124,7 +125,7 @@ export default function ServicesClient({ initialTrainings }: { initialTrainings:
 
                 <div className="relative aspect-[4/3] sm:aspect-auto sm:w-2/5 shrink-0 overflow-hidden service-card-image">
                   <img
-                    src={training.image}
+                    src={optimizedSrc(training.image, 828)}
                     alt={training.title}
                     className="w-full h-full object-cover object-[50%_25%]"
                   />
@@ -187,7 +188,7 @@ export default function ServicesClient({ initialTrainings }: { initialTrainings:
             <div className="relative enter-left">
               <div className="relative rounded-3xl overflow-hidden shadow-fitness-lg">
                 <img
-                  src="/images/029.JPG"
+                  src={optimizedSrc('/images/029.JPG', 1080)}
                   alt="Fitness Training"
                   className="w-full h-auto"
                 />

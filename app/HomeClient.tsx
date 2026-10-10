@@ -14,6 +14,7 @@ import {
 import { testimonialService, Testimonial } from '@/app/api_services/testimonialService';
 import { useSite } from '@/components/site/SiteProvider';
 import { galleryService } from '@/app/api_services/galleryService';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 interface Banner { id: number; title: string; subtitle: string | null; badge: string | null; image: string | null; ctaLabel: string | null; ctaUrl: string | null }
 
@@ -156,7 +157,7 @@ export default function HomeClient() {
               <div key={b.id} className="relative overflow-hidden rounded-3xl bg-ink text-white">
                 {b.image && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={b.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+                  <img src={optimizedSrc(b.image, 1920)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
                 )}
                 <div className="relative flex flex-col gap-3 p-7 md:flex-row md:items-end md:justify-between md:p-10">
                   <div className="max-w-2xl">
@@ -578,7 +579,7 @@ export default function HomeClient() {
             <div className="flex gap-3 shrink-0">
               {galleryImages.slice(0, 3).map((image, index) => (
                 <div key={index} className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden">
-                  <img src={image.src} alt={image.alt} className="w-full h-full object-cover object-center" />
+                  <img src={optimizedSrc(image.src, 384)} alt={image.alt} className="w-full h-full object-cover object-center" />
                 </div>
               ))}
             </div>

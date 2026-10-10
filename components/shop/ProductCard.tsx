@@ -9,6 +9,7 @@ import { useCartStore } from '@/app/lib/cartStore';
 import { hasOptions, imagesForColor, sizeRange } from '@/app/lib/productImages';
 import ColorSwatch from './ColorSwatch';
 import Price from './Price';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 export function productHref(product: Product, color?: string) {
   return `/shop/${product.slug}${color && product.colors.length > 1 ? `?color=${encodeURIComponent(color)}` : ''}`;
@@ -36,7 +37,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <Link href={href} className="relative block aspect-square overflow-hidden bg-gray-50">
         {main && (
           <img
-            src={main}
+            src={optimizedSrc(main, 640)}
             alt={`${product.name}${activeColor ? ` in ${activeColor}` : ''}`}
             loading="lazy"
             className={clsx(
@@ -47,7 +48,7 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
         {hover && (
           <img
-            src={hover}
+            src={optimizedSrc(hover, 640)}
             alt=""
             aria-hidden
             loading="lazy"

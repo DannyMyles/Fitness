@@ -17,6 +17,7 @@ import {
   saveContactDetails,
   sendToWhatsApp,
 } from '@/app/lib/whatsappHandoff';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 const inputClass =
   'w-full px-4 py-3 border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-fitness-primary focus:border-transparent transition';
@@ -210,7 +211,7 @@ export default function CartClient() {
                       <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
                         {item.image && (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.image} alt={item.name} className="w-full h-full object-contain p-1.5" />
+                          <img src={optimizedSrc(item.image, 384)} alt={item.name} className="w-full h-full object-contain p-1.5" />
                         )}
                       </div>
 

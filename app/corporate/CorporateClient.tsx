@@ -13,6 +13,7 @@ import { Training, trainingService } from '@/app/api_services/trainingService';
 import { EnquiryResult, newRequestId, priceLabelFor, submitEnquiry } from '@/app/lib/enquiries';
 import { PHONE_REGEX, cancelWhatsAppTab, reserveWhatsAppTab, sendToWhatsApp } from '@/app/lib/whatsappHandoff';
 import { useSite } from '@/components/site/SiteProvider';
+import { optimizedSrc } from '@/app/lib/imageSrc';
 
 interface Faq { id: number; question: string; answer: string; category: string | null }
 interface Banner { id: number; title: string; subtitle: string | null; badge: string | null; image: string | null; ctaLabel: string | null; ctaUrl: string | null }
@@ -89,7 +90,7 @@ export default function CorporateClient() {
             <div key={b.id} className="relative overflow-hidden rounded-3xl bg-ink p-7 text-white">
               {b.image && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={b.image} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+                <img src={optimizedSrc(b.image, 1200)} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" />
               )}
               <div className="relative">
                 {b.badge && <span className="mb-2 inline-block rounded-full bg-fitness-primary px-3 py-1 text-xs font-bold uppercase">{b.badge}</span>}
@@ -211,7 +212,7 @@ function CorporateCard({ service: s, onBook }: { service: Training; onBook: (pac
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-200">
         {s.image && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover object-[50%_25%] transition-transform duration-500 group-hover:scale-105" />
+          <img src={optimizedSrc(s.image, 828)} alt={s.title} loading="lazy" className="h-full w-full object-cover object-[50%_25%] transition-transform duration-500 group-hover:scale-105" />
         )}
         {s.category && <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-gray-800">{s.category}</span>}
         {s.popular && <span className="absolute right-4 top-4 rounded-full bg-fitness-primary px-3 py-1 text-xs font-bold text-white">Popular</span>}
