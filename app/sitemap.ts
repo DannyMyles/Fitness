@@ -1,49 +1,67 @@
 import { MetadataRoute } from 'next';
-import { productService } from '@/app/api_services/productService';
-import { blogService } from '@/app/api_services/blogService';
+import { backendFetch } from '@/app/lib/backend';
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
+// Rebuilt at most hourly, so new products, posts and events appear without a deploy.
+export const revalidate = 3600;
+
+/** Fetches a list from the shared API; an unreachable API just leaves that part out. */
+async function list<T>(path: string, key: string): Promise<T[]> {
+  try {
+    const res = await backendFetch(path, { next: { revalidate } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (Array.isArray(data) ? data : data[key] ?? []) as T[];
+  } catch {
+    return [];
+  }
+}
+
+type Dated = { slug: string; updatedAt?: string };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const page = (path: string, changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'], priority: number) => ({
+    url: `${APP_URL}${path}`,
+    changeFrequency,
+    priority,
+  });
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${APP_URL}/`, changeFrequency: 'weekly', priority: 1 },
-    { url: `${APP_URL}/about`, changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${APP_URL}/services`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${APP_URL}/corporate`, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${APP_URL}/events`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${APP_URL}/gallery`, changeFrequency: 'monthly', priority: 0.6 },
-    { url: `${APP_URL}/shop`, changeFrequency: 'daily', priority: 0.9 },
-    { url: `${APP_URL}/blog`, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${APP_URL}/contact`, changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${APP_URL}/privacy-policy`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${APP_URL}/terms-and-conditions`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${APP_URL}/cookie-policy`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${APP_URL}/refund-policy`, changeFrequency: 'yearly', priority: 0.3 },
+    page('/', 'weekly', 1),
+    page('/services', 'weekly', 0.9),
+    page('/corporate', 'weekly', 0.9),
+    page('/shop', 'daily', 0.9),
+    page('/events', 'weekly', 0.8),
+    page('/about', 'monthly', 0.7),
+    page('/gallery', 'monthly', 0.6),
+    page('/blog', 'weekly', 0.7),
+    page('/contact', 'monthly', 0.7),
+    page('/site-map', 'monthly', 0.2),
+    page('/privacy-policy', 'yearly', 0.3),
+    page('/terms-and-conditions', 'yearly', 0.3),
+    page('/cookie-policy', 'yearly', 0.3),
+    page('/refund-policy', 'yearly', 0.3),
   ];
 
-  let productRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const products = await productService.getProducts();
-    productRoutes = products.map((product) => ({
-      url: `${APP_URL}/shop/${product.slug}`,
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    }));
-  } catch {
-    // Commerce API unreachable at build/request time — ship the static routes rather than fail the whole sitemap.
-  }
+  const [products, blogs, events] = await Promise.all([
+    list<Dated>('/api/products', 'products'),
+    list<Dated>('/api/v1/blogs?limit=100', 'blogs'),
+    list<Dated & { date: string }>('/api/v1/events?upcoming=true', 'events'),
+  ]);
+  const dated = (base: string, items: Dated[], changeFrequency: 'weekly' | 'monthly', priority: number) =>
+    items
+      .filter((i) => i.slug)
+      .map((i) => ({
+        url: `${APP_URL}${base}/${i.slug}`,
+        lastModified: i.updatedAt ? new Date(i.updatedAt) : undefined,
+        changeFrequency,
+        priority,
+      }));
 
-  let blogRoutes: MetadataRoute.Sitemap = [];
-  try {
-    const { blogs } = await blogService.getAllBlogs({ limit: 100 });
-    blogRoutes = blogs.map((blog) => ({
-      url: `${APP_URL}/blog/${blog.slug}`,
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    }));
-  } catch {
-    // Same fallback as products above.
-  }
-
-  return [...staticRoutes, ...productRoutes, ...blogRoutes];
+  return [
+    ...staticRoutes,
+    ...dated('/shop', products, 'weekly', 0.6),
+    ...dated('/events', events, 'weekly', 0.6),
+    ...dated('/blog', blogs, 'monthly', 0.5),
+  ];
 }

@@ -24,6 +24,7 @@ const legal = [
   { name: 'Terms', href: '/terms-and-conditions' },
   { name: 'Cookies', href: '/cookie-policy' },
   { name: 'Refunds', href: '/refund-policy' },
+  { name: 'Sitemap', href: '/site-map' },
 ];
 
 const SOCIAL_ICONS = {
